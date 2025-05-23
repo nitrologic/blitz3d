@@ -1,0 +1,2788 @@
+:::System Commands
+
+
+::Keyboard Input
+
+
+:GetKey ()
+
+.desc
+Returns an ascii code corresponding to the key last typed by the
+user or 0 if all keyboard events have been reported.
+
+The @GetKey function is useful for situations when the user is
+expected to type some text.
+
+The @KeyDown function is more apropriate when the user is expected
+to hold down certain keys in order to control their player in a game 
+environment.
+
+.also
+KeyDown;WaitKey
+
+
+:WaitKey ()
+
+.desc
+Returns an ascii code corresponding to the key combination typed
+by the user.
+
+@WaitKey is similar in behavior to the @GetKey function but pauses 
+program execution until a keystroke is made by the user.
+
+.also
+GetKey
+
+
+:KeyDown (scancode)
+
+.args
+scancode = scancode of key to test
+
+.desc
+Returns @True if the specified key on the keyboard is currently
+being pressed.
+
+The scancode specified is based on the position of the key on the
+keyboard and should not be confused with the ascii character code 
+printed when the key is used in normal use (which may differ with
+systems in other regions / countries).
+
+.also
+ScanCodes;KeyHit
+
+
+:KeyHit (scancode)
+
+.args
+scancode = scancode of key to test
+
+.desc
+Returns @True if the key specified has been pressed since the last
+time the @KeyHit command was called.
+
+@KeyHit will only return True once when a key is pressed where as
+@KeyDown will repeatedly return True until the specified key is released.
+
+.also
+ScanCodes;KeyDown;GetKey;WaitKey;FlushKeys
+
+
+:FlushKeys
+
+.desc
+Resets the state of the internal keyboard map so all keys are considered
+up.
+
+.also
+KeyHit;KeyDown
+
+
+
+::Mouse Input
+
+
+:MouseX()
+
+.desc
+Returns the horizontal display position of the mouse pointer.
+
+.also
+MouseY;MouseZ
+
+
+:MouseY()
+
+.desc
+Returns the vertical display position of the mouse pointer.
+
+.also
+MouseX;MouseZ
+
+
+:MouseZ()
+
+.desc
+Returns the mouse wheel position if present.
+
+The value returned by @MouseZ increases as the user scrolls
+the wheel up (away from them) and decreases when the user
+scrolls the wheel down (towards them).
+
+.also
+MouseX;MouseY
+
+
+:MouseDown (button)
+
+.args
+button = 1,2 or 3 (left, right or middle)
+
+.desc
+The @MouseDown function returns @True if the specfied mouse button
+is currently being pressed.
+
+Similar to @KeyDown a corresponding @MouseHit command is available
+that will return @True only once during the period the specifed
+button is being pressed.
+
+.also
+MouseHit
+
+
+:MouseHit (button)
+
+.args
+button = 1,2 or 3 (left, right or middle)
+
+.desc
+The @MouseHit function returns @True if the specfied mouse button
+has been pressed down since the last call to @MouseHit.
+
+Use the @MouseDown command to test if the specified button "is
+currently in a depressed state" as opposed to if the button has
+has just been hit. 
+
+No harm intentional or otherwise to any rodent alive or dead should
+result from the use of this command.
+
+.also
+MouseDown
+
+
+:GetMouse()
+
+.desc
+Returns the mouse button pressed since the last call to @GetMouse
+or 0 if none.
+
+@GetMouse will return 1 if the left button, 2 if the right and
+3 if the middle button has been recently pressed.
+
+
+:WaitMouse()
+
+.desc
+@WaitMouse causes the program to halt until a mouse button is pressed
+by the user and returns the ID of that button.
+
+@WaitMouse will wait and return 1 for the left button, 2 for the right 
+and 3 for the middle button when pressed.
+
+.also
+GetMouse
+
+
+:ShowPointer
+
+.desc
+@ShowPointer displays the mouse pointer if previously hidden with thhe
+@HidePointer command.
+
+Has no effect in FullScreen modes.
+
+.also
+HidePointer
+
+
+:HidePointer
+
+.desc
+HidePointer makes the mouse pointer invisible when placed above
+@Graphics in windowed mode. 
+
+The mouse pointer is always hidden in FullScreen @Graphics mode.
+
+.also
+ShowPointer;Graphics
+
+
+:MoveMouse x,y
+
+.args
+x = horizontal screen position
+y = vertical screen position
+
+.desc
+The #x, #y parameters define a location on the graphics display
+that the mouse pointer is moved to.
+
+By recentering the mouse to the middle of the display every
+frame the #MouseXSpeed and #MouseYSpeed functions can be used
+to provide "mouse look" type control common in first person
+shooters.
+
+.also
+MouseXSpeed;MouseYSpeed
+
+
+:MouseXSpeed()
+
+.desc
+Returns the horizontal distance travelled by the mouse since 
+the last call to MouseXSpeed or MoveMouse.
+
+.also
+MoveMouse;MouseYSpeed
+
+
+:MouseYSpeed()
+
+.desc
+Returns the vertical distance travelled by the mouse since the 
+last call to MouseYSpeed or MoveMouse.
+
+.also
+MoveMouse;MouseXSpeed
+
+
+:MouseZSpeed()
+
+.desc
+Returns the number of clicks the mouse scroll wheel has been 
+turned since the last call to MouseZSpeed.
+
+The result is negative if the wheel is scrolled down (rolled
+back) and positive if scrolled up (rolled forward).
+
+
+:FlushMouse
+
+.desc
+Resets the state of the internal mouse button map so all buttons
+are considered up.
+
+
+
+::Joystick Input
+
+
+:JoyType ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns the type of joystick that is currently connected 
+to the computer.
+
+.table
+JoyType,Description
+0,None
+1,Digital
+2,Analog
+
+The optional #port identifier is required to index
+all the joysticks, wheels and other gaming devices
+connected to the system.
+
+.also
+GetJoy;JoyDown;
+
+
+:GetJoy ([port])
+
+.args
+port = optional joystick port to read
+
+.desc
+Returns the number of any button press that
+has not already been reported by the GetJoy 
+command. 
+
+Returns 0 if the system button buffer is
+empty.
+
+The @GetJoy command may be called multiple
+times until it signals there are no more
+button events queued by returning 0.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+@JoyType
+
+
+:JoyDown ( button [,port] )
+
+.args
+button = number of joystick button to check 
+port = number of joystick port to check (optional) 
+
+.desc
+Returns True if the specified button of the specified
+joystick is pressed.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyHit;KeyDown;MouseDown
+
+
+:JoyHit (button [,port])
+
+.args
+button = number of joystick button to check
+port = number of joystick port to check (optional) 
+
+.desc
+Returns the number of times a specified joystick button 
+has been hit since the last time it was specified in 
+a @JoyHit function call.
+
+The optional #port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+KeyHit;MouseHit
+
+
+:WaitJoy ([port])
+
+.args
+port = optional joystick port to pause for
+
+.desc
+Waits for any joystick button to be pressed and
+returns the button identifier.
+
+@WaitJoy causes the program to pause until any button of the
+specified joystick is pressed.
+
+If there is no gaming device connected or the optional
+port identifier is not a valid device WaitJoy
+will not pause but return 0 immediately.
+
+.also
+JoyType
+
+
+:FlushJoy
+
+.desc
+Resets the state of the internal joystick button map 
+so all buttons of all joysticks are considered up
+and all joystick events are discarded.
+
+@FlushJoy is useful when transitioning from control
+systems based on the state commands such as @JoyDown
+to an event style control using the @GetJoy command
+and any buffered button presses need to be discarded.
+
+.also
+JoyDown;GetJoy
+
+
+:JoyHat ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a compass value between 0 and 360 degrees in 
+which the direction of the D-Pad or "hat" control
+is being pressed.
+
+@JoyHat returns a value of -1 if the "hat" or D-Pad is 
+currently centered.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyX #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the direction
+of the joystick in the horizontal axis.
+
+A value near 0.0 represents the joystick at rest position.
+
+Due to the nature of analog joysticks @JoyX and the other
+axis reading commands are unlikely to ever return an exact 
+value of 0.0 and so a tolerance factor may need to be applied
+if a rest position is required.
+
+The @JoyXDir command should be used instead of @JoyX 
+when only the digital state of the stick is required
+(be it left, centered or right).
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyXDir;JoyY;JoyZ;JoyHat
+
+
+:JoyXDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+horizontal direction of the joystick be it left, centered
+or right.
+
+.table
+Value,Direction
+-1,left
+0,centered
+1,right
+
+.also
+JoyX;JoyUDir
+
+
+:JoyY #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the direction
+of the the joystick in the vertical axis.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyYDir;JoyX;JoyZ;JoyU;JoyV
+
+
+:JoyYDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+vertical direction of the joystick.
+
+.table
+Value,Direction
+-1,up
+0,centered
+1,down
+
+.also
+JoyY;JoyXDir;JoyVDir
+
+
+:JoyZ #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the rotation
+axis of the joystick or steering wheel.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyZ;JoyU;JoyV
+
+
+:JoyZDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+rotation axis of the joystick.
+
+.table
+Value,Direction
+-1,anti-clockwise
+0,centered
+1,clockwise
+
+.also
+JoyY;JoyXDir
+
+
+:JoyU #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the horizontal
+direction of the second stick of a dual stick joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyV
+
+
+:JoyUDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+horizontal direction of the joystick's second stick be 
+it left, centered or right.
+
+.table
+Value,Direction
+-1,left
+0,centered
+1,right
+
+.also
+JoyU;JoyXDir
+
+
+:JoyV #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the vertical
+direction of the second stick of a dual stick joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyVDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+vertical direction of the joystick's second stick.
+
+.table
+Value,Direction
+-1,up
+0,centered
+1,down
+
+.also
+JoyY;JoyXDir
+
+
+:JoyYaw#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+
+Returns a value between -1.0 and 1.0 representing the yaw
+axis if present of the specified joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyPitch#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the pitch
+axis if present of the specified joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyRoll#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the roll
+axis if present of the specified joystick.
+
+The roll axis of a joystick commonly refers to a joystick's 
+twistable stick or rudder feature.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+
+::Sound and Music
+
+:LoadSound (filename$)
+
+.args
+filename$ - the name of an existing sound file
+
+.desc
+If successful returns the handle of a sound object to be
+used with the @PlaySound command.
+
+The following file formats are supported:
+
+.table
+Format,Compression,Features
+raw,none,fast loading
+wav,none,fast loading
+mp3,yes,license required
+ogg,yes,license free
+
+The reader should be aware that an additional license is 
+required to distribute software that utilizes playback of 
+mp3 files.
+
+.also
+PlaySound;LoopSound;FreeSound
+
+
+:PlaySound ( sound )
+
+.args
+sound = valid sound handle
+
+.desc
+Returns the channel allocated for playback.
+
+@PlaySound plays a sound previously loaded using the @LoadSound command.
+
+The channel handle returned can subsequently be used to control
+the playback of the sound sample specified.
+
+The inital volume and pitch of the sound may be modified before
+playback using the @SoundVolume and @SoundPitch commands.
+
+.also
+ChannelPlaying;StopChannel;PauseChannel;ResumeChannel;ChannelPitch
+
+
+:FreeSound sound
+
+.args
+sound - valid sound handle
+
+.desc
+The @FreeSound command releases the resources used by
+a sound created by a previous call to @LoadSound.
+
+Usually a program will load all it's sound files at startup
+and let Blitz3D automatically free the resources when the
+program ends.
+
+The @FreeSound command however provides a way of managing
+system resources when large sound files are no longer needed
+by a running program.
+
+.also
+LoadSound
+
+
+:LoopSound sound
+
+.args
+sound = valid sound handle
+
+.desc
+Enables a sound objects looping property. Subsequent playback
+of the sound object using @PlaySound will result in continuous
+looped playback of the sound.
+
+.also
+LoadSound;PlaySound
+
+
+:SoundPitch sound, samplerate
+
+.args
+sound = valid sound handle
+samplerate = playback rate in samples per second
+
+.desc
+Modifies the pitch of an existing sound object by changing it's
+playback rate.
+
+Sounds are commonly recorderd at rates such as 22050 and 44100
+samples per second and their playback rate defaults to the
+recorded rate.
+
+Changing the sounds playback rate with the @SoundPitch command
+will modify the pitch at which it is next played with the
+@PlaySound command.
+
+For more dynamic control see the @ChannelPitch command that
+allows modifying the pitch of a channel during playback of 
+a sound.
+
+.also
+SoundVolume;PlaySound
+
+
+:SoundVolume sound,volume#
+
+.args
+sound = valid sound handle
+volume# = amplitude setting 
+
+.desc
+Modifies the default volume of an existing sound object by changing
+its amplitude setting.
+
+The default volume of a sound returned by @LoadSound is 1.0.
+
+Use values between 0.0 and 1.0 to cause @PlaySound to begin
+playback of the specified sound at a quieter volume and values
+greater than 1.0 for their volume to be amplified.
+
+Use the @ChannelVolume command to modify volumes during sound 
+playback.
+
+
+:SoundPan sound,pan#
+
+.args
+sound = valid sound handle
+pan# = stereo position 
+
+.desc
+Modifies the default balance of an existing sound object by
+changing it's pan setting.
+
+The #pan value can be any float between -1.0 and 1.0 and
+modifies the stereo position used the next time the sound 
+is played using the @PlaySound command.
+
+.table
+pan,effect
+-1,sound played through left speaker
+0,sound played through both speakers
+1,sound played through right speaker
+
+Use the @ChannelPan command to pan the sound during playback.
+
+.also
+PlaySound;ChannelPan
+
+
+:PlayMusic (filename$)
+
+.args
+filename$ - name of music file
+
+.desc
+Returns a valid channel handle or 0 if unsuccessful.
+
+@PlayMusic opens the music file specified and begins
+playback.
+
+Unlike a combination of @LoadSound and @PlaySound, @PlayMusic
+allocates only a small buffer of resources and the music
+file is streamed directly from the file.
+
+.table
+Format,FileSize,Features
+raw;wav,large,industry standard uncompressed
+mod;s3m;xm;it,medium,8 channel module files
+mid,small,midi files depend on the system's music synthesiser
+mp3,medium,requires additional license
+ogg;wma;asf,medium,compressed and freely distributable
+
+The channel handle returned can be used to change various
+playback settings inluding volume, pitch as well as 
+pause and resume playback itself.
+
+.also
+StopChannel;PauseChannel;ResumeChannel;PlaySound
+
+
+:PlayCDTrack( track,[mode] )
+
+.args
+track = track number to play
+mode = playback mode
+
+.desc
+Plays a CD track and returns a sound channel.
+
+The behavior of the @PlayCDTrack may be modified
+with the optional #mode parameter:
+
+.table
+Mode,Description
+1,play track once - default
+2,loop track
+3,play track once then continue to next track
+
+The @PlayCDTrack requires the user has a CD playback
+facility on their system and that a CD containing
+music tracks is currently inserted.
+
+.also
+StopChannel;PauseChannel;ResumeChannel
+
+
+:StopChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Stop any audio being output on a currently playing channel.
+
+The @PlaySound, @PlayMusic and @PlayCDTrack functions all return
+a channel handle that can be used with @StopChannel to cancel the
+resulting sound playback.
+
+.also
+PlaySound;PlayMusic;PlayCDTrack;PauseChannel
+
+
+:PauseChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Pauses playback in the specified audio channel.
+
+Any sound playing from the result of a @PlaySound, @PlayMusic 
+or @PlayCDTrack may be paused with the @PauseChannel command.
+
+Use the @ResumeChannel command to continue playback after
+pausing an audio channel with @PauseChannel.
+
+.also
+ResumeChannel;StopChannel;PlaySound
+
+
+:ResumeChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Continue playback of a previously paused audio channel.
+
+
+:ChannelPitch channel, samplerate
+
+.args
+channel = valid playback channel
+samplerate = playback rate in samples per second
+
+.desc
+Modifies the pitch of an active audio channel by changing it's
+playback rate.
+
+Sound sources are commonly recorderd at rates such as 22050 
+and 44100 samples per second and their playback rate defaults 
+to the recorded rate.
+
+Changing a channel's playback rate with the @ChannelPitch command
+will modify the pitch of the recorded audio currently used as
+a playback source.
+
+.also
+LoadSound;SoundPitch
+
+
+:ChannelVolume channel, volume#
+
+.args
+channel = valid playback channel
+volume# = volume level
+
+.desc
+Modifies the amplitude of the specified audio channel.
+
+A floating point of less than 1.0 will reduce volume
+while a value of larger than 1.0 will increase the volume
+of the specified channel.
+
+Increasing a channel volume above 1.0 should not be 
+attempted if distortion and clamping of the audio output 
+is to be avoided.
+
+To make a channel silent use @StopChannel or @PauseChannel
+as an alternative to a volume setting of 0.0.
+
+.also
+SoundVolume
+
+
+:ChannelPan channel, pan#
+
+.args
+channel = valid playback channel
+pan# = left right stereo position
+
+.desc
+Position the output of an audio channel in left right stereo 
+space.
+
+.table
+value,effective pan
+0.0,Left
+0.25,Center Left
+0.5,Center
+0.75,Center Right
+1.0,Right
+
+Panning the position of sound effects in a video game is a
+useful technique for adding to the immersive experience.
+
+
+:ChannelPlaying ( channel )
+
+.args
+channel = valid playback channel
+
+.desc
+Returns @True if the specified audio output channel is in playback
+mode.
+
+.also
+PlaySound;StopSound;PauseSound
+
+
+
+::Movies
+
+
+:OpenMovie ( moviefile$ )
+
+.args
+moviefile$ - filename of a movie file
+
+.desc
+Locates and starts a movie file playing.
+
+Returns a valid movie handle if the function is successful
+or 0 if the command fails for any reason.
+
+Movie files will typically have the AVI, MPEG and MPG
+file extensions.
+
+Blitz3D applications may need to specify DirectX8 
+requirements or the installation of a particular 
+version of Window's media  player software if they 
+are to support movie files using codecs other than 
+MPEG1, CinePak, MotionJPEG and the like.
+
+.also
+DrawMovie;CloseMovie;MoviePlaying;MovieWidth;MovieHeight
+
+
+:CloseMovie movie
+
+.args
+movie - valid open movie file
+
+.desc
+Stops and closes an open movie.
+
+.also
+OpenMovie
+
+
+:DrawMovie movie [,x,y [,width,height] ]
+
+.args
+movie - movie handle
+x - horizontal postition
+y - vertical position
+width - width of movie in pixels
+height - height of movie in pixels
+
+.desc
+Draws the current frame of the specified playing movie
+onto the current graphics buffer.
+
+The movie must not overlap the edges of the current graphics
+buffer or else nothing is drawn. 
+
+The Viewport and Origin are not taken into account.
+
+See the @OpenMovie command for more details regarding supported
+movie files and how to open them before using the @DrawMovie
+command.
+
+.also
+OpenMovie;CloseMovie;MoviePlaying;MovieWidth;MovieHeight
+
+
+:MovieWidth ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns the width of a movie.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MoviePlaying;MovieHeight
+
+
+:MovieHeight ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns the height of a movie.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MoviePlaying;MovieWidth
+
+
+:MoviePlaying ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns True if the specified movie is playing.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MovieWidth;MovieHeight
+
+
+
+::System
+
+
+:AppTitle title$ [,close_prompt$]
+
+.args
+title$ - the text to be used in a program's task bar entry and any window title
+close_prompt$ - the text displayed after the user tries to close a program window
+
+.desc
+@AppTitle sets the application's name, affecting the application's taskbar
+entry, and the titlebar of any @Graphics and @Graphics3D windows.
+
+An optional close_prompt will prompt the user to confirm closing and
+application window using the specified text.
+
+The defaut is no close_prompt which results in the program ending immediately
+if the user clicks the close button of a program's graphics window.
+
+.also
+End;Graphics;Graphics3D
+
+
+:CommandLine$()
+
+.desc
+Returns the command line arguments if any specified when the program
+was run.
+
+@CommandLine arguments are useful for running a program in a variety
+of modes either specified by the user from an actual command line
+or more commonly specified in shortcut icons created to invoke the
+application in a variety of modes.
+
+The Blitz3D IDE allows the simulation of command line arguments
+during development with the Command Line Argument option that can
+be found in the Blitz3D editor's Program menu.
+
+
+:SystemProperty $( propertyname$ )
+
+.args
+propertyname$ - a valid system property name
+
+.desc
+Returns an information String stored in one of the following
+named properties:
+
+.table
+Name,Description
+AppDir,The folder from which the application was run.
+TempDir,A folder for the current user's temporary documents.
+WindowsDir,Operating System folder for current Windows session.
+SystemDir,System folder for current Windows session.
+AppHWND,Integer identifier of the application's main window.
+AppHINSTANCE,Integer identifier of the application's main window class.
+Direct3D7,Currently used instance of the DirectX7 object.
+Direct3DDevice7,The current @Graphics3D DirectX device handle.
+DirectDraw7,The current @Graphics DirectDraw handle.
+DirectInput7,The current DirectInput device handle.
+
+.also
+
+
+:SetEnv environmentvariable$,value$
+
+.args
+environmentvariable$ - name of the system environment variable
+value$ - the value to associate with the named environment variable
+
+.desc
+Sets an environment variable that will be available to any
+userlib functions and processes started with the @ExecFile 
+command.
+
+An environment variable is simply a named string that can be
+used to share information with the host operating system
+and other running programs.
+
+See @GetEnv for an example of some of the useful environment 
+values already created by the Operating System.
+
+.also
+GetEnv
+
+
+:GetEnv$ ( environmentvariable$ )
+
+.args
+environmentvariable$ - name of a system environment variable
+
+.desc
+Returns the value of the specified environment variable if it exists
+or an empty string of the environment variable is undefined.
+
+Environment variables are created both by the system and other
+running programs as well as the operating system itself.
+
+The following are examples of some environment variables
+that contain useful information on a Windows system:
+
+.table
+Name,Description
+COMPUTERNAME, The name of the computer currently running the application
+HOMEDRIVE, Current user's home folder drive location.
+HOMEPATH, Current user's drive relative home folder location.
+NUMBER_OF_PROCESSORS, 1
+OS,Name of the currently used Operating System
+ProgramFiles,Location of current user's Program Files folder
+ComSpec, Full path to the Windows command line tool cmd.exe.
+
+.also
+SetEnv
+
+
+:ExecFile ( file$ )
+
+.args
+file$ - the file to be executed
+
+.desc
+blah blah
+
+
+
+:CallDLL ( dll_name$, proc_name$[,in_bank,out_bank] )
+
+.args
+dll_name$ - name of dll
+proc_name$ - name of procedure 
+in_bank(optional) - handle of bank that is made available from Blitz to DLL procedure
+out_bank (optional) - handle of bank that is made available from DLL procedure to Blitz
+
+.desc
+The DLL is called with pointers to and sizes of bank memory. 
+
+Dll function prototypes should like something like this (Visual C++) example:
+
+extern "C"{
+	_declspec(dllexport) int _cdecl my_dll_func(const void *in,int in_size,void *out,int out_sz );
+}
+
+The 'extern "C"' bit prevents C++ 'name-mangling', and the _cdecl bit prevents name
+decoration. You could call this function using something like:
+
+	in_bank=CreateBank(...)
+	out_bank=CreateBank(...)
+
+	;poke input parameters into in_bank
+	result=CallDLL("mydll","my_dll_func",bank1,bank2 )
+	;peek output results from out_bank
+
+
+::Time
+
+
+:Millisecs ()
+
+.desc
+This command will return to you the
+system timer value in milliseconds.
+
+This is incredibly useful for precision
+timing of events. By reading this value into a variable, and checking it
+against the CURRENT time in milliseconds, you can perform 'waits' or check
+time lapses with a high degree of accuracy. A common use of this command
+is to seed the random number generator with the SeedRnd command.
+
+
+:Delay milliseconds
+
+.args
+milliseconds = the amount of milliseconds to delay.
+1000=1 second
+
+.desc
+This command stops all program execution for the
+designated time period. All execution stops. If you need program execution
+to continue, consider trapping time elapsed with a custom timer function
+using Millisecs().
+
+
+:CurrentDate$ ()
+
+.desc
+Returns the current date in the format: DD MON YYYY
+(i.e. 10 DEC 2000).
+
+
+:CurrentTime$ ()
+
+.desc
+Returns the current time in the format: HH:MM:SS (i.e. 14:31:57).
+
+
+:CreateTimer ( frequency )
+
+.args
+frequency = usually a framerate like 50 or 60
+
+.desc
+Use this command in conjunction with
+the WaitTimer command to control the speed of program execution (fps).
+You will use this in your main screen redraw loop to control the playback
+speed to match the proper speed. This will prevent your games from playing
+back too fast on computers faster than yours. Use of this system is VERY
+GOOD practice, as your game will be played on a variety of computers.
+
+
+
+:WaitTimer ( timer )
+
+.args
+timer = any valid timer handle returned by the CreateTimer function
+
+.desc
+Once a Timer has been created with the @CreateTimer function, use
+@WaitTimer to halt execution until the specified timer reaches its 
+value.
+
+.also
+CreateTimer;FreeTimer
+
+:FreeTimer ( timer )
+
+.args
+timer = any valid timer handle returned by the CreateTimer function
+
+.desc
+This command will
+destroy a timer variable created with the with the CreateTimer command and
+free the memory it was using. It is a good practice to destroy elements
+in your game you are no longer using.
+
+
+::Banks
+
+:CreateBank ([size])
+
+.args
+size - size of memory bank in bytes (default
+is 0 bytes)
+
+.desc
+The bank commands allow you to perform high-speed
+data operations on a block of memory. This is useful for writing your own
+compression/decompression routines, passing and receiving data to and from
+a DLL and more. Banks start at 0 and finish at size-1.
+
+The data types
+available for use with a bank are: 
+
+Byte - takes up one byte. Values
+can be in the range 0 to 255.
+Short - takes up two bytes. Values can be
+in the range 0 to 65535.
+Int - takes up four bytes. Values can be in the
+range -2147483647 to 2147483647.
+Float - takes up four bytes.
+
+.also
+FreeBank
+
+:FreeBank bank
+
+.args
+bank - bank handle
+
+.desc
+Frees a bank.
+
+.also
+CreateBank
+
+:BankSize (bankhandle)
+
+.args
+bankhandle - handle assigned to the bank when created.
+
+.desc
+Use this command to determine the size of an existing bank.
+
+.also
+CreateBank;ResizeBank;CopyBank
+
+:ResizeBank bankhandle,new_size
+
+.args
+bankhandle = handle assigned to bank when created
+new_size = new
+size of bank in bytes 
+
+.desc
+Resizes a previously created memory bank.
+Existing bank data is unmodified, but may be moved in memory. Also see
+CreateBank, CopyBank, and BankSize.
+
+:CopyBank src_bank,src_offset,dest_bank,dest_offset,count
+
+.args
+src_bank = handle of source memory bank
+src_offset = offset location
+to start copying from
+dest_bank = handle of destination memory bank
+dest_offset
+= offset location to start writing to
+count = how many bytes to copy
+
+.desc
+Copies data from one memory bank to another.
+
+:PeekByte(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation
+will be started at
+
+.desc
+Reads a byte from a memory bank and returns
+the value.
+
+
+A byte takes up one byte of a memory bank. Values can be
+in the range 0 to 255.
+
+.also
+PeekShort;PeekInt;PeekFloat
+
+:PeekShort(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation
+will be started at
+
+.desc
+Reads a short from a memory bank and returns
+the value.
+
+
+A short takes up two bytes of a memory bank. Values can
+be in the range 0 to 65535.
+
+.also
+PeekByte;PeekInt;PeekFloat
+
+:PeekInt(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation
+will be started at
+
+.desc
+Reads an int from a memory bank and returns
+the value.
+
+
+An int takes up four bytes of a memory bank. Values can
+be in the range -2147483647 to 2147483647.
+
+.also
+PeekByte;PeekShort;PeekFloat
+
+:PeekFloat(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation
+will be started at
+
+.desc
+Reads a float from a memory bank and returns
+the value.
+
+
+A float takes up four bytes of a memory bank.
+
+.also
+PeekByte;PeekShort;PeekInt
+
+:PokeByte bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation
+will be started at
+value - value that will be written to bank
+
+.desc
+Writes a byte into a memory bank.
+
+
+A byte takes up one byte of a memory
+ bank. Values can be in the range 0 to 255.
+
+.also
+PokeShort;PokeInt;PokeFloat
+
+:PokeShort bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation
+will be started at
+value - value that will be written to bank
+
+.desc
+Writes a short into a memory bank.
+
+
+A short takes up two bytes of a
+memory bank. Values can be in the range 0 to 65535.
+
+.also
+PokeByte;PokeInt;PokeFloat
+
+:PokeInt bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation
+will be started at
+value - value that will be written to bank
+
+.desc
+Writes an int into a memory bank.
+
+
+An int takes up four bytes of a memory
+ bank. Values can be in the range -2147483647 to 2147483647.
+
+.also
+PokeByte;PokeShort;PokeFloat
+
+:PokeFloat bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation
+will be started at
+value - value that will be written to bank
+
+.desc
+Writes a float into a memory bank.
+
+
+A float takes up four bytes of a
+memory bank.
+
+.also
+PokeByte;PokeShort;PokeInt
+
+
+::Files
+
+:OpenFile (filename$)
+
+.args
+filename$ = any valid path and filename.
+The returned value is the filehandle which is used by other file handling
+commands.
+
+.desc
+This command opens the designated file and prepares
+it to be updated. The file must exists since this function will not create
+a new file.
+
+
+By using FilePos and SeekFile the position within the file
+that is being read or written can be determined and also changed. This
+allows a file to be read and updated without having to make a new copy
+of the file or working through the whole file sequentially. This could
+be useful if you have created a database file and you want to find and
+update just a few records within it.
+
+
+The file handle that is returned
+is an integer value that the operating system uses to identify which file
+is to be read and written to and must be passed to the functions such as
+ReadInt() and WriteInt().
+
+
+Note extreme care needs to be exercised when
+updating files that contain strings since these are not fixed in length.
+
+.also
+ReadFile;WriteFile;CloseFile;SeekFile
+
+:ReadFile (filename$)
+
+.args
+filename$
+= any valid path and filename. The returned value is the filehandle which
+is an integer value.
+
+.desc
+This command opens the designated filename
+and prepares it to be read from. Use this to read back your own configuration
+file, save game data, etc. also useful for reading custom types from a
+files. The filehandle that is returned is an integer value that the operating
+system uses to identify which file is to be read from and must be passed
+to the functions such as ReadInt(). If the file could not be opened, for
+instance, if it does not exists, then the filehandle is Zero.
+
+:WriteFile (filename$)
+
+.args
+filename$ = any valid path and filename. The returned value is
+the filehandle which is an integer value.
+
+.desc
+This command opens
+the designated filename and prepares it to be written to. Use this to write
+your own configuration file, save game data, etc. also useful for saving
+custom types to files. The filehandle that is returned is an integer value
+that the operating system uses to identify which file is to be written
+to and must be passed to the functions such as WriteInt(). If the file
+could not be opened then the filehandle is Zero.
+
+:CloseFile filehandle
+
+.args
+filehandle = variable defined with the WriteFile or OpenFile command
+
+.desc
+Use this command to close a file previously opened. You should
+always close a file as soon as you have finished reading or writing to
+it.
+
+:FilePos (filehandle)
+
+.args
+filehandle = the variable returned by
+the Readfile WriteFile or OpenFile when the file was opened. The value
+returned is the offset from the start of the file. ( 0 = Start of the file
+)
+
+.desc
+Returns the current position within a file that
+is being processed following ReadFile, WriteFile or OpenFile. The returned
+integer is the offsets in bytes from the start of the file to the current
+read/write position. Note, this is zero when pointing to the first byte
+of the file.
+
+
+By using FilePos and SeekFile the position within the
+file that is being read or written can be determined and also changed.
+This allows a file to be read and updated without having to make a new
+copy of the file or working through the whole file sequentially. This could
+be useful if you have created a database file and you want to find and
+update just a few records within it. It is also possible to create an index
+file that contains pointers to where each record starts in a data file.
+
+:SeekFile (filehandle, offset)
+
+.args
+filehandle = the variable returned
+by the Readfile, WriteFile or OpenFile when the file was opened. The value
+returned is the offset from the start of the file. ( 0 = Start of the file
+)
+
+.desc
+This command allows the position in a file to be changed. This
+allows random access to data within files and can be used with files opened
+by ReadFile, WriteFile and OpenFile. Note, the offset is the number of
+bytes from the start of the file, where the first byte is at offset 0.
+It is important to take account of the size of the data elements in your
+file.
+
+
+For instance Integers are 4 bytes long so the first integer in
+the file is at offset 0 and the second at offset 4. If you write Custom
+Data types out then you must work out haw many bytes each takes so that
+you can move about the file correctly. Seeking beyond the end of a file
+does not generate an error but the data is not read or written to the file,
+and may course unknown side effects.
+
+
+By using FilePos and SeekFile
+the position within the file that is being read or written can be determined
+and also changed. This allows a file to be read and updated without having
+to make a new copy of the file or working through the whole file sequentially.
+This could be useful if you have created a database file and you want to
+find and update just a few records within it. It is also possible to create
+an index file that contains pointers to where each record starts in a data
+file.
+
+
+To calculate an offset you need to know how long each data element
+is; Offset = Wanted_Element * size_of_element - size_of_element
+
+
+For
+example a file of integers which are 4 bytes long is calculated by:
+
+
+The 7th integer is at offset 7 * 4 - 4 i.e. 24
+
+
+Note, extreme care needs
+to be exercised when updating files that contain strings since these are
+not fixed in length.
+
+:ReadDir (directory)
+
+.args
+directory
+= full path and name of folder/directory to open
+
+.desc
+In file operations,
+you will often need to parse through a directory/folder and retrieve unknown
+filenames and other folders from it. This command opens a specified folder
+to begin these operations. The command returns a file handle which is used
+by the other commands to perform other services (like most file operators).
+You will use the NextFile$ to iterate through each entry (use FILE@Type
+to see if it is a file or folder). Remember, once completed, good programming
+practice dictates that you CloseDir the open folder. The example should
+ help out alot.
+
+:CloseDir filehandle
+
+.args
+filehandle
+= valid filehandle assigned from the ReadDir command
+
+.desc
+Once you
+are finished with NextFile$ on the directory previously opened for read
+with the ReadDir command, use this command to close the directory. This
+is good programming practice!
+
+
+.also
+ReadDir, NextFile$
+
+:NextFile$ (filehandle)
+
+.args
+filehandle = valid filehandle assigned
+from the ReadDir command
+
+.desc
+This command will return the @Next file
+or folder from the currently open directory (use ReadDir to open the desired
+folder for reading). This will return a string containing the folder name
+or the filename plus extention. Use FILE@Type to determine if it is a file
+or folder. See ReadDir and CloseDir for more. You cannot move 'backwards'
+through a directory, only forward. You might want to parse the contents
+of a directory into an array for display, processing, etc.
+
+:CurrentDir$()
+
+
+.desc
+This command will return the
+currently selected directory for disk operations, useful for advanced file
+operations. Use CHANGEDIR to change the current directory. The value returned
+doesn't have a trailing slash - aside from the root directory of the drive.
+
+:ChangeDir directory/path
+
+.args
+directory/path = full path to directory/folder
+
+.desc
+This command
+will change the currently selected directory for disk operations, useful
+for advanced file operations. Use CURRENTDIR$() to see what the current
+directory is.
+
+Use a directory/path of ".." to change to the parent of
+the current directory, unless you are at the root directory of the drive,
+then no change happens.
+
+
+:CreateDir path/name
+
+.args
+path/name = full path and name for new directory
+
+.desc
+Creates
+a directory (file folder) at the destination specified. Do not use a trailing
+slash at the end of the path/name parameter. You cannot be sure the directory
+was created with this command, so you will need to verify its existance
+ yourself (use the FILE@Type command).
+
+:DeleteDir directory/path
+
+.args
+directory/path = full path/name of directory
+
+.desc
+Deletes a
+specified folder/directory from the device. Note: This only works on EMPTY
+directories - you cannot delete a folder with other folders or files inside
+with this command. Do not apply a trailing slash.
+
+
+:FileType (filename$)
+
+.args
+filename$ = any valid variable with path/filename
+
+.desc
+This command checks the
+filename you pass and determines if it exists and whether or not it is
+a valid filename or if it is a directory. Here are the values it returns:
+
+
+1 = The filename exists
+
+0 = The filename doesn't exist
+
+2 = The filename is not a file - but a directory
+
+
+Use this to validate that a file exists before you do something to it.
+
+
+:FileSize (filename$)
+
+.args
+filename$ = any valid variable with path/filename
+
+.desc
+Often it will be useful to return the size of a file. File size
+is important for copying, reading, and other file evolutions.
+
+
+:CopyFile from$, to$
+
+.args
+from$ = valid path/filename to the file to be copied
+to$ = valid path/filename to copy the file to
+
+.desc
+Use this command to copy a file from one location
+to another. Perhaps you'll write your own installer and need to copy files
+from the installation folder to the installed location folder. Make sure
+you do your own validation to ensure that the files/paths are valid and
+accurate before executing this command.
+
+
+:DeleteFile path/filename
+
+.args
+path/filename = full path/filename to the file to
+delete
+
+.desc
+Deletes a specified file from the drive. You will need
+to make sure the file exists before execution and be sure its been deleted
+@After execution. Use FILE@Type to determine this.
+
+
+::File/Stream
+
+:Eof (filehandle/stream)
+
+.args
+filehandle/stream = a valid variable
+set with the OpenFile, ReadFile command, or OpenTCPStream (v1.52+)
+
+.desc
+Checks to see if the End of File of an opened file or stream has been reached.
+ Use this to determine if you should continue to pull more information from
+a file/stream or not. Use this to read a text file of unknown length (say
+a README.TXT) and display it. See example.
+
+
+Eof returns 1 if eof has
+been reached or, in the case of a TCP stream, the stream has been 'nicely'
+closed.
+
+
+Eof returns -1 if something has gone wrong during stream processing.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+:ReadAvail (filehandle/streamhandle)
+
+.args
+filehandle/streamhandle = handle assigned
+to the file or stream when originally opened.
+
+.desc
+In the case of
+file streams, this reflects how much data is internally buffered. In the
+case of TCP streams, this reflects how much data has 'arrived'. 
+
+:ReadByte ( filehandle/stream )
+
+.args
+filehandle/stream
+= a valid variable set with the OpenFile, ReadFile command, or OpenTCPStream
+(v1.52+)
+
+.desc
+Once you've opened a disk file (or stream) for reading,
+use this command to read a single byte at a time from the file/stream.
+Note, a byte is an integer that can take the values 0..255 and occupies
+8 bits of storage. Since characters are stored as byte values this function
+can be used to read a file one character at a time. Reading beyond the
+end of file does not result in an error, but each value read will be zero.
+
+
+Advanced notes
+
+
+The number that is stored by WriteByte is actually
+the least significant byte of an integer so negative numbers and numbers
+above 255 will still have a value between 0..255. Unless you understand
+how 32 bit integers are stored in 2's compliment notation this will seem
+strange but it is @Not a bug.
+
+
+Streams can only be used in Blitz Basic
+v1.52 or greater.
+
+:ReadShort (filehandle/stream)
+
+.args
+filehandle/stream = a valid
+variable set with the OpenFile, ReadFile command, or OpenTCPStream (v1.52+)
+The value returned is an integer in the range 0-65535.
+
+.desc
+Once you've
+opened a disk file (or stream) for reading, use this command to read a
+single short integer (16bit) value from the file. Note, each value written
+uses 2 bytes of disk space and is written least significant byte first.
+ Reading beyond the end of file does not result in an error, but each value
+read will be zero.
+
+
+Streams can only be used in Blitz Basic v1.52 or
+greater.
+
+
+:ReadInt (filehandle/stream)
+
+.args
+filehandle/stream = a valid variable
+set with the OpenFile, ReadFile command, or OpenTCPStream (v1.52+)
+The
+value returned is an integer in the range -2147483648 to 2147483647
+
+.desc
+Once you've opened a disk file (or stream) for reading, use this command
+ to read a single integer value from the file. Note, each value written
+uses 4 bytes of space and is written least significant byte first. Reading
+beyond the end of file does not result in an error, but each value read
+will be zero.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+
+:ReadFloat (filehandle/stream)
+
+.args
+filehandle/stream = a valid variable set with
+the OpenFile, ReadFile command, or OpenTCPStream (v1.52+) The value returned
+is a floating point number.
+
+.desc
+Once you've opened a disk file (or
+stream) for reading, use this command to read a single floating point number
+from the file. Note, each value written uses 4 bytes of space. Reading
+beyond the end of file does not result in an error, but each value read
+will be zero.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+:ReadString$ (filehandle/stream)
+
+.args
+filehandle/stream
+= a valid variable set with the OpenFile, ReadFile command, or OpenTCPStream
+(v1.52+) The value returned is a text string.
+
+.desc
+Once you've opened
+a disk file (or stream) for reading, use this command to read a string variable
+from the file.
+
+
+Each string is stored in the file as a 4 byte (32bit)
+integer followed by the characters that form the string. The integer contains
+the number of characters in the string, i.e. its length. Note, that Carriage
+Return, Line Feed and Null characters are @Not use to indicate the end of
+the string. A file of strings cannot be read like a text file, since it
+contains string variables and not text. A null string, i.e. a string of
+zero length ("") is stored as 4 bytes, an integer count with a value =
+zero, followed by no Characters. Note strings are not limited to 255 characters
+as in some languages. Reading beyond the end of file does not result in
+an error, but each value read will be a zero length string.
+
+
+This command
+should only be used when reading from a binary file or stream. Text files
+should be interrogated using ReadLine.
+
+
+Streams can only be used in
+Blitz Basic v1.52 or greater.
+
+.also
+WriteString;OpenTCPStream;ReadFile;ReadLine;ReadByte;ReadShort;ReadInt;ReadFloat;ReadBytes;ReadAvail
+
+:ReadLine$ (filehandle/stream)
+
+.args
+filehandle/stream
+= a valid variable set with the OpenFile, ReadFile command, or OpenTCPStream
+(v1.52+). The value returned is a text string.
+
+.desc
+Once you've opened
+a disk file (or stream) for reading, use this command to read a whole line
+of text from a text file or stream. Each line of text is returned as a
+string variable. This function can be used to read plain text files.
+
+
+Characters are read from the input file until an "end-of-line" mark is
+found. An "end-of-line" can be a single carriage return (0Dh) or a single
+linefeed (0Ah) or carriage return followed by a linefeed (0Dh, 0Ah). Reading
+beyond the end of file does not result in an error, but each value read
+will be a zero length string.
+
+
+ReadLine$ returns all chars except chr$(13)/chr$(10).
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+:ReadBytes bank,file/stream,offset,count
+
+.args
+bank =
+variable containing handle to valid bank
+file/stream = file handle of previously
+opened file or stream
+offset = offset in bytes to write the value
+count
+= how many bytes to write from the offset
+
+.desc
+You can read the contents
+of a disk file (or stream) to a memory bank using this command.
+
+
+Note:
+The file handle must be opened with OpenFile or OpenTCPStream and subsequently
+closed with CloseFile or CloseTCPStream after the reading operations are
+complete.
+
+
+Return how many bytes successfully read from a stream.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+.also
+WriteBytes
+
+:WriteByte (filehandle/stream, mybyte)
+
+.args
+filehandle/stream = a valid variable set with the OpenFile, ReadFile command,
+ or OpenTCPStream (v1.52+)
+mybyte = can be an Integer or a floating point
+number, but only values between 0 and 255 will be stored faithfully. 
+
+.desc
+Once you've opened a disk file (or stream) for reading, use this
+command to write a single byte at a time to the file/stream. Note, a byte
+is an integer that can take the values 0..255 and occupies 8 bits of storage.
+Since characters are stored as byte values this function can be used to
+create a text file one character at a time.
+
+
+Advanced notes:
+
+
+The
+number that is stored by WriteByte is actually the least significant byte
+ of an integer so negative numbers and numbers above 255 will still have
+a value between 0..255. Unless you understand how 32 bit integers are stored
+in 2's compliment notation this will seem strange but it is @Not a bug.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+:WriteShort (filehandle/stream, myinteger)
+
+.args
+filehandle/stream
+= a valid variable set with the OpenFile, WriteFile command, or OpenTCPStream
+(v1.52+)
+myinteger = an integer variable (a floating point number can be
+used but this will be converted to an integer before saving so only the
+integer part will be saved) 
+
+.desc
+Once you've opened a disk file (or
+stream) for writing, use this command to write a single short integer (16
+bit) value to the file. Note, each value written uses 2 bytes and is written
+least significant byte first. The range of the value saved is 0-65535
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+
+:WriteInt (filehandle/stream, myinteger)
+
+.args
+filehandle/stream = a valid variable set with the OpenFile,
+WriteFile command, or OpenTCPStream (v1.52+)
+myinteger = an integer variable
+(a floating point number can be used but this will be converted to an integer
+before saving so only the integer part will be saved) 
+
+.desc
+Once you've
+opened a disk file (or stream) for writing, use this command to write a
+single integer value to the file. Note, each value written uses 4 bytes
+and is written least significant byte first. The range of the value saved
+ is -2147483648 to 2147483647
+
+
+Streams can only be used in Blitz Basic
+v1.52 or greater.
+
+
+:WriteFloat (filehandle/stream, myFloat)
+
+.args
+filehandle/stream = a
+valid variable set with the OpenFile, WriteFile command, or OpenTCPStream
+(v1.52+)
+myFloat = a floating point variable
+
+.desc
+Once you've opened
+a disk file (or stream) for writing, use this command to write a single
+floating point number to the file. Note, each value written uses 4 bytes.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+
+:WriteString (filehandle/stream, mystring$)
+
+.args
+filehandle/stream
+= a valid variable set with the OpenFile, WriteFile command, or OpenTCPStream
+(v1.52+)
+mystring$ = any string variable or text contained between quotes.
+
+
+.desc
+Once you've opened a disk file (or stream) for writing, use this
+command to write a string variable to the file.
+
+
+Each string is stored
+in the file as a 4 byte (32bit) integer followed by the characters that
+form the string. The integer contains the number of characters in the string,
+i.e. its length. Note, that Carriage Return, Line Feed and Null characters
+are @Not use to indicate the end of the string. A file of strings cannot
+be read like a text file, since it contains string variables and not text.
+A null string, i.e. a string of zero length ("") is stored as 4 bytes, 
+an integer count with a value = zero, followed by no Characters. Note strings
+ are not limited to 255 characters as in some languages. Reading beyond
+the end of file does not result in an error, but each value read will be
+a zero length string.
+
+
+Streams can only be used in Blitz Basic v1.52
+or greater.
+
+
+:WriteLine$ (filehandle/stream, string$)
+
+.args
+filehandle/stream = a valid variable set with the OpenFile, WriteFile
+command, or OpenTCPStream (v1.52+). The value returned is a text string.
+string$ = valid string value.
+
+.desc
+Once you've opened a disk file (or
+stream) for writing, use this command to right a whole line of text to
+the file. Each line of text is automatically terminated with an "end-of-line"
+mark, consisting of a Carriage Return character followed by a LineFeed
+character. (i.e. 0Dh, 0Ah ) This function can be used to make plain text
+files.
+
+
+Streams can only be used in Blitz Basic v1.52 or greater.
+
+:WriteBytes bank,filehandle/stream,offset,count
+
+.args
+bank = variable containing handle to valid bank
+filehandle/stream = a valid
+variable set with the WriteFile or OpenTCPStream (v1.52+)
+offset = offset
+in bytes to write the value
+count = how many bytes to write from the offset
+
+.desc
+You can write the contents of a memory bank to a file on disk (or
+stream) using this command.
+
+
+Note: The file handle must be opened with
+WriteFile or OpenTCPStream and subsequently closed with CloseFile or CloseTCPStream
+ after the writing operations are complete.
+
+Return how many bytes successfully
+written to a stream.
+
+
+Streams can only be used in Blitz Basic v1.52
+or greater.
+
+.also
+ReadBytes
+
+
+::Network
+
+:CountHostIPs( host_name$ )
+
+.args
+host_name$ - name of host
+
+.desc
+None.
+
+:HostIP( host_index )
+
+.args
+host_index - index
+number of host
+
+.desc
+Returns an integer IP address for the specified
+host. host_index must be in the range 1...CountHostIPs().
+
+:DottedIP$( IP )
+
+.args
+IP - integer IP address
+
+.desc
+None.
+
+:CopyStream src_stream,dest_stream[,buffer_size]
+
+.args
+src_stream - source stream
+dest_stream - destination stream
+buffer_size
+(optional) - buffer size of stream
+
+.desc
+Copies a stream.
+
+
+
+::TCP Network
+
+
+:OpenTCPStream (ip$,port)
+
+.args
+ip$=Address of stream
+port=TCP/IP
+Port Number
+
+.desc
+Use this command to open up a TCP/IP stream to the
+designated server and port. If the open command was successful, the command
+returns a stream handle. Otherwise it returns 0.
+
+
+You can use this
+for a multitude of different 'internet' options. Obviously to contact a
+TCP/IP host outside your own network, you'll need to be connected to the
+Internet.
+
+The IP address can be in the form of 1.2.3.4 or "www.domain.com".
+
+
+:CloseTCPStream streamhandle
+
+.args
+streamhandle = handle assigned when the stream was opened.
+
+.desc
+Once you've completed the use of your TCP/IP stream, close the connection
+ you opened with OpenTCPStream with this command.
+
+
+:CreateTCPServer (port)
+
+.args
+port = the port to use when creating the server
+
+.desc
+Creates a TCP/IP
+server with the designated port. Use this for communications between other
+clients and the local box. See OpenTCPStream, CloseTCPServer, and CloseTCPStream
+for more information.
+
+Returns a TCP/IP server handle if successful or 0 if not.
+
+
+:AcceptTCPStream (serverhandle)
+
+.args
+serverhandle = the server handle assigned when the server was created
+
+.desc
+Accepts an incoming TCP/IP stream, and returns a TCP/IP stream
+if one is available, or 0 if not.
+
+See CreateTCPServer and CloseTCPServer.
+
+
+:CloseTCPServer serverhandle
+
+.args
+serverhandle = handle
+assigned when the server was created.
+
+.desc
+Closes a TCP/IP server previously
+created with the CreateTCPServer command.
+
+
+:TCPStreamIP( tcp_stream )
+
+.args
+tcp_stream - TCP stream handle
+
+.desc
+Returns the integer
+IP address of the specified tcp_stream. The address returned is always
+that of the client machine.
+
+
+:TCPStreamPort( tcp_stream )
+
+.args
+tcp_stream - TCP stream handle
+
+.desc
+Returns the port number
+of the specified TCP stream. The port number returned is always that of
+the client machine.
+
+
+:TCPTimeouts read_millis,accept_millis
+
+.args
+read_millis - milliseconds value
+accept_millis - milliseconds value 
+
+.desc
+read_millis allows you to control how long reading data
+into a TCP stream can take before causing an error. By default, this is
+set to 10,000 (10 seconds). This means that if data takes longer than 10
+seconds to arrive, an error occurs and the stream can not be used any more.
+
+
+accept_millis allows you to control how the AcceptTCPStream() function
+will wait for a new connection. By default, this value is 0, so AcceptTCPStream()
+will return immediately if there is no new connection available.
+
+
+::UDP Network
+
+
+:CreateUDPStream( [port] )
+
+.args
+port (optional) - port number
+
+.desc
+If no port is specified, a free port will be allocated and you can then
+use UDPStreamPort() to find out the allocated port.
+
+
+:CloseUDPStream udp_stream
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+None
+
+
+:SendUDPMsg udp_stream,dest_ip[,dest_port]
+
+.args
+udp_stream
+- UDP stream handle
+dest_ip - destination IP address
+dest_port (optional)
+- destination port number
+
+.desc
+Transmits all the data written to the
+UDP stream to the specified IP address and port. Data is written using
+the standard stream commands. If no destination port is specified, the
+port number used to create the UDP Stream is used.
+
+
+Note that IP addresses
+must be in integer format, @Not in dotted IP format.
+
+
+:RecvUDPMsg( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Receives
+a UDP message into the specified UDP stream. Standard stream read commands
+can then be used to examine the message.
+
+
+The return value is the integer
+IP address of the message source, or 0 if no message was available. You
+can use UDPMsgPort() to find out the port number of the message source.
+
+
+:UDPStreamIP( udp_stream )
+
+.args
+udp_stream - UDP
+stream handle
+
+.desc
+Returns the integer IP address of the specified
+udp_stream. Currently, this always returns 0.
+
+:UDPStreamPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns
+the port number of the specified UDP stream. This can be useful if you've
+created the UDP stream without specifying a port number.
+
+
+:UDPMsgIP( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the integer IP address of the sender of the last UDP message received.
+ This value is also returned by RecvUDPMsg().
+
+
+:UDPMsgPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns
+the port of the sender of the last UDP message received.
+
+
+:UDPTimeouts recv_millis
+
+.args
+recv_millis - milliseconds value
+
+.desc
+recv_millis allows you to control how long the RecvUDPMsg() function
+will wait for a new message. By default, this is set to 0, meaning RecvUDPMsg()
+will return immediately if there is no message to be received.
+
+
+::DirectPlay
+
+
+:StartNetGame()
+
+
+.desc
+Displays a Windows dialog with
+option to join or start a new multiplayer network game, via modem, serial
+connection or TCP/IP (Internet).
+
+
+Note: This command must be started
+before any other network commands, otherwise they will fail.
+
+
+A return
+value of 0 indicates failure, 1 means a game was joined and 2 means a game
+was created and is being hosted on the local machine. 
+
+:HostNetGame (gamename$)
+
+.args
+gamename$ = string value designating the game's name
+
+.desc
+This allows you to bypass
+the 'standard' networked game dialog box (normally using StartNetGame)
+and start a hosted game directly. A value of 2 is returned if the hosted
+game has started successfully. 
+
+:JoinNetGame (gamename$,serverIP$)
+
+.args
+gamename$ = valid string containing game
+name to join
+serverIP$ = IP address of computer hosting game 
+
+.desc
+Use this command to join a network game, bypassing the dialog box normally
+ endured with the StartNetGame command.
+
+This returns 0 if the command
+failed, or 1 if the game was joined successfully.
+
+:StopNetGame
+
+
+.desc
+Use this command to terminate the network game currently in progress
+(started with the StartNetGame() command). If possible, the hosting session
+will transfer to another machine connected to the network game.
+
+:CreateNetPlayer (name$)
+
+.args
+name$ = any valid string holding the player's name.
+
+.desc
+Creates a new local player. This also causes a special message to
+be sent to all remote machines (see NetMsgType). This returns an integer
+player number to be used in sending/receiving messages. Note that you must
+create at least one player before you can send and receive messages. 
+
+:DeleteNetPlayer playerID
+
+.args
+playerID = value assigned when player
+was created with CreateNetPlayer
+
+.desc
+Using the playerID generated
+by the CreateNetPlayer command, this command will remove the designated
+player from the network game.
+
+
+This also causes a special message to
+be sent to all remote machines (see NetMsgType). 
+
+:NetPlayerName$ (playerID)
+
+.args
+playerID = a valid player ID number (get from the NetMsgFrom() command
+
+.desc
+First off, this ONLY works when you have joined a network game
+via StartNetGame or JoinNetGame and you have created a player via CreateNetPlayer
+ (you must create a player, even if it is just to lurk).
+
+
+Use this command
+in conjunction with the NetMsgFrom() (to get the player's ID) command to
+derive the actual name of the player. Returns a string value.
+
+
+You will use NetMsgType(), NetMsgFrom(), and NetMsgTo() to get other
+important information from the message and act on it.
+
+
+The example requires
+that you run it on a remote machine while the local computer runs the example
+in the SendNetMsg command.
+
+:NetPlayerLocal (playerID)
+
+.args
+playerID = a valid player ID number
+(get from the NetMsgFrom() command)
+
+.desc
+First off, this ONLY works
+when you have joined a network game via StartNetGame or JoinNetGame and
+you have created a player via CreateNetPlayer (you must create a player,
+even if it is just to lurk).
+
+
+Use this command in conjunction with the
+NetMsgFrom() (to get the player's ID) command to check and see if the player
+in question is on the local machine (as opposed to a remote machine). You
+may wish to act differently in your program based on whether the message
+that came in was from a local or remote machine.
+
+
+You will use NetMsgType(),
+NetMsgFrom(), and NetMsgTo() to get other important information from the
+message and act on it.
+
+
+The example requires that you run it on a remote
+machine while the local computer runs the example in the SendNetMsg command.
+
+:RecvNetMsg()
+
+
+.desc
+First off, this ONLY works
+when you have joined a network game via StartNetGame or JoinNetGame and
+you have created a player via CreateNetPlayer (you must create a player,
+even if it is just to lurk).
+
+
+This returns a @True value if a message
+was received, @False if none has been received. This will typically go inside
+a function that is constantly being checked for message and decode and
+handle them. You will use NetMsgType, NetMsgFrom, NetMsgTo, and NetMsgData$
+ to get the important information from the message and act on it.
+
+
+The
+example requires that you run it on a remote machine while the local computer
+ runs the example in the SendNetMsg command.
+
+:NetMsgType()
+
+
+.desc
+First off, this ONLY works when you have joined
+a network game via StartNetGame or JoinNetGame and you have created a player
+via CreateNetPlayer (you must create a player, even if it is just to lurk).
+You must've received the message already, determined by the RecvNetMsg()
+ command.
+
+
+The value returned from this command denotes the message;
+1-99 means it is a user message, 100 means a new player has joined the
+game, 101 means a player has been deleted from the network game (NetMsgFrom()
+ returns the player deleted), 102 means the original host has left the game
+and THIS machine is now the new host.
+
+
+If you receive a 200, this means
+a fatal exception has occurred and you need to exit the game.
+
+
+You
+will use NetMsgFrom, NetMsgTo, and NetMsgData$ to get the important information
+from the message and act on it.
+
+
+The example requires that you run it
+on a remote machine while the local computer runs the example in the SendNetMsg
+command.
+
+:NetMsgFrom()
+
+
+.desc
+First off, this ONLY
+works when you have joined a network game via StartNetGame or JoinNetGame
+ and you have created a player via CreateNetPlayer (you must create a player,
+even if it is just to lurk). You must've received the message already,
+determined by the RecvNetMsg() command - and probably determined the type
+of message with (NetMsgType().
+
+
+The value returned from this command
+denotes the sender's ID number assigned to them when they were created
+with CreateNetPlayer command. Use this to perform actions on the player
+on the local machine.
+
+
+You will use NetMsgType(), NetMsgTo(), and NetMsgData$()
+ to get other important information from the message and act on it.
+
+
+The example requires that you run it on a remote machine while the local
+computer runs the example in the SendNetMsg command.
+
+:NetMsgTo()
+
+
+.desc
+First off, this ONLY
+works when you have joined a network game via StartNetGame or JoinNetGame
+ and you have created a player via CreateNetPlayer (you must create a player,
+even if it is just to lurk). You must've received the message already,
+determined by the RecvNetMsg() command - and probably determined the type
+of message with (NetMsgType().
+
+
+The value returned from this command
+denotes the messages's intended recipient's ID number assigned to them
+when they were created with CreateNetPlayer.
+
+
+You will use NetMsgType(),
+NetMsgFrom(), and NetMsgData$() to get other important information from
+the message and act on it.
+
+
+The example requires that you run it on
+a remote machine while the local computer runs the example in the SendNetMsg
+command.
+
+:NetMsgData$()
+
+
+.desc
+First off, this ONLY works when you have joined a
+network game via StartNetGame or JoinNetGame and you have created a player
+via CreateNetPlayer (you must create a player, even if it is just to lurk).
+You must've received the message already, determined by the RecvNetMsg()
+ command - and probably determined the type of message with (NetMsgType().
+
+
+The string value returned from this command is the actual message text
+that was sent.
+
+
+You will use NetMsgType(), NetMsgFrom(), and NetMsgTo()
+ to get other important information from the message and act on it.
+
+
+The example requires that you run it on a remote machine while the local
+computer runs the example in the SendNetMsg command.
+
+:SendNetMsg type,data$,from,to,reliable
+
+.args
+type = value 1-99
+data$ = string containing message to send
+from
+= player ID of the sender
+to = player ID of the recipient (0=broadcast)
+reliable = flag for sending message reliably 
+
+.desc
+First off, this
+ONLY works when you have joined a network game via StartNetGame or JoinNetGame
+ and you have created a player via CreateNetPlayer (you must create a player,
+even if it is just to lurk).
+
+
+This is probably the most complicated
+of the networking commands. This what you use to actually send a message
+to one or all of the players on the network game. The other players will
+use RecvNetMsg() to intercept your message. 
+
+The @Type parameter is a
+number from 1 to 99. These values are denoted as 'user messages'.
+
+
+The Data$ parameter is the actual string that contains the message you want
+ to send. Helpful to know that in order to keep traffic low, you will want
+to combine details of a message into a single message instead of sending
+multiple messages with a single element. For example, you might want to
+send X, Y, and FRAME in a single string like "200,100,4" and parse it out
+at the recipient's end.
+
+
+FROM is the player's ID that is sending the
+message. This is the value returned from the CreateNetPlayer() command.
+
+
+TO is the player's ID you wish to send the message to. A default value
+of 0 will broadcast to ALL players.
+
+
+The RELIABLE flag will put a priority
+on the message and it will ensure there is no packet loss in the delivery.
+However, it is at least 3 times slower than a regular non-reliable message.
+
+
+The example requires that you run it on the local machine while the
+remote computer runs the example in the RecvNetMsg() command.
+
+

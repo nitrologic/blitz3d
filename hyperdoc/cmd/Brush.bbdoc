@@ -1,0 +1,397 @@
+:CreateBrush ( [red#][,green#][,blue#] )
+
+.args
+red# (optional) - brush red value
+green# (optional) - brush green value
+blue# (optional) - brush blue value
+
+.desc
+Creates a brush and returns a brush handle.
+
+The optional green, red and  blue values allow you to set the colour of the brush. Values should be in the  range 0-255. If omitted the values default to 255.
+
+A brush is a collection of properties such as Colour, Alpha, Shininess, Texture  etc that are all stored as part of the brush. Then, all these properties can  be applied to an entity, mesh or surface at once just by using PaintEntity, PaintMesh  or PaintSurface. 
+
+When creating your own mesh, if you wish for certain surfaces to look differently  from one another, then you will need to use brushes to paint individual surfaces.  Using commands such as EntityColor, EntityAlpha will apply the effect to all  surfaces at once, which may not be what you wish to achieve. 
+
+.also
+LoadBrush.
+
+.code
+; CreateBrush Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture("media/b3dlogo.jpg")
+
+; Create brush
+brush=CreateBrush()
+
+; Apply texture to brush
+BrushTexture brush,tex
+
+; And some shininess
+BrushShininess brush,1 
+
+; Paint mesh with brush
+PaintMesh cube,brush
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:LoadBrush ( texture_file$[,flags][,u_scale][,v_scale]
+
+.args
+texture_file$ - filename of texture
+flags - brush flags
+
+flags (optional) - flags can be added to combine effects:
+1: Color
+2: Alpha
+4: Masked
+8: Mipmapped
+16: Clamp U
+32: Clamp V
+64: Spherical reflection map
+
+u_scale - brush u_scale
+v_scale - brush v_scale
+
+.desc
+Creates a brush, loads and assigns a texture to it, and returns a brush handle.
+
+.code
+None.
+
+:FreeBrush brush
+
+.args
+brush - brush handle
+
+.desc
+Frees up a brush.
+
+.code
+None.
+
+:BrushColor brush,red#,green#,blue#
+
+.args
+brush - brush handle
+red# - red value of brush
+green# - green value of brush
+blue# - blue value of brush
+
+.desc
+Sets the colour of a brush.
+
+The green, red and blue values should be in  the range 0-255. The default brush color is  255,255,255.
+
+Please note that if EntityFX or  BrushFX flag 2 is being used, brush colour will have no effect and vertex  colours will be used instead.
+
+.code
+; BrushColor Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Create brush
+brush=CreateBrush()
+
+; Set brush color
+BrushColor brush,0,0,255
+
+; Paint mesh with brush
+PaintMesh cube,brush
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:BrushAlpha brush,alpha#
+
+.args
+brush - brush handle
+alpha# - alpha level of brush
+
+.desc
+Sets the alpha level of a brush.
+
+The alpha# value should be in the range  0-1. The default brush alpha setting is 1. 
+
+The alpha level is how transparent an entity is. A value of 1 will mean the  entity is non-transparent, i.e. opaque. A value of 0 will mean the entity is  completely transparent, i.e. invisible. Values between 0 and 1 will cause varying  amount of transparency accordingly, useful for imitating the look of objects  such as glass and ice. 
+
+An BrushAlpha value of 0 is especially useful as Blitz3D will not render  entities with such a value, but will still involve the entities in collision  tests. This is unlike HideEntity, which doesn't  involve entities in collisions.
+
+.code
+None.
+
+:BrushShininess brush,shininess#
+
+.args
+brush - brush handle
+shininess# - shininess of brush
+
+.desc
+Sets the specular shininess of a brush.
+
+The shininess# value should be  in the range 0-1. The default shininess setting is 0. 
+
+Shininess is how much brighter certain areas of an object will appear to  be when a light is shone directly at them. 
+
+Setting a shininess value of 1 for a medium to high poly sphere, combined  with the creation of a light shining in the direction of it, will give it the  appearance of a shiny snooker ball.
+
+.code
+None.
+
+:BrushTexture brush,texture[,frame][,index]
+
+.args
+brush - brush handle
+texture - texture handle
+frame (optional) - texture frame. Defaults to 0.
+index (optional) - texture index. Defaults to 0.
+
+.desc
+Assigns a texture to a brush.
+
+The optional frame parameter specifies which  animation frame, if any exist, should be assigned to the brush. 
+
+The optional index parameter specifies texture layer that the texture should  be assigned to. Brushes have up to four texture layers, 0-3 inclusive.
+
+.code
+; BrushTexture Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Create brush
+brush=CreateBrush()
+
+; Apply texture to brush
+BrushTexture brush,tex
+
+; Paint mesh with brush
+PaintMesh cube,brush
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:BrushBlend brush,blend
+
+.args
+brush - brush handle
+blend -
+1: alpha (default)
+2: multiply
+3: add
+
+.desc
+Sets the blending mode for a brush.
+
+.code
+None.
+
+:BrushFX brush,fx
+
+.args
+brush - brush handle
+
+fx -
+0: nothing (default)
+1: full-bright
+2: use vertex colors instead of brush color
+4: flatshaded
+8: disable fog
+16: disable backface culling
+
+.desc
+Sets miscellaneous effects for a brush.
+
+Flags can be added to combine  two or more effects. For example, specifying a flag of 3 (1+2) will result in  a full-bright and vertex-coloured brush.
+
+.code
+None.
+
+:GetEntityBrush(entity)
+
+.args
+entity - entity handle
+
+.desc
+Returns a brush with the same properties as is applied to the specified entity.
+
+If this command does not appear to be returning a valid brush, try using @GetSurfaceBrush instead with the first surface available.
+
+Remember, GetEntityBrush actually creates a new brush so don't forget to free it afterwards using FreeBrush to prevent memory leaks.
+
+Once you have got the brush handle from an entity, you can use GetBrushTexture and TextureName to get the details of what texture(s) are applied to the brush.
+
+.also
+GetSurfaceBrush;FreeBrush;GetBrushTexture;TextureName
+
+:GetSurfaceBrush(surface)
+
+.args
+surface - surface handle
+
+.desc
+Returns a brush with the same properties as is applied to the specified mesh surface.
+
+If this command does not appear to be returning a valid brush, try using @GetEntityBrush instead.
+
+Remember, GetSurfaceBrush actually creates a new brush so don't forget to free it afterwards using @FreeBrush to prevent memory leaks.
+
+Once you have got the brush handle from a surface, you can use @GetBrushTexture and @TextureName to get the details of what texture(s) are applied to the brush.
+
+.also
+GetEntityBrush;FreeBrush;GetSurface;GetBrushTexture;TextureName
+
+.code
+; GetSurfaceBrush Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load mesh
+crate=LoadMesh("media/wood-crate/wcrate1.3ds")
+PositionEntity crate,0,0,100
+
+; Get mesh surface
+surf=GetSurface(crate,1)
+
+; Get surface brush
+crate_brush=GetSurfaceBrush(surf)
+
+; Get brush texture
+crate_tex=GetBrushTexture(crate_brush,0)
+
+While Not KeyDown( 1 )
+
+	RenderWorld
+
+	; Display full texture name
+	Text 0,0,"Texture name, as returned by TextureName$():"
+	Text 0,20,TextureName$(crate_tex)
+	
+	; Display trimmed texture name
+	Text 0,40,"Texture name with path stripped:"
+	Text 0,60,StripPath$(TextureName$(crate_tex))
+
+	Flip
+
+Wend
+
+End
+
+Function StripPath$(file$) 
+
+	If Len(file$)>0 
+	
+		For i=Len(file$) To 1 Step -1 
+		
+			mi$=Mid$(file$,i,1) 
+			If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$ 
+		
+		Next 
+	
+	EndIf 
+	
+	Return name$ 
+
+End Function
+

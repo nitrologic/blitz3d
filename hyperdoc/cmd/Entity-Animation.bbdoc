@@ -1,0 +1,248 @@
+:LoadAnimSeq ( entity,filename$ )
+
+.args
+entity - entity handle
+filename$ - filename of animated 3D object
+
+.desc
+Appends an animation sequence from a file to an entity.
+
+Returns the animation  sequence number added. 
+
+.code
+None.
+
+:SetAnimKey entity,frame[,pos_key][,rot_key][,scale_key]
+
+.args
+entity - entity handle
+frame - frame of animation to be used as anim key
+pos_key (optional) - true to include entity position information when setting  key. Defaults to true.
+rot_key (optional) - true to include entity rotation information when setting  key. Defaults to true.
+scale_key (optional) - true to include entity scale information when setting  key. Defaults to true.
+
+.desc
+Sets an animation key for the specified entity at the specified frame.  The entity must have a valid animation sequence to work with.
+
+This is most useful when you've got a character, or a complete set of complicated moves to perform, and you want to perform them en-masse.
+
+.code
+;Create 3d animation example
+
+;Set up a simple nice looking level
+Graphics3D 640,480
+camera=CreateCamera()
+PositionEntity camera,0,12,-12
+RotateEntity camera,35,0,0
+light=CreateLight(2)
+PositionEntity light,1000,1000,-1000
+ground=CreatePlane(2)
+EntityAlpha ground,0.5
+EntityColor ground,0,0,255
+mirror=CreateMirror()
+
+;Lets make a bouncing ball that squashes on impact with the floor.
+ball=CreateSphere(16)
+EntityShininess ball,1
+EntityColor ball,255,0,0
+
+; Lets animate him and "record" the 3D animation for later playback
+bloat#=0 : flatten#=0 : ypos#=10
+
+For frame=1 To 10
+;Drop the ball from height 10 to 2
+ypos = ypos - spd#
+spd#=spd#+.2
+PositionEntity ball,0,ypos,0
+ScaleEntity ball,1+bloat,1+flatten,1+bloat
+
+;If the ball is low enough make it look increasingly squashed
+If frame>8
+bloat=bloat+1.5
+flatten=flatten-.25
+Else
+flatten=flatten+.05
+EndIf
+
+;Record the frame!
+SetAnimKey ball,frame
+Next
+
+;Now we need to add the frames we've just made to the sequence of "film"!
+seq = AddAnimSeq(ball,frame-1) ; total number of frames
+
+;Play it back ping-pong!
+Animate ball,2,0.15
+While Not KeyHit(1)
+UpdateWorld
+RenderWorld
+Flip
+Wend
+End
+
+:AddAnimSeq ( entity,length)
+
+.args
+entity - entity handle
+length -
+
+.desc
+Creates an animation sequence for an entity. This must be done before any  animation keys set by SetAnimKey can be used in  an actual animation however this is optional. You may use it to "bake" the frames you have added previously using SetAnimKey.
+
+Returns the animation sequence number added.
+
+.code
+;Create 3d animation example
+
+;Set up a simple nice looking level
+Graphics3D 640,480
+camera=CreateCamera()
+PositionEntity camera,0,12,-12
+RotateEntity camera,35,0,0
+light=CreateLight(2)
+PositionEntity light,1000,1000,-1000
+ground=CreatePlane(2)
+EntityAlpha ground,0.5
+EntityColor ground,0,0,255
+mirror=CreateMirror()
+
+;Lets make a bouncing ball that squashes on impact with the floor.
+ball=CreateSphere(16)
+EntityShininess ball,1
+EntityColor ball,255,0,0
+
+; Lets animate him and "record" the 3D animation for later playback
+bloat#=0 : flatten#=0 : ypos#=10
+
+For frame=1 To 10
+;Drop the ball from height 10 to 2
+ypos = ypos - spd#
+spd#=spd#+.2
+PositionEntity ball,0,ypos,0
+ScaleEntity ball,1+bloat,1+flatten,1+bloat
+
+;If the ball is low enough make it look increasingly squashed
+If frame>8
+bloat=bloat+1.5
+flatten=flatten-.25
+Else
+flatten=flatten+.05
+EndIf
+
+;Record the frame!
+SetAnimKey ball,frame
+Next
+
+;Now we need to add the frames we've just made to the sequence of "film"!
+seq = AddAnimSeq(ball,frame-1) ; total number of frames
+
+;Play it back ping-pong!
+Animate ball,2,0.15
+While Not KeyHit(1)
+UpdateWorld
+RenderWorld
+Flip
+Wend
+End
+
+:ExtractAnimSeq( entity,first_frame,last_frame[,anim_seq] )
+
+.args
+entity - entity handle
+first_frame - first frame of anim sequence to extract
+last_frame - last frame of anim sequence to extract
+anim_seq (optional) - anim sequence to extract from. This is usually 0, and  as such defaults to 0.
+
+.desc
+This command allows you to convert an animation with an MD2-style series  of anim sequences into a pure Blitz anim sequence, and play it back as such  using Animate.
+
+.code
+mesh=LoadAnimMesh( base_mesh$ ) ;anim sequence 0.
+ExtractAnimSeq( mesh,0,30 ) ;anim sequence 1: frames 0...30 are 'run'
+ExtractAnimSeq( mesh,31,40 ) ;anim sequence 2: frames 31...40 are 'jump' etc  etc...
+
+Animate mesh,3,1,2 ;play one-shot jump anim
+
+:Animate entity[,mode][,speed#][,sequence][,transition#]
+
+.args
+entity - entity handle
+
+mode (optional) - mode of animation.
+0: stop animation
+1: loop animation (default)
+2: ping-pong animation
+3: one-shot animation
+
+speed# (optional) - speed of animation. Defaults to 1.
+sequence (optional) - specifies which sequence of animation frames to play.  Defaults to 0.
+transition# (optional) - used to tween between an entities current position  rotation and the first frame of animation. Defaults to 0.
+
+.desc
+Animates an entity.
+
+More info about the optional parameters: 
+
+speed# - a negative speed will play the animation backwards. 
+
+sequence - Initially, an entity loaded with LoadAnimMesh  will have a single animation sequence. More sequences can be added using either LoadAnimSeq or AddAnimSeq.  Animation sequences are numbered 0,1,2...etc. 
+
+transition# - A value of 0 will cause an instant 'leap' to the first frame,  while values greater than 0 will cause a smooth transition. 
+
+.code
+None.
+
+:SetAnimTime entity,time#[,anim_seq]
+
+.args
+entity - a valid entity handle.
+time# - a floating point time value.
+anim_seq - an optional animation sequence number.
+
+.desc
+SetAnimTime allows you to manually animate entities.
+
+:AnimSeq ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the specified entity's current animation sequence.
+
+.code
+None.
+
+:AnimLength ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the length of the specified entity's current animation sequence.
+
+.code
+None.
+
+:AnimTime# ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the current animation time of an entity.
+
+.code
+None.
+
+:Animating ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns true if the specified entity is currently animating.
+
+.code
+None.
+

@@ -1,0 +1,168 @@
+:CreateListener ( parent[,rolloff_factor#][,doppler_scale#][,distance_scale#] )
+
+.args
+parent - parent entity of listener. A parent entity, typically a camera,  must be specified to 'carry' the listener around.
+rolloff_factor# (optional) - the rate at which volume diminishes with distance.  Defaults to 1.
+doppler_scale# (optional) - the severity of the doppler effect. Defaults to  1.
+distance_scale# (optional) - artificially scales distances. Defaults to 1.
+
+.desc
+Creates a listener entity and returns its handle. Currently, only a single  listener is supported.
+
+.code
+; CreateListener Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+microphone=CreateListener(camera) ; Create listener, make it child of camera
+sound=Load3DSound("media/ufo.wav") ; Load 3D sound
+
+While Not KeyDown(1)
+
+If KeyDown(205)=True Then TurnEntity camera,0,-1,0
+If KeyDown(203)=True Then TurnEntity camera,0,1,0
+If KeyDown(208)=True Then MoveEntity camera,0,0,-0.05
+If KeyDown(200)=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then emit sound from cube
+If MouseHit(1) = True Then EmitSound(sound,cube)
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to make a sound be emitted from the cube"
+
+Flip
+
+Wend
+
+End
+
+:Load3DSound ( file$ )
+
+.args
+file$ - filename of sound file to be loaded and used as 3D sound
+
+.desc
+Loads a sound and returns its handle for use with EmitSound.
+
+.code
+; Load3DSound Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+microphone=CreateListener(camera) ; Create listener, make it child of camera
+sound=Load3DSound("media/ufo.wav") ; Load 3D sound
+
+While Not KeyDown(1)
+
+If KeyDown(205)=True Then TurnEntity camera,0,-1,0
+If KeyDown(203)=True Then TurnEntity camera,0,1,0
+If KeyDown(208)=True Then MoveEntity camera,0,0,-0.05
+If KeyDown(200)=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then emit sound from cube
+If MouseHit(1) = True Then EmitSound(sound,cube)
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to make a sound be emitted from the cube"
+
+Flip
+
+Wend
+
+End
+
+:EmitSound( sound,entity )
+
+.args
+sound - sound handle
+entity - entity handle
+
+.desc
+Emits a sound attached to the specified entity and returns a sound channel.
+
+The sound must have been loaded using Load3DSound for 3D effects.
+
+.code
+; EmitSound Example
+; -----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+microphone=CreateListener(camera) ; Create listener, make it child of camera
+sound=Load3DSound("media/ufo.wav") ; Load 3D sound
+
+While Not KeyDown(1)
+
+If KeyDown(205)=True Then TurnEntity camera,0,-1,0
+If KeyDown(203)=True Then TurnEntity camera,0,1,0
+If KeyDown(208)=True Then MoveEntity camera,0,0,-0.05
+If KeyDown(200)=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then emit sound from cube
+If MouseHit(1) = True Then EmitSound(sound,cube)
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to make a sound be emitted from the cube"
+
+Flip
+
+Wend
+
+End
+

@@ -1,0 +1,1664 @@
+:Graphics width, height, color depth,[mode]
+
+.args
+width = width of screen in pixels (640, 800, etc)
+height = height of screen in pixels (480, 600, etc)
+color depth = depth in bits (0, 16, 24, or 32 bit)
+mode = Video mode (see description); Optional
+
+.desc
+This command sets Blitz into 'graphics' mode with the specified width, height, and color depth (in bits). This command must be executed before any graphic related commands can be used. Every time this command is used, any images loaded will be lost, and all handles to images will become invalid.
+
+
+Color depth is OPTIONAL and should be left blank or set to zero if possible - Blitz will then determine the best color mode automatically for the user's video card.  In general 16 bit should be sufficient for most games and should be used wherever possible to ensure greatest compatibility.
+
+
+Valid graphic width and height varies GREATLY from card to card so to be sure  your users can display the mode you wish, use the GfxModeExists command to be sure before you  try and set the mode yourself. Common resolutions that are probably safe are  640x480 and 800x600. Try to avoid odd screen modes like 640x400 as MANY MANY  cards cannot display them. Chances are if you can set your Windows screen resolution  to a particular resolution, then Blitz will behave in that resolution also.
+
+
+Remember, each step higher in resolution and color depth mark a large jump in  system requirements and may be inversely proportionate to system performance.  If you use the lowest resolution and depth possible to meet your desired game  parameters, it will allow more people with lesser systems than your own still  play and enjoy your game. This is why many games still support a 640x480 mode  :)
+
+
+An extra parameter is used at the end of the command after the color depth.  Here are the parameters:
+
+
+0 : auto - windowed in debug, fullscreen in non-debug (this is the default)
+
+1 : fullscreen mode
+
+2 : windowed mode
+
+3 : scaled window mode
+
+.also
+EndGraphics;Graphics3D
+
+.code
+;GRAPHICS Example
+
+; Set The Graphic Mode
+Graphics 800,600
+
+; Now print something on the graphic screen
+Text 0,0, "This is some text printed on the graphic screen (and a white box)!  Press ESC ..."
+
+; Now for a box
+Rect 100,100,200,200,1
+
+While Not KeyHit(1)
+Wend
+
+:EndGraphics
+
+.args
+None.
+
+.desc
+Returns a program to a non-Graphics mode state. This is the same state that a program starts up in, before the Graphics command is used. 
+
+
+One possible use for EndGraphics is to switch between full-screen and windowed states.
+
+.also
+Graphics
+
+.code
+Graphics 640,480,0,1
+SetBuffer BackBuffer()
+
+Text 0,0,"EndGraphics Example Stage 1/2"
+Text 0,20,"Currently in Graphics mode"
+Text 0,40,"Press a key to deactive Graphics mode with EndGraphics command"
+
+Flip
+
+WaitKey()
+
+EndGraphics
+
+Print "EndGraphics Example Stage 2/2"
+Print "Currently in non-Graphics mode"
+
+WaitKey()
+
+End
+
+:SetBuffer buffer
+
+.args
+Buffers can either be the FrontBuffer(), BackBuffer() or an ImageBuffer()  Default buffer is the FrontBuffer
+
+.desc
+Use this command to set the current drawing buffer. If not used the default  buffer, FrontBuffer() is used. SetBuffer also resets the origin to 0,0 and the  Viewpoint to the width and height of the buffer.
+
+.code
+SetBuffer FrontBuffer() ;Sets FrontBuffer as the current drawing buffer
+
+:FrontBuffer()
+
+.args
+None
+
+.desc
+It's important to understand buffers when writing a game.
+
+What the player can see at any given time is usually the front buffer. Anything you draw to this buffer is IMMEDIATELY visible to the player. This sounds fast (and it is) but the problem is that when you are drawing to the front buffer - like a piece of paper and pencil - anything you draw on the screen overwrites anything else that exists in the same space. So, if you want to 'save' any portion of the screen from being overwritten by another drawing operation, YOU - the programmer - have to copy the area 'under' the location of the new operation  to an image so you can replace it later. Imagine taking a piece of paper with a picture of some mountains, and making an airplane pass in front of them, inch by inch. Every time the plane moves, you have to draw the new area that will be under the plane next on another sheet of paper (so you know what it looked  like) then draw the plane over the new place. Next time you move, you will repeat  this, then draw the image back in the OLD plane location. This process is labor-intensive  and largely unnecessary thanks to a process called DOUBLE BUFFERING (see BackBuffer(). Double buffering is used for pretty  much all games for high-action with lots of objects on the screen.
+
+So, if double buffering rocks so much, why would you WANT to ever draw to the front buffer? Sometimes, you just want to draw stuff to the screen, without caring what you overwrite. You don't have to worry about redrawing the screen over and over again in double buffering in this case. Just set the buffer to FrontBuffer() and you can write directly to the screen in real time.
+
+.code
+; FrontBuffer()/Rect Example
+
+; Engage graphics mode
+Graphics 640,480,16
+
+; Set the drawing buffer to front - instant drawing ops!
+SetBuffer FrontBuffer()
+
+; Repeat this until user presses ESC
+While Not KeyHit(1)
+; Set a random color
+Color Rnd(255),Rnd(255),Rnd(255)
+; Draw a rectangle at a random location, with a random width and height
+; plus randomly choose if the rectangle is solid or just an outline
+Rect Rnd(640),Rnd(480),Rnd(50),Rnd(50),Rnd(0,1)
+; Blitz is so dang fast, we need a delay so you can watch it draw!
+Delay 10
+Wend
+
+:BackBuffer()
+
+.args
+None.
+
+.desc
+This is a value usually used with SETBUFFER  to denote the secondary non-visible drawing buffer called the Back Buffer. In  MOST gaming situations, you will want to be using the BackBuffer() for drawing  operations then using Flip to bring that buffer to the FrontBuffer() where it can be seen. There are  other uses for the command, but this is the biggie. See SETBUFFER for more info, and check out the example.  Once again - if you set drawing operations to the BackBuffer() you will NOT  see any of them until you call FLIP.
+
+.code
+; Flip/Backbuffer()/Rect Example
+
+; Set Graphics Mode
+Graphics 640,480
+
+; Go double buffering
+SetBuffer BackBuffer()
+
+; Setup initial locations for the box
+box_x = -20 ; negative so it will start OFF screen
+box_y = 100
+
+While Not KeyHit(1)
+Cls ; Always clear screen first
+Rect box_x,box_y,20,20,1 ; Draw the box in the current x,y location
+Flip ; Flip it into view
+box_x = box_x + 1 ; Move the box over one pixel
+If box_x = 640 Then box_x=-20 ; If it leaves the Right edge, reset its x location
+Wend
+
+
+:LoadBuffer (buffer, filename$)
+
+.args
+buffer = system or image buffer
+filename$ = string containing full path and filename of image 
+
+.desc
+There are a hundred and one uses for this command, but probably most often  used would be to display a title screen or some other 'one time viewing only'  image to the front buffer (as in our example).
+
+
+You can also load to an image buffer or back buffer. The image is scaled to  match the buffer size. This command returns 1 if the command was successful,  0 if there was an error.
+
+.code
+; LoadBuffer example
+
+; Set graphics mode
+Graphics 800,600,16
+
+; Load an image directly to the front buffer (your location may be different)
+LoadBuffer (FrontBuffer(),"C:Program FilesBlitz Basicsampleslitzanoidgfx	itle.bmp")
+
+; wait for ESC so user gets to see the screen
+While Not KeyHit(1)
+Wend 
+
+
+:SaveBuffer (buffer,filename$)
+
+.args
+buffer = The buffer to save; FrontBuffer() or BackBuffer()
+filename$ = valid Windows path/filename 
+
+.desc
+Typically, this is used to take a screen snapshot. This will save the screen  buffer you specify to a .bmp file you specify. Remember, use the proper name  for the buffer you wish to save; FrontBuffer() for the current visible  screen, and BackBuffer() for the back or invisible drawing buffer. The  filename must be valid Windows filename syntax.
+
+.code
+; Save the screen when player pushes F10
+
+If KeyHit(10) Then
+SaveBuffer(FrontBuffer(),"screenshot.bmp")
+End If
+
+
+:LockBuffer buffer
+
+.args
+buffer = any valid screen/image buffer (optional)
+
+.desc
+After you use LockBuffer on a buffer, the only graphics commands you can  use are the read/write pixel commands ReadPixel, WritePixel, ReadPixelFast, WritePixelFast,  CopyPixelFast, and CopyPixel. You must UnlockBuffer before using other graphics commands or API calls, and you are advised to only keep the buffer locked for as long as it is needed.
+
+The buffer parameter isn't required. If omitted, the default buffer set with SetBuffer will be used.
+
+See the other commands for more information.
+
+.also
+LockedPitch;LockedFormat;LockedPixels;ReadPixelFast;WritePixelFast;UnlockBuffer
+
+.code
+; High Speed Graphics Commands
+
+Graphics 640,480,16
+
+; Draw a bunch of stuff on the screen
+For t= 1 To 1000
+Color Rnd(255),Rnd(255),Rnd(255)
+Rect Rnd(640),Rnd(480),Rnd(150),Rnd(150),Rnd(1)
+Next
+
+Delay 3000
+
+; Copy the top half of the screen over the bottom half
+; using fast pixels and locked buffers
+For x = 1 To 640
+For y = 1 To 240
+LockBuffer FrontBuffer()
+WritePixelFast x,y+241,ReadPixelFast(x,y)
+UnlockBuffer FrontBuffer()
+Next
+Next
+
+Delay 3000
+
+; Draw the left half of the screen over the right half
+; using the slower direct pixel access
+For x = 1 To 320
+For y = 1 To 480
+WritePixel x+320,y,ReadPixel(x,y)
+Next
+Next
+
+:UnlockBuffer buffer
+
+.args
+buffer = any valid screen/image buffer (optional)
+
+.desc
+After you use LockBuffer on a buffer, the only  graphics commands you can use are the read/write pixel commands ReadPixel, WritePixel, ReadPixelFast, and WritePixelFast. You must use this command before  using other graphics commands.
+
+The buffer parameter isn't required. If omitted, the default buffer set with SetBuffer will be used.
+
+See the other commands for more information.
+
+.also
+LockedPitch;LockedFormat;LockedPixels;ReadPixelFast;WritePixelFast;LockBuffer
+
+.code
+; High Speed Graphics Commands
+
+Graphics 640,480,16
+
+; Draw a bunch of stuff on the screen
+For t= 1 To 1000
+Color Rnd(255),Rnd(255),Rnd(255)
+Rect Rnd(640),Rnd(480),Rnd(150),Rnd(150),Rnd(1)
+Next
+
+Delay 3000
+
+; Copy the top half of the screen over the bottom half
+; using fast pixels and locked buffers
+For x = 1 To 640
+For y = 1 To 240
+LockBuffer FrontBuffer()
+WritePixelFast x,y+241,ReadPixelFast(x,y)
+UnlockBuffer FrontBuffer()
+Next
+Next
+
+Delay 3000
+
+; Draw the left half of the screen over the right half
+; using the slower direct pixel access
+For x = 1 To 320
+For y = 1 To 480
+WritePixel x+320,y,ReadPixel(x,y)
+Next
+Next
+
+:ReadPixel (x,y,[buffer])
+
+.args
+x - x coordinate of pixel
+y - y coordinate of pixel
+buffer (optional) - name of buffer to read colour value from, e.g. BackBuffer() (defaults to current graphics buffer)
+
+.desc
+Reads a color value from either the current buffer or the specified buffer.
+
+
+The returned colour value is in the form of an integer that contains the alpha, red, green and blue values of the pixel. 
+
+
+You can use this command on a locked buffer for a slight speed-up. See LockBuffer. 
+
+
+Warning: this is a low level command with no error checking for out of range parameters, use with care.
+
+.also
+GetColor;ReadPixelFast
+
+.code
+; ReadPixel/WritePixel Example
+; ----------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to read color values (this may take a few seconds)"
+WaitKey()
+
+; Load and draw an image on to the screen - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+DrawImage pic,0,0 
+
+; Initialise an array big enough to fit all the color information of the screen
+Dim pix(GraphicsWidth(),GraphicsHeight())
+
+; Use ReadPixel to get all the color information of the screen
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+pix(x,y)=ReadPixel(x,y)
+Next
+Next
+
+Cls
+Locate 0,0
+Print "Press a key to write pixels (this may takes a few seconds)"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Use WritePixel to redraw the screen using the color information we got earlier
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+WritePixel x,y,pix(x,GraphicsHeight()-y) ; get y array value in backwards order,  to flip screen
+Next
+Next
+
+WaitKey()
+
+:WritePixel x,y,argb,[buffer]
+
+.args
+x - y-coordinate of pixel
+y - y-coordinate of pixel
+argb - argb colour value of pixel (alpha, red, green, blue)
+buffer (optional) - name of buffer to write colour value to, e.g. BackBuffer()
+
+.desc
+Writes a color value to either the current buffer or the specified buffer.
+
+
+You can use this command on a locked buffer for a slight speed-up.
+
+.also
+Plot;WritePixelFast;LockBuffer
+
+.code
+; ReadPixel/WritePixel Example
+; ----------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to read color values (this may take a few seconds)"
+WaitKey()
+
+; Load and draw an image on to the screen - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+DrawImage pic,0,0 
+
+; Initialise an array big enough to fit all the color information of the screen
+Dim pix(GraphicsWidth(),GraphicsHeight())
+
+; Use ReadPixel to get all the color information of the screen
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+pix(x,y)=ReadPixel(x,y)
+Next
+Next
+
+Cls
+Locate 0,0
+Print "Press a key to write pixels (this may takes a few seconds)"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Use WritePixel to redraw the screen using the color information we got earlier
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+WritePixel x,y,pix(x,GraphicsHeight()-y) ; get y array value in backwards order,  to flip screen
+Next
+Next
+
+WaitKey()
+
+:ReadPixelFast (x,y,[buffer])
+
+.args
+x - y-coordinate of pixel
+y - y-coordinate of pixel
+buffer (optional) - name of buffer to read colour value from, e.g. BackBuffer() 
+
+.desc
+Reads a color value from either the current buffer or the specified buffer,  and returns it.
+
+
+The returned colour value is in the form of an integer than  contains the alpha, red, green and blue values of the pixel. 
+
+
+IMPORTANT: 
+
+
+You *must* use this command on a locked buffer, otherwise the command will  fail. See LockBuffer. 
+
+
+Also, you must make sure that the coordinates that you are reading from are  valid, otherwise you will end up reading garbage values. 
+
+
+WARNING: 
+
+
+By not following the above advice, you may cause your computer to crash. 
+
+
+.also
+GetColor, ReadPixel.  
+
+.code
+; ReadPixelFast/WritePixeFast Example
+; -----------------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to read color values"
+WaitKey()
+
+; Load and draw an image on to the screen - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+DrawImage pic,0,0 
+
+; Initialise an array big enough to fit all the color information of the screen
+Dim pix(GraphicsWidth(),GraphicsHeight())
+
+; Lock buffer before using ReadPixelFast
+LockBuffer
+
+; Use ReadPixel to get all the color information of the screen
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+pix(x,y)=ReadPixelFast(x,y)
+Next
+Next
+
+; Lock buffer after using ReadPixelFast
+UnlockBuffer
+
+Cls
+Locate 0,0
+Print "Press a key to write pixels"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Lock buffer before using WritePixelFast
+LockBuffer
+
+; Use WritePixel to redraw the screen using the color information we got earlier
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+WritePixelFast x,y,pix(x,GraphicsHeight()-y) ; get y array value in backwards  order, to flip screen
+Next
+Next
+
+; Unlock buffer after using WritePixelFast
+UnlockBuffer
+
+WaitKey()
+
+
+:WritePixelFast x,y,rgb,[buffer]
+
+.args
+x - y-coordinate of pixel
+y - y-coordinate of pixel
+argb - argb colour value of pixel (alpha, red, green, blue)
+buffer (optional) - name of buffer to write colour value to, e.g. BackBuffer() 
+
+.desc
+Writes a colour value to either the current buffer or the specified buffer.
+
+
+IMPORTANT: 
+
+
+You *must* use this command on a locked buffer, otherwise the command will  fail. See LockBuffer. 
+
+
+Also, you must make sure that the coordinates that you are writing to are  valid, otherwise you will end up overwriting other areas of memory. 
+
+
+WARNING: 
+
+
+By not following the above advice, you may cause your computer to crash. 
+
+
+.also
+Plot, WritePixel. 
+
+.code
+; ReadPixelFast/WritePixeFast Example
+; -----------------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to read color values"
+WaitKey()
+
+; Load and draw an image on to the screen - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+DrawImage pic,0,0 
+
+; Initialise an array big enough to fit all the color information of the screen
+Dim pix(GraphicsWidth(),GraphicsHeight())
+
+; Lock buffer before using ReadPixelFast
+LockBuffer
+
+; Use ReadPixel to get all the color information of the screen
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+pix(x,y)=ReadPixelFast(x,y)
+Next
+Next
+
+; Lock buffer after using ReadPixelFast
+UnlockBuffer
+
+Cls
+Locate 0,0
+Print "Press a key to write pixels"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Lock buffer before using WritePixelFast
+LockBuffer
+
+; Use WritePixel to redraw the screen using the color information we got earlier
+For y=0 To GraphicsHeight()
+For x=0 To GraphicsWidth()
+WritePixelFast x,y,pix(x,GraphicsHeight()-y) ; get y array value in backwards  order, to flip screen
+Next
+Next
+
+; Unlock buffer after using WritePixelFast
+UnlockBuffer
+
+WaitKey()
+
+
+:CopyPixel src_x,src_y,src_buffer,dest_x,dest_y,[dest_buffer]
+
+.args
+src_x - x-coordinate of source pixel to copy from
+src_y - y-coordinate of source pixel to copy from
+src_buffer - name of buffer to copy from, e.g. ImageBuffer()
+dest_x - x-coordinate of destination pixel to copy to
+dest_y - y-coordinate of destination pixel to copy to
+dest_buffer (optional) - name of buffer to copy to, e.g. BackBuffer()
+
+.desc
+You can use this command  on a locked buffer for a slight speed-up. See LockBuffer. 
+
+
+.also
+CopyPixelFast.
+
+.code
+; CopyPixel/CopyPixelFast Example
+; -------------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to use CopyPixel to copy the top half of an image to the  frontbuffer"
+WaitKey()
+
+; Load an image - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+
+; Use CopyPixel to copy the top half of the image to the frontbuffer
+For y=0 To ImageHeight(pic)/2
+For x=0 To ImageWidth(pic)
+CopyPixel x,y,ImageBuffer(pic),x,y
+Next
+Next
+
+Locate 0,GraphicsHeight()/2
+Print "Press a key to use CopyPixelFast to copy the bottom half of the image"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Lock buffer before using CopyPixelFast
+LockBuffer
+
+; Use CopyPixelFast to copy the bottom half of the image to the frontbuffer
+For y=0 To (ImageHeight(pic)/2)+ImageHeight(pic)
+For x=0 To ImageWidth(pic)
+CopyPixelFast x,y,ImageBuffer(pic),x,y
+Next
+Next
+
+; Unlock buffer after using CopyPixelFast
+UnlockBuffer
+
+WaitKey()
+
+:CopyPixelFast src_x,src_y,src_buffer,dest_x,dest_y,[dest_buffer]
+
+.args
+src_x - x-coordinate of source pixel to copy from
+src_y - y-coordinate of source pixel to copy from
+src_buffer - name of buffer to copy from, e.g. ImageBuffer()
+dest_x - x-coordinate of destination pixel to copy to
+dest_y - y-coordinate of destination pixel to copy to
+dest_buffer (optional) - name of buffer to copy to, e.g. BackBuffer()
+
+.desc
+IMPORTANT: 
+
+
+You *must* use this command on a locked buffer, otherwise the command will  fail. See LockBuffer. 
+
+
+Also, you must make sure that the coordinates that you are copying from and  to are valid, otherwise you will end up overwriting other areas of memory. 
+
+
+WARNING: 
+
+
+By not following the above advice, you may cause your computer to crash. 
+
+
+.also
+CopyPixel.
+
+.code
+; CopyPixel/CopyPixelFast Example
+; -------------------------------
+
+Graphics 640,480,16
+
+Print "Press a key to use CopyPixel to copy the top half of an image to the  frontbuffer"
+WaitKey()
+
+; Load an image - can be anything
+pic=LoadImage("media/blitz_pic.bmp")
+
+; Use CopyPixel to copy the top half of the image to the frontbuffer
+For y=0 To ImageHeight(pic)/2
+For x=0 To ImageWidth(pic)
+CopyPixel x,y,ImageBuffer(pic),x,y
+Next
+Next
+
+Locate 0,GraphicsHeight()/2
+Print "Press a key to use CopyPixelFast to copy the bottom half of the image"
+Print "Once this has finished, you can then press a key to end the program"
+
+WaitKey()
+
+; Lock buffer before using CopyPixelFast
+LockBuffer
+
+; Use CopyPixelFast to copy the bottom half of the image to the frontbuffer
+For y=0 To (ImageHeight(pic)/2)+ImageHeight(pic)
+For x=0 To ImageWidth(pic)
+CopyPixelFast x,y,ImageBuffer(pic),x,y
+Next
+Next
+
+; Unlock buffer after using CopyPixelFast
+UnlockBuffer
+
+WaitKey()
+
+:CopyRect src_x,src_y,src_width,src_height,dest_x,dest_y,[src_buffer],[dest_buffer]
+
+.args
+src_x = source top left x location to begin copying from
+src_y = source top left y location to begin copying from
+src_width = width of source area to copy
+src_height = height of source area to copy
+dest_x = destination top left x location to copy to
+dest_y = destination top left y location to copy to
+src_buffer = handle to the source image buffer (optional)
+dest_buffer = handle to the destination image buffer (optional) 
+
+.desc
+Copies a rectangle of graphics from one buffer to another. If a buffer is  omitted, the current buffer is used.
+
+.code
+; CopyRect Example
+
+; Turn on graphics mode
+Graphics 800,600,16
+
+; create a blank image
+gfxBlank=CreateImage (300,300)
+
+; Fill the screen with random boxes in random colors
+For t = 1 To 1000
+Rect Rand(800),Rand(600),Rand(100),Rand(100),Rand(0,1) 
+Color Rand(255),Rand(255),Rand(255)
+Next
+
+; Wait a couple of seconds so the user can see it
+Delay 2000
+
+; Copy graphics randomly from the front buffer to the blank image
+CopyRect Rand(800),Rand(600),300,300,0,0,FrontBuffer(),ImageBuffer(gfxBlank)
+
+; Clear the screen, draw the copied to image, wait for user to hit a key
+Cls
+DrawImage gfxBlank,0,0
+WaitKey 
+
+
+:Viewport x, y, width, height
+
+.args
+x = the topmost left corner to start the port x coordinate
+y = the topmost left corner to start the port y coordinate
+width = how wide the port is (in pixels)
+height = how tall the port is (in pixels) 
+
+.desc
+There are MANY MANY times you want to draw graphics (aliens, ships, etc)  ONLY on a certain area of the screen while leaving the other areas alone. This  is often referred to as 'windowing' or 'portaling' or 'clipping' an area. Usually,  you will perform all your drawing operations first (background, controls, etc),  then section off the restricted area of the screen with VIEWPORT to do drawing  in that area. There are a million uses for this; overhead map radar screens,  Ultima style display windows, onscreen scrollers, etc. This is a bit more complex  than most graphic commands, so be sure you have a good handle on it before trying  to use it. The biggest tip I can give you about this command is: REMEMBER TO  CLEAR THE VIEWPORT WHEN YOU ARE DONE! Do this by setting the viewport to include  the whole screen (i.e. Viewport 0,0,640,480 if your game was in 640x480). Look  carefully at the example. Remember, the second set of numbers isn't the ENDING  location of the port - rather the SIZE of the port starting at the first coordinates.
+
+.code
+; ViewPort Example
+
+; Set Up Graphics Mode
+Graphics 800,600
+
+; Set up Double Buffering
+SetBuffer BackBuffer()
+
+; Set viewport starting at 100,100 and make it 200,200 pixels in size
+Viewport 100,100,200,200
+
+; Infinately draw random rectangles with random colors
+While Not KeyHit(1)
+Cls ; Clear screen in 'blitting' technique
+For t = 1 To 100 ; Do 100 rectangles each time
+Color Rnd(255),Rnd(255),Rnd(255) ; Random color
+Rect Rnd(800),Rnd(600),Rnd(300),Rnd(300),Rnd(0,1) ; Random sized and located  box, some filled
+Next ; repeat that drawing loop
+Flip ; Flip to the back buffer
+Wend
+
+
+:Origin x,y
+
+.args
+x = x offset value
+y = y offset value 
+
+.desc
+This command sets a point of origin for all subsequent drawing commands.  This can be positive or negative.
+
+.code
+; Origin example
+Graphics 800,600,16
+
+; Offset drawing options with origin command -200 in each direction
+Origin -200,-200
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+
+; Draw an oval - SHOULD be at the exact center, but it isn't!
+Oval 400,300,50,50,1
+Wend
+
+
+:Flip [vwait]
+
+.args
+vwait = set to FALSE to disable frame syncing, defaults to TRUE which waits for vertical blank to finish
+
+.desc
+Flip will switch the FrontBuffer() and BackBuffer().
+
+
+This command should be used when you are using Double Buffering.  Double Buffering is a technique used to ensure that screen updates are not visible to the user.  If you draw directly to the FrontBuffer, the display may appear flickery as the updates are drawn directly to the screen.  If you draw to the BackBuffer, the updates are drawn in memory.  Flip is then used to make the BackBuffer the FrontBuffer, and hence show the updates on screen in one go.  At the same time, the FrontBuffer becomes the BackBuffer, allowing you to draw the next screen update on the BackBuffer before Flipping again.
+
+
+The vwait parameter defines whether or not the graphics card will wait for the vertical blank before flipping the screen.  The vertical blank is an event that occurs at the frequency of the monitors refresh rate, and corresponds to the point in time when the last line on the screen has been drawn, and the top line is about to be drawn by the monitor.  By waiting until the vertical blank, you ensure smooth updates to the screen as the image being drawn by the monitor will change only once the entire screen has been drawn by the monitor, and the screen is just about to start being refreshed.
+
+
+However, it is worth noting that this setting applies to the graphics card only, and some graphics cards allow the user to disable the vertical blank event.  Therefore, if you rely on Flip alone, the display may be corrupted on certain setups.  The VWait command may be useful to you in  this respect, as it forces the CPU to wait for the vertical blank (as opposed to the graphics card), and this cannot be disabled.  Hence true silky smooth updates are best achieved using "VWait : Flip False".
+
+.also
+FrontBuffer;BackBuffer;VWait;ScanLine
+
+.code
+; Flip/Backbuffer()/Rect Example
+
+; Set Graphics Mode
+Graphics 640,480
+
+; Go double buffering
+SetBuffer BackBuffer()
+
+; Setup initial locations for the box
+box_x = -20 ; negative so it will start OFF screen
+box_y = 100
+
+While Not KeyHit(1)
+Cls ; Always clear screen first
+Rect box_x,box_y,20,20,1 ; Draw the box in the current x,y location
+Flip ; Flip it into view
+box_x = box_x + 1 ; Move the box over one pixel
+If box_x = 640 Then box_x=-20 ; If it leaves the Right edge, reset its x location
+Wend
+
+:VWait [frames]
+
+.args
+frames = optional number of frames to wait.  Default is 1 frame.
+
+.desc
+VWait will cause the CPU to wait for the next (or specified number of) vertical blank event on the monitor
+
+
+There are times when you can draw too fast, and your drawing operations happen so fast that you get undesireable effects.  This command forces the CPU to wait until the drawing scan line reaches the bottom of the screen before proceeding. Try the example with and without the VWait command.
+
+
+Note that this command is different to the vertical blank waiting mechanism in Flip because Flip will cause the graphics card (as opposed to the CPU) to wait for the next vertical blank.  The vertical blank can be disabled on some graphics cards, hence it is quite common to use "VWait : Flip False" to ensure consistent updates on all setups.
+
+.also
+Flip;ScanLine
+
+.code
+; Vwait example
+Graphics 800,600,16
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+; Set a random color
+Color Rnd(255),Rnd(255),Rnd(255)
+; Draw a random line
+Line Rnd(800),Rnd(600),Rnd(800),Rnd(600)
+; Wait For a vertical blank to happen before looping
+VWait
+Wend
+
+:ScanLine()
+
+.args
+None.
+
+.desc
+If for some reason you need to know the current scanline location of the  drawing system, here is how you get it.
+
+.also
+VWait;Flip
+
+.code
+; ScanLine() Example
+
+While Not KeyHit(1)
+Print ScanLine()
+Wend
+
+:GraphicsHeight()
+
+.args
+None
+
+.desc
+This command will tell you the height, in pixels, of the current graphics  mode.
+
+.code
+; GraphicsWidth(), GraphicsHeight(), GraphicsDepth(), GraphicsBuffer() example
+
+; Set a graphics mode and buffer
+Graphics 640,480,16
+SetBuffer FrontBuffer()
+
+; Print the details
+Print "Screen width is: " + GraphicsWidth()
+Print "Screen height is: " + GraphicsHeight()
+Print "Screen color depth is: " + GraphicsDepth()
+Print "Current buffer handle is: " + GraphicsBuffer()
+
+; Wait for ESC before exiting
+While Not KeyHit(1)
+Wend
+
+
+:GraphicsWidth()
+
+.args
+None
+
+.desc
+This command will tell you the width, in pixels, of the current graphics  mode.
+
+.code
+; GraphicsWidth(), GraphicsHeight(), GraphicsDepth(), GraphicsBuffer() example
+
+; Set a graphics mode and buffer
+Graphics 640,480,16
+SetBuffer FrontBuffer()
+
+; Print the details
+Print "Screen width is: " + GraphicsWidth()
+Print "Screen height is: " + GraphicsHeight()
+Print "Screen color depth is: " + GraphicsDepth()
+Print "Current buffer handle is: " + GraphicsBuffer()
+
+; Wait for ESC before exiting
+While Not KeyHit(1)
+Wend
+
+
+:GraphicsDepth()
+
+.args
+None
+
+.desc
+This command will tell you the color depth of the current graphics mode.
+
+.code
+; GraphicsWidth(), GraphicsHeight(), GraphicsDepth(), GraphicsBuffer() example
+
+; Set a graphics mode and buffer
+Graphics 640,480,16
+SetBuffer FrontBuffer()
+
+; Print the details
+Print "Screen width is: " + GraphicsWidth()
+Print "Screen height is: " + GraphicsHeight()
+Print "Screen color depth is: " + GraphicsDepth()
+Print "Current buffer handle is: " + GraphicsBuffer()
+
+; Wait for ESC before exiting
+While Not KeyHit(1)
+Wend
+
+
+:GraphicsBuffer()
+
+.args
+None
+
+.desc
+Use this command to get which buffer Blitz is currently writing to.
+
+.code
+; GraphicsWidth(), GraphicsHeight(), GraphicsDepth(), GraphicsBuffer() example
+
+; Set a graphics mode and buffer
+Graphics 640,480,16
+SetBuffer FrontBuffer()
+
+; Print the details
+Print "Screen width is: " + GraphicsWidth()
+Print "Screen height is: " + GraphicsHeight()
+Print "Screen color depth is: " + GraphicsDepth()
+Print "Current buffer handle is: " + GraphicsBuffer()
+
+; Wait for ESC before exiting
+While Not KeyHit(1)
+Wend
+
+
+:Color red,green,blue
+
+.args
+red = value of red component (0-255)
+green = value of green component (0-255)
+blue = value of blue component (0-255) 
+
+.desc
+This command sets the drawing color (using RGB values) for all subsequent  drawing commands (Line, Rect, Text, etc.) You must be in Graphics  mode to execute this command.
+
+.code
+; Color, ColorRed(), ColorBlue(), ColorGreen() Example
+
+; Gotta be in graphics mode
+Graphics 640,480
+
+; Change the random seed
+SeedRnd MilliSecs()
+
+; Let's set the color to something random
+Color Rnd(0,255),Rnd(0,255),Rnd(0,255)
+
+; Now let's see what they are!
+While Not KeyHit(1)
+Text 0,0,"This Text is printed in Red=" + ColorRed() + " Green=" + ColorGreen()  + " Blue=" + ColorBlue() + "!"
+Wend
+
+
+:ClsColor red,green,blue
+
+.args
+red, green and blue = number between 0 and 255
+
+.desc
+This changes the color for subsequent CLS calls. Use  this command when you need CLS to 'clear' the screen with some other color than  black.
+
+.code
+;set ClsColor to red
+ClsColor 255,0,0 
+
+;set current drawing buffer to the color set by the ClsColor command
+Cls
+
+:Cls
+
+.args
+None.
+
+.desc
+This command will wipe the current drawing buffer clean of any graphics  or text present and reset the drawing buffer back to the color defined in the ClsColor command
+
+.code
+;set ClsColor to red
+ClsColor 255,0,0
+
+;set current drawing buffer to the color set by the ClsColor command
+Cls
+
+:Plot x,y
+
+.args
+x= and number from zero to the width of the current graphics mode
+y= and number from zero to the height of the current graphics mode 
+
+.desc
+Used to put a pixel on the screen defined by its x, y location in the current  drawing color defined by the Color command
+
+.code
+;Set the color to green
+Color 0,255,0
+
+;Draw a dot at location 100,200 with the color green
+plot 100,200
+
+:Line x,y,x1,y1
+
+.args
+x=starting x location of the line
+y=starting y location of the line
+x1=ending x location of the line
+y1=ending y location of the line 
+
+.desc
+This command draws a line, in the current drawing color, from one point  on the screen to another (from the x,y to x1,y1 location). See example.
+
+.code
+; Line example
+Graphics 800,600,16
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+; Set a random color
+Color Rnd(255),Rnd(255),Rnd(255)
+; Draw a random line
+Line Rnd(800),Rnd(600),Rnd(800),Rnd(600)
+Wend
+
+
+:Rect x, y, width, height, solid
+
+.args
+x = x coordinate to begin drawing the rectangle
+y = y coordinate to begin drawing the rectangle
+width = how wide to make the rectangle in pixels
+height = how tall to make the rectangle in pixels
+solid = 0 or False for unfilled and 1 or True for filled 
+
+.desc
+This command will draw a rectangle in the current drawing Color starting at the location specified. The last parameter  determines if the rectangle is filled or just a 'box'.
+
+.code
+; Flip/Backbuffer()/Rect Example
+
+; Set Graphics Mode
+Graphics 640,480
+
+; Go double buffering
+SetBuffer BackBuffer()
+
+; Setup initial locations for the box
+box_x = -20 ; negative so it will start OFF screen
+box_y = 100
+
+While Not KeyHit(1)
+Cls ; Always clear screen first
+Rect box_x,box_y,20,20,1 ; Draw the box in the current x,y location
+Flip ; Flip it into view
+box_x = box_x + 1 ; Move the box over one pixel
+If box_x = 640 Then box_x=-20 ; If it leaves the Right edge, reset its x location
+Wend
+
+
+:Oval x,y,width,height[,solid]
+
+.args
+x = x coordinate on the screen to draw the oval
+y = y coordinate on the screen to draw the oval
+width = how wide to make the oval
+height = how high to make the oval
+[solid] = 1 to make the oval solid 
+
+.desc
+Use this to draw an oval shape at the screen coordinates of your choice.  You can make the oval solid or hollow.
+
+.code
+; Oval example
+Graphics 800,600,16
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+; Set a random color
+Color Rnd(255),Rnd(255),Rnd(255)
+; Draw a random oval
+Oval Rnd(800),Rnd(600),Rnd(100),Rnd(100),Rnd(0,1)
+Wend
+
+
+:GetColor x, y
+
+.args
+x = x coordinate of pixel
+y = y coordinate of pixel 
+
+.desc
+This command works like a 'color picker' in your favorite paint program.  By specifying
+
+.code
+; GetColor Example
+
+Graphics 320,200
+SetBuffer BackBuffer()
+
+For t = 1 To 1000
+Color Rnd(255), Rnd(255), Rnd(255)
+Rect Rnd(320),Rnd(200),10,10,1
+Next
+
+GetColor 100,100
+Print "Box at 100,100 is RGB:" + ColorRed() + "," + ColorGreen() + "," + ColorBlue()  + "!"
+Flip 
+While Not KeyHit(1)
+Wend
+
+
+:ColorRed()
+
+.args
+None.
+
+.desc
+Use this command to return the red component of the RGB color of the current  drawing color. Use ColorBlue() and ColorGreen() for the other two color components.
+
+.code
+; Color, ColorRed(), ColorBlue(), ColorGreen() Example
+
+; Gotta be in graphics mode
+Graphics 640,480
+
+; Change the random seed
+SeedRnd MilliSecs()
+
+; Let's set the color to something random
+Color Rnd(0,255),Rnd(0,255),Rnd(0,255)
+
+; Now let's see what they are!
+While Not KeyHit(1)
+Text 0,0,"This Text is printed in Red=" + ColorRed() + " Green=" + ColorGreen()  + " Blue=" + ColorBlue() + "!"
+Wend
+
+
+:ColorGreen()
+
+.args
+None.
+
+.desc
+Use this command to return the green component of the RGB color of the current  drawing color. Use ColorRed() and ColorBlue() for the other two color components.
+
+.code
+; Color, ColorRed(), ColorBlue(), ColorGreen() Example
+
+; Gotta be in graphics mode
+Graphics 640,480
+
+; Change the random seed
+SeedRnd MilliSecs()
+
+; Let's set the color to something random
+Color Rnd(0,255),Rnd(0,255),Rnd(0,255)
+
+; Now let's see what they are!
+While Not KeyHit(1)
+Text 0,0,"This Text is printed in Red=" + ColorRed() + " Green=" + ColorGreen()  + " Blue=" + ColorBlue() + "!"
+Wend
+
+
+:ColorBlue()
+
+.args
+None.
+
+.desc
+Use this command to return the blue component of the RGB color of the current  drawing color. Use ColorRed() and ColorGreen() for the other two color components.
+
+.code
+; Color, ColorRed(), ColorBlue(), ColorGreen() Example
+
+; Gotta be in graphics mode
+Graphics 640,480
+
+; Change the random seed
+SeedRnd MilliSecs()
+
+; Let's set the color to something random
+Color Rnd(0,255),Rnd(0,255),Rnd(0,255)
+
+; Now let's see what they are!
+While Not KeyHit(1)
+Text 0,0,"This Text is printed in Red=" + ColorRed() + " Green=" + ColorGreen()  + " Blue=" + ColorBlue() + "!"
+Wend
+
+
+:CountGFXModes()
+
+.args
+None.
+
+.desc
+Use this command to return the number of video modes the user's video card  can display in. Use the GFXModeWidth, GFXModeHeight, and GFXModeDepth with each number of video mode to  determine the width, height, and color depth capabilities of each mode. See  example.
+
+.code
+; CountGFXModes()/GfxModeWidth/GfxModeHeight/GfxModeDepth example
+
+intModes=CountGfxModes()
+
+Print "There are " + intModes + "graphic modes available:"
+
+; Display all modes including width, height, and color depth
+For t = 1 To intModes
+Print "Mode " + t + ":
+Print "Width=" + GfxModeWidth(t)
+Print "Height=" + GfxModeHeight(t)
+Print "Height=" + GfxModeDepth(t)
+Next
+
+
+:CountGfxDrivers()
+
+.args
+None.
+
+.desc
+Some computers may have more than one video card and/or video driver installed  (a good example is a computer system with a primary video card and a Voodoo2  or other pass-through card). Once you know how many drivers there are, you can  iterate through them with GfxDriverName$ and  display them for the user to choose from. Once the user has chosen (or you decide),  you can set the graphics driver with SetGfxDriver.  Normally, this won't be necessary with 2D programming.
+
+.code
+; GfxDriver Examples
+
+; Count how many drivers there are
+totalDrivers=CountGfxDrivers()
+Print "Choose a driver to use:"
+
+; Go through them all and print their names (most people will have only 1)
+For t = 1 To totalDrivers
+Print t+") " + GfxDriverName$(t)
+Next
+
+; Let the user choose one
+driver=Input("Enter Selection:")
+
+; Set the driver!
+SetGfxDriver driver
+Print "Your driver has been selected!"
+
+
+:GfxDriverName$ (index)
+
+.args
+index = index number obtained with CountGfxDrivers command 
+
+.desc
+Some computers may have more than one video card and/or video driver installed  (a good example is a computer system with a primary video card and a Voodoo2  or other pass-through card).
+
+
+Once you know how many drivers there are using CountGfxDrivers(), you can iterate through  them with this command and display them for the user to choose from. Once the  user has chosen (or you decide), you can set the graphics driver with SetGfxDriver.
+
+
+Normally, this won't be necessary with 2D programming. 
+
+.code
+; GfxDriver Examples
+
+; Count how many drivers there are
+totalDrivers=CountGfxDrivers()
+Print "Choose a driver to use:"
+
+; Go through them all and print their names (most people will have only 1)
+For t = 1 To totalDrivers
+Print t+") " + GfxDriverName$(t)
+Next
+
+; Let the user choose one
+driver=Input("Enter Selection:")
+
+; Set the driver!
+SetGfxDriver driver
+Print "Your driver has been selected!"
+
+
+:SetGfxDriver index
+
+.args
+index = index number obtained with CountGfxDrivers command
+
+.desc
+Some computers may have more than one video card and/or video driver installed  (a good example is a computer system with a primary video card and a Voodoo2  or other pass-through card).
+
+
+Once you know how many drivers there are using the CountGfxDrivers(), you can iterate through  them with GfxDriverName$ and display them for  the user to choose from. Once the user has chosen (or you decide), you can set  the graphics driver with this command.
+
+
+Normally, this won't be necessary with 2D programming. 
+
+.code
+; GfxDriver Examples
+
+; Count how many drivers there are
+totalDrivers=CountGfxDrivers()
+Print "Choose a driver to use:"
+
+; Go through them all and print their names (most people will have only 1)
+For t = 1 To totalDrivers
+Print t+") " + GfxDriverName$(t)
+Next
+
+; Let the user choose one
+driver=Input("Enter Selection:")
+
+; Set the driver!
+SetGfxDriver driver
+Print "Your driver has been selected!"
+
+
+:GFXModeWidth (mode)
+
+.args
+None.
+
+.desc
+Once you determine the video modes available by the video card using CountGFXModes(), you can iterate through them  and determine the width, height, and color depth capabilities of each mode.  Use this command to get the width of the mode. Use the GFXModeHeight and  GFXModeDepth to get the remaining parameters.
+
+.code
+; CountGFXModes()/GfxModeWidth/GfxModeHeight/GfxModeDepth example
+
+intModes=CountGfxModes()
+
+Print "There are " + intModes + "graphic modes available:"
+
+; Display all modes including width, height, and color depth
+For t = 1 To intModes
+Print "Mode " + t + ":
+Print "Width=" + GfxModeWidth(t)
+Print "Height=" + GfxModeHeight(t)
+Print "Height=" + GfxModeDepth(t)
+Next
+
+
+:GFXModeHeight (mode)
+
+.args
+None.
+
+.desc
+Once you determine the video modes available by the video card using CountGFXModes(), you can iterate through them  and determine the width, height, and color depth capabilities of each mode.  Use this command to get the height of the mode. Use the GFXModeWidth and GFXModeDepth  to get the remaining parameters.
+
+.code
+; CountGFXModes()/GfxModeWidth/GfxModeHeight/GfxModeDepth example
+
+intModes=CountGfxModes()
+
+Print "There are " + intModes + "graphic modes available:"
+
+; Display all modes including width, height, and color depth
+For t = 1 To intModes
+Print "Mode " + t + ":
+Print "Width=" + GfxModeWidth(t)
+Print "Height=" + GfxModeHeight(t)
+Print "Height=" + GfxModeDepth(t)
+Next
+
+
+:GFXModeDepth (mode)
+
+.args
+None.
+
+.desc
+Once you determine the video modes available by the video card using CountGFXModes(), you can iterate through them  and determine the width, height, and color depth capabilities of each mode.  Use this command to get the color depth of the mode. Use the GFXModeWidth and  GFXModeHeight to get the remaining parameters.
+
+.code
+; CountGFXModes()/GfxModeWidth/GfxModeHeight/GfxModeDepth example
+
+intModes=CountGfxModes()
+
+Print "There are " + intModes + "graphic modes available:"
+
+; Display all modes including width, height, and color depth
+For t = 1 To intModes
+Print "Mode " + t + ":
+Print "Width=" + GfxModeWidth(t)
+Print "Height=" + GfxModeHeight(t)
+Print "Height=" + GfxModeDepth(t)
+Next
+
+
+:GfxModeExists (width,height,depth)
+
+.args
+width = width, in pixels (i.e. 640)
+height = height, in pixels (i.e. 480)
+depth = color depth (i.e. 16, 24, 32) 
+
+.desc
+Use this command to verify whether or not the user's video card can use  this graphic mode. Returns TRUE if the mode exists, FALSE if not. If you want  to know what mode number this mode is, use FindGFXMode.
+
+.code
+; GFXModeExists example
+
+; If there is a mode, tell user
+mode=GfxModeExists(800,800,16)
+
+If mode=1 Then 
+Print "The mode you requested exists!"
+Else
+Print "Sorry, that mode doesn't exist." 
+End If
+
+; Wait for ESC press from user
+While Not KeyHit(1)
+Wend
+
+
+:TotalVidMem()
+
+.args
+None.
+
+.desc
+TotalVidMem () simply returns the total available memory on a graphics  card, in bytes. Note that to retrieve the currently available number  of bytes, you should use AvailVidMem (). 
+
+.code
+Print "Total graphics memory available: " + TotalVidMem () + " bytes."
+; NOTE: To retrieve the *available* graphics memory, use AvailVidMem ()!
+
+:AvailVidMem()
+
+.args
+None.
+
+.desc
+This command will return the total bytes of available free video memory.  Use this to keep track of your resources!
+
+.code
+Print "Your available video memory is: " + AvailVidMem()
+
+
+:SetGamma red,green,blue,dest_red#,dest_green#,dest_blue#
+
+.args
+red,green,blue - specifies the source red,green,blue components.
+dest_red#,dest_green#,dest_blue - specifies the destination red,green,blue components.
+
+.desc
+SetGamma allows you to modify the gamma tables.
+
+
+Gamma can ONLY be used in fullscreen mode.
+
+
+After performing one or more SetGamma commands, you must call @UpdateGamma in order for the changes to become effective.
+
+
+Note that the behaviour of this command in Blitz3D is different to BlitzPlus.  Blitz3D will clamp out of range values, so that 300 is treated as 255.  BlitzPlus allows values to "roll-over", so that 300 is treated as 44.
+
+.also
+UpdateGamma
+
+.code
+;gamma demo - use left/right arrows to
+;control display intensity
+;
+;hold down left-control for a 'red-out' effect!
+
+Graphics 640,480,16,1
+SetBuffer BackBuffer()
+
+n=0
+
+While Not KeyHit(1)
+
+	If KeyDown(203) And n>0 Then n=n-1
+	If KeyDown(205) And n<255 Then n=n+1
+
+	If KeyDown(29)
+		SetGammaRed(n)
+	Else
+		SetGammaIntensity(n)
+	EndIf
+	Cls
+	SeedRnd 1234
+	For k=1 To 1000
+		Color Rnd(255),Rnd(255),Rnd(255)
+		Rect Rnd(640),Rnd(480),Rnd(64),Rnd(64)
+	Next
+
+	Text 0,0,"Intensity offset="+n
+	Flip
+Wend
+End ; bye!
+
+Function SetGammaRed( n )
+	For k=0 To 255
+		SetGamma k,k,k,k+n,0,0
+	Next
+	UpdateGamma
+End Function
+
+Function SetGammaIntensity( n )
+	For k=0 To 255
+		SetGamma k,k,k,k+n,k+n,k+n
+	Next
+	UpdateGamma
+End Function
+
+:UpdateGamma [calibrate]
+
+.args
+calibrate - a flag to indicate whether the gamma table should be calibrated to the display. Defaults to false.
+
+.desc
+UpdateGamma should be used after a series of @SetGamma commands in order to effect actual changes.
+
+.also
+SetGamma
+
+.code
+;gamma demo - use left/right arrows to
+;control display intensity
+;
+;hold down left-control for a 'red-out' effect!
+
+Graphics 640,480,16,1
+SetBuffer BackBuffer()
+
+n=0
+
+While Not KeyHit(1)
+
+If KeyDown(203) n=n-1
+If KeyDown(205) n=n+1
+
+If KeyDown(29)
+SetGammaRed(n)
+Else
+SetGammaIntensity(n)
+EndIf
+Cls
+SeedRnd 1234
+For k=1 To 1000
+Color Rnd(255),Rnd(255),Rnd(255)
+Rect Rnd(640),Rnd(480),Rnd(64),Rnd(64)
+Next
+
+Text 0,0,"Intensity offset="+n
+
+Flip
+
+Wend
+
+End
+
+Function SetGammaRed( n )
+
+For k=0 To 255
+SetGamma k,k,k,k+n,0,0
+Next
+
+UpdateGamma
+
+End Function
+
+Function SetGammaIntensity( n )
+
+For k=0 To 255
+SetGamma k,k,k,k+n,k+n,k+n
+Next
+
+UpdateGamma
+
+End Function
+
+:GammaRed ( red )
+
+.args
+red - an integer color component in the range 0 to 255.
+
+.desc
+Returns the current output red component of the gamma tables for the specified input red component.
+
+:GammaGreen ( green )
+
+.args
+green - an integer color component in the range 0 to 255.
+
+.desc
+Returns the current output green component of the gamma tables for the specified input green component.
+
+:GammaBlue ( blue )
+
+.args
+blue - an integer color component in the range 0 to 255.
+
+.desc
+Returns the current output blue component of the gamma tables for the specified input blue component.
+

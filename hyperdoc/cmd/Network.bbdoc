@@ -1,0 +1,86 @@
+:CountHostIPs( host_name$ )
+
+.args
+host_name$ - name of host
+
+.desc
+None.
+
+.code
+None.
+
+:HostIP( host_index )
+
+.args
+host_index - index number of host
+
+.desc
+Returns an integer IP address for the specified host. host_index must be in the range 1...CountHostIPs().
+
+.code
+; First call CountHostIPs (blank infers the local machine)
+n = CountHostIPs("")
+; n now contains the total number of known host machines.
+
+; Obtain the internal id for the IP address
+ip = HostIP(1)
+
+; Convert it to human readable IP address
+ipaddress$ = DottedIP$(ip)
+
+Print "Dotted IP Test"
+Print "=============="
+Print ""
+Print "Internal Host IP ID:" + ip
+Print "Dotted IP Address:" + ipaddress$
+Print ""
+Print "Press any key to continue"
+
+WaitKey()
+
+End
+
+:DottedIP$( IP )
+
+.args
+IP - integer IP address
+
+.desc
+None.
+
+.code
+; First call CountHostIPs (blank infers the local machine)
+n = CountHostIPs("")
+; n now contains the total number of known host machines.
+
+; Obtain the internal id for the IP address
+ip = HostIP(1)
+
+; Convert it to human readable IP address
+ipaddress$ = DottedIP$(ip)
+
+Print "Dotted IP Test"
+Print "=============="
+Print ""
+Print "Internal Host IP ID:" + ip
+Print "Dotted IP Address:" + ipaddress$
+Print ""
+Print "Press any key to continue"
+
+WaitKey()
+
+End
+
+:CopyStream src_stream,dest_stream[,buffer_size]
+
+.args
+src_stream - source stream
+dest_stream - destination stream
+buffer_size (optional) - buffer size of stream
+
+.desc
+Copies a stream.
+
+.code
+None.
+

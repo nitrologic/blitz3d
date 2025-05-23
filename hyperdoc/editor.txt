@@ -1,0 +1,119 @@
+:::Introduction
+
+
+:::Getting Started
+
+::Installing and Running Blitz3D
+
++Installing Blitz3D
+
+To install the Blitz3D software on your computer you should
+have received installer software featuring the following icon.
+
+<img src="setupicon.png">
+
+By running this setup software you will be asked to confirm
+a small number of options and then, following a short pause,
+the Blitz3D programming language will be installed and
+available for use.
+
++Creating your first program
+
+Once you have successfully installed Blitz3D on your Windows
+computer an entry for Blitz3D can be found in the desktop's
+start menu as illustrated.
+
+<img src="startmenu.png">
+
+Selecting the Blitz3D icon will launch the Blitz3D program
+editor where your own programs can be created. 
+
+<img src="newmenu.png">
+
+Selecting the New option from the File menu will create a blank
+program which you should modify according to the following
+instructions to become familiar with the Blitz3D development
+cycle.
+
++Checking out the samples
+
++Using the Help system
+
++The Blitz3D Debugger
+
+
+::File Menu Commands
+
+:New
+
+:Open
+
+:Close
+
+:Close All
+
+:Save
+
+:Save As
+
+:Save All
+
+:Next File
+
+:Previous File
+
+:Recent Files
+
+:Print
+
+:Exit
+
+
+::Edit Menu
+
+:Cut
+
+:Copy
+
+:Paste
+
+:Select All
+
+:Find
+
+:Find Next
+
+:Replace
+
+:Show Toolbars
+
+
+::Program Menu
+
+
+:Run program
+
+:Run program again
+
+:Check for errors
+
+:Create Executable
+
+:Program Command Line
+
+:Debug Enabled
+
+
+::Help Menu
+
+
+:Home
+
+:Back
+
+:Forward
+
+:Quick Command Help
+
+:About Blitz3D
+

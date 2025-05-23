@@ -1,0 +1,372 @@
+:ResetEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Resets the collision state of an entity.
+
+.also
+EntityBox;EntityRadius;Collisions;EntityType;GetEntityType
+
+.code
+None.
+
+:EntityRadius entity,x_radius#[,y_radius#]
+
+.args
+entity - entity handle
+x_radius# - x radius of entity's collision ellipsoid
+y_radius# (optional) - y radius of entity's collision ellipsoid. If omitted the x_radius# will be used for the y_radius#.
+
+.desc
+Sets the radius of an entity's collision ellipsoid.
+
+An entity radius should be set for all entities involved in ellipsoidal collisions, which is all source entities (as collisions are always ellipsoid-to-something), and  whatever destination entities are involved in ellipsoid-to-ellipsoid collisions (collision method No.1).
+
+.also
+EntityBox;Collisions;EntityType
+
+.code
+; EntityRadius Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,-2,0,5
+
+cone=CreateCone( 32 )
+EntityType cone,type_cone
+PositionEntity cone,2,0,5
+
+; Set collision type values
+type_sphere=1
+type_cone=2
+
+; Set sphere radius value
+sphere_radius#=1
+
+; Set sphere and cone entity types
+EntityType sphere,type_sphere
+EntityType cone,type_cone
+
+; Enable collisions between type_sphere and type_cone, with ellipsoid->polygon method and slide response
+Collisions type_sphere,type_cone,2,2
+
+While Not KeyDown( 1 )
+
+x#=0
+y#=0
+z#=0
+
+If KeyDown( 203 )=True Then x#=-0.1
+If KeyDown( 205 )=True Then x#=0.1
+If KeyDown( 208 )=True Then y#=-0.1
+If KeyDown( 200 )=True Then y#=0.1
+If KeyDown( 44 )=True Then z#=-0.1
+If KeyDown( 30 )=True Then z#=0.1
+
+MoveEntity sphere,x#,y#,z#
+
+; If square brackets keys pressed then change sphere radius value
+If KeyDown( 26 )=True Then sphere_radius#=sphere_radius#-0.1
+If KeyDown( 27 )=True Then sphere_radius#=sphere_radius#+0.1
+
+; Set entity radius of sphere
+EntityRadius sphere,sphere_radius#
+
+; Perform collision checking
+UpdateWorld
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to move sphere"
+Text 0,20,"Press [ or ] to change EntityRadius radius_x# value"
+Text 0,40,"EntityRadius sphere,"+sphere_radius
+
+Flip
+
+Wend
+
+End
+
+:EntityBox entity,x#,y#,z#,width#,height#,depth#
+
+.args
+entity - entity handle#
+x# - x position of entity's collision box
+y# - y position of entity's collision box
+z# - z position of entity's collision box
+width# - width of entity's collision box
+height# - height of entity's collision box
+depth# - depth of entity's collision box
+
+.desc
+Sets the dimensions of an entity's collision box.
+
+.also
+EntityRadius;Collisions;EntityType
+
+.code
+None.
+
+:EntityType entity,collision_type[,recursive]
+
+.args
+entity - entity handle
+collision_type - collision type of entity. Must be in the range 0-999.
+recursive (optional) - true to apply collision type to entity's children. Defaults  to false.
+
+.desc
+Sets the collision type for an entity.
+
+A collision_type value of 0 indicates that no collision checking will occur with that entity. A collision value of 1-999 will mean collision checking will occur.
+
+.also
+Collisions;GetEntityType;EntityBox;EntityRadius
+
+.code
+None.
+
+:EntityPickMode entity,pick_geometry[,obscurer]
+
+.args
+entity - entity handle
+
+pick_geometry - type of geometry used for picking:
+0: Unpickable (default)
+1: Sphere (EntityRadius is used)
+2: Polygon
+3: Box (EntityBox is used)
+
+obscurer (optional) - True to determine that the entity 'obscures' other entities  during an EntityVisible call. Defaults to True.
+
+.desc
+Sets the pick mode for an entity.
+
+The optional obscurer parameter is used  with EntityVisible to determine just what can  get in the way of the line-of-sight between 2 entities. This allows some entities  to be pickable using the other pick commands, but to be ignored (i.e. 'transparent')  when using EntityVisible. So, its very much EntityVisible specific.
+
+Please note that only Sphere and Box picking will work with Blitz3D sprites. For polygon picking, you will need a valid mesh.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+.code
+None.
+
+:EntityCollided ( entity,type )
+
+.args
+entity - entity handle
+type - type of entity
+
+.desc
+Returns the handle of the entity of the specified type that collided with  the specified entity.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CountCollisions ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns how many collisions an entity was involved in during the last UpdateWorld.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionX# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world x coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity  ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionY# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world y coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity  ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionZ# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world z coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity  ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionNX# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the x component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions(  entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionNY# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the y component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions(  entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionNZ# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the z component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions(  entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionTime ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the time taken to calculate a particular collision.
+
+Index should be in the range 1...CountCollisions(  entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionEntity ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the other entity involved in a particular collision. Index should  be in the range 1...CountCollisions( entity  ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionSurface ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the handle of the surface belonging to the specified entity that was closest to the point of a particular collision.
+
+Index should be in  the range 1...CountCollisions( entity ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:CollisionTriangle ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the index number of the triangle belonging to the specified entity  that was closest to the point of a particular collision.
+
+Index should be in the range 1...CountCollisions(  entity ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+.code
+None.
+
+:GetEntityType ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the collision type of an entity as set by the EntityType command.
+
+.also
+EntityType;EntityBox;EntityRadius;Collisions;ResetEntity
+
+.code
+None.
+

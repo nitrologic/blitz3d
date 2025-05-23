@@ -1,0 +1,1803 @@
+:::Graphics Commands
+
+
+::Graphics
+
+:Graphics width, height [,depth] [,mode]
+
+.args
+width - width of display in pixels
+height - height of display in pixels
+depth - color depth in bits, 0 = default
+mode - video mode flags, 0 = default
+
+.desc
+The @Graphics command resizes the graphics display to the 
+specified size in pixels and with the specified display 
+properties including the color depth and fullscreen options.
+
+When a Blitz program begins a default 400x300 pixel 
+graphics window is created.
+
+The depth parameter is optional, the defaults value of 0
+specifies that Blitz3D select the most appropriate color
+depth.
+
+The mode parameter may be any of the following values:
+.table
+mode,name,description
+0,Default,FixedWindowed in Debug mode and FullScreen in Release
+1,FullScreen,Own entire screen for optimal performance
+2,FixedWindow,A fixed size window placed on the desktop
+3,ScaledWindow,Graphics scaled according to current size of Window
+
+Before using @Graphics to configure a fullscreen display,
+the specified resolution should be verified as available
+on the current graphics driver.
+
+The @GfxModeExists function will return @False if the specified
+resolution is not available. Calling @Graphics with an unsupported
+resolution will cause the program to fail with an "Unable to Set 
+Graphics Mode" error message.
+
+.hint
+The @Graphics command causes all images to be destroyed meaning
+all images should be (re)loaded after any use of the @Graphics command.
+
+See the Blitz3D command @Graphics3D for configuring the display
+for use with 3D graphics.
+
+.also
+GfxModeExists;Graphics3D;FrontBuffer;BackBuffer;Flip;EndGraphics
+
+
+:Flip [synch]
+
+.args
+synch = @True (default) to synchronize flip to display
+
+.desc
+The @Flip command switches the FrontBuffer() and BackBuffer() 
+of the current @Graphics display.
+
+See the @BackBuffer command for a description on setting a 
+standard @Graphics display up for double buffered drawing.
+
+The ability to draw graphics to a hidden buffer and then
+transfer the completed drawing to the display is called 
+double buffering.
+
+The @Flip command is used at the end of each drawing cycle 
+to display the results onto the display in a flicker free 
+manner.
+
+The optional #synch value may be set to False to override
+the default True setting. Unsynchronized flipping should
+only ever be used monitoring rendering performance as
+it results in an ugly screen tearing.
+
+.also
+BackBuffer;FrontBuffer
+
+
+:BackBuffer()
+
+.desc
+The @BackBuffer function returns a @Buffer that corresponds
+to the hidden area that will be flipped to the display when
+the @Flip command is called.
+
+The @BackBuffer is the current drawing buffer after a call
+to @Graphics3D.
+
+Unlike @Graphics3D the @Graphics command does not make the
+BackBuffer the default drawing surface so a @SetBuffer @BackBuffer
+command sequence is required after the @Graphics command
+in order the display be configured for double buffered drawing.
+
+.also
+Flip;SetBuffer;FrontBuffer
+
+
+:FrontBuffer()
+
+.desc
+The @FrontBuffer function returns a @Buffer that corresponds
+to that viewable on the display.
+
+Drawing to the FrontBuffer() can be used to display an image
+that is progressively rendered. That is each main loop the
+program does not include a @Cls or @Flip but continually draws
+to the FrontBuffer allowing the user to view the image as it
+is created over the period of minutes or hours.
+
+.also
+BackBuffer
+
+
+:GraphicsWidth()
+
+.desc
+The @GraphicsWidth command returns the current width of the
+display in pixels.
+
+.also
+Graphics,GraphicsHeight,GraphicsDepth
+
+
+:GraphicsHeight()
+
+.desc
+The @GraphicsHeight command returns the current height of the
+display in pixels.
+
+.also
+Graphics,GraphicsWidth,GraphicsDepth
+
+
+:GraphicsDepth()
+
+.desc
+The @GraphicsDepth command returns the current color depth of the
+display.
+
+.also
+Graphics,GraphicsWidth,GraphicsHeight
+
+
+:EndGraphics
+
+.desc
+
+Returns the Graphics mode to the original 400x300 fixed window.
+
+.hint
+The @EndGraphics command causes all images to be destroyed.
+
+.also
+Graphics
+
+
+:VWait [frames]
+
+.args
+frames = optional number of frames to wait. Default is 1
+
+.desc
+@VWait will cause the program to halt execution until the
+video display has completed it's refresh and reached it's
+Vertical Blank cycle (the time during which the video
+beam returns to the top of the display to begin it's next
+refresh).
+
+The @VWait command provides an alternative method to using
+the synchronized version of the @Flip command (default)
+which is useful on vintage computer hardware that does
+not provide a properly synchonized Flip response.
+
+Synching a game's display using the VWait command will also
+cause the program to exhibit excess CPU usage and should
+be made optional if utilized at all.
+
+.also
+Flip;ScanLine
+
+
+:ScanLine()
+
+.desc
+The @ScanLine function returns the actual scanline being
+refreshed by the video hardware or 0 if in vertical blank
+or unsupported by the hardware.
+
+.also
+VWait;Flip
+
+
+:TotalVidMem()
+
+.desc
+Returns the total amount of graphics memory present on the current graphics
+device.
+
+Use the @AvailVidMem command to find the available amount of video memory
+and the difference to calculate the amount of video memory currently in
+use.
+
+.also
+AvailVidMem;SetGfxDriver
+
+
+:AvailVidMem()
+
+.desc
+Returns the available amount of graphics memory on the current graphics
+device.
+
+.also
+TotalVidMem;SetGfxDriver
+
+
+:SetGamma red,green,blue,dest_red,dest_green,dest_blue
+
+.args
+red = red input value
+green = green input value
+blue = blue input value
+dest_red = red output value
+dest_green = green output value
+dest_blue = blue output value
+
+.desc
+SetGamma allows you to modify the gamma tables.
+
+Gamma can ONLY be used in fullscreen mode.
+
+Gamma is performed on a per channel basis, with each red, green and blue
+channel using a translation table of 256 entries to modify the resultant
+color output. The @SetGamma command allows you to modify the specified
+entry with the specified value for each of the 3 channels.
+
+Suitable translation tables can be configured to influence
+any or all of the 3 primary color components allowing the
+displayed channel (red, green or blue) to be amplified, 
+muted or even inverted.
+
+After performing one or more @SetGamma commands, call @UpdateGamma in 
+order for the changes to become effective.
+
+.also
+UpdateGamma;GammaRed;GammeBlue;GammaGreen
+
+
+:UpdateGamma [calibrate]
+
+.args
+calibrate - True if the gamma table should be calibrated to the display
+
+.desc
+UpdateGamma should be used after a series of @SetGamma commands in order to 
+effect actual changes.
+
+.also
+SetGamma
+
+
+:GammaRed ( value )
+
+.args
+value - an integer index into the red gamma table
+
+.desc
+Returns the adjusted output value of the red channel given the 
+specified input #value by referencing the current gamma correction
+tables.
+
+See #SetGamma for more information
+
+.also
+GammaGreen;GammaBlue;SetGamma
+
+
+:GammaGreen ( value )
+
+.args
+value - an integer index into the green gamma table
+
+.desc
+Returns the adjusted output value of the green channel given the 
+specified input #value by referencing the current gamma correction
+tables.
+
+See #SetGamma for more information
+
+.also
+GammaRed;GammaBlue;SetGamma
+
+
+:GammaBlue ( value )
+
+.args
+value - an integer index into the blue gamma table
+
+.desc
+Returns the adjusted output value of the blue channel given the 
+specified input #value by referencing the current gamma correction
+tables.
+
+See #SetGamma for more information
+
+.also
+GammaRed;GammaGreen;SetGamma
+
+
+
+::Printing and BASIC Input
+
+
+:Print [value$]
+
+.args
+value - the text to be output (optional)
+
+.desc
+The @Print command writes a string version of @value if specified to the 
+current graphics buffer at the current cursor position and moves the 
+cursor position to the next line.
+
+If the optional value parameter is omitted the @Print command simply
+moves the cursor position down a line.
+
+As Blitz automatically converts any numeric or custom type to a string
+the value parameter can infact be any value.
+
+.also
+Write;Input;Locate
+
+
+:Write value$
+
+.args
+value - the text to be output (optional)
+
+.desc
+The @Write command is similar to the @Print command but the cursor
+is not moved to a new line at the completion of the command.
+
+.also
+Print;Locate
+
+
+:Input$ ([prompt$])
+
+.args
+prompt$ = optional text to be printed before keyboard input proceeds
+
+.desc
+The @Input command accepts and prints keyboard entry from the user
+until a Return key is received at which time the Input command returns
+a string result.
+
+.also
+Print;Locate
+
+
+:Locate x,y
+
+.args
+x-horizontal position on the current graphics buffer in pixels
+x-vertical position on the current graphics buffer in pixels
+
+.desc
+The @Locate command positions the cursor position at the specified
+pixel position of the current graphics buffer.
+
+.also
+Print;Write;Input
+
+
+
+::2D Drawing
+
+
+:Cls
+
+.desc
+The @Cls command clears the current graphics buffer clean, using 
+an optional color specified with a previous call to @ClsColor.
+
+Cls has it's origins as an acronym of CLear Screen which is 
+appropriate if you consider the default drawing buffer is by 
+default the @FrontBuffer of the current @Graphics display.
+
+@Cls is not commonly called when using @Graphics3D due to the
+behavior of @RenderWorld which clears the @BackBuffer
+using the various @CameraClsMode settings instead.
+
+.also
+ClsColor;CameraClsMode
+
+
+:Plot x,y
+
+.args
+x=horizontal pixel position
+y=vertical pixel position
+
+.desc
+@Plot draws a single pixel at the coordinates specified 
+using the current drawing color.
+
+.also
+Line;Rect;Color
+
+
+:Line x1,y1,x2,y2
+
+.args
+x1 = start pixel's horizontal position
+y1 = start pixel's vertical position
+x2 = end pixel's horizontal position
+y2 = end pixel's vertical position
+
+.desc
+The @Line command draws a line, in the current drawing color, 
+from one pixel position to another.
+
+.also
+Plot;Rect;Color
+
+
+:Rect x, y, width, height [,solid=True]
+
+.args
+x = horizontl pixel position
+y = vertical pixel position
+width = width in pixels
+height = height in pixels
+solid = False draws an outline only
+
+.desc
+The @Rect command draws a rectangle.
+
+It uses the current drawing color to draw a solid rectangle or
+outlined if a False setting is specified for the #solid parameter.
+
+.also
+Plot;Line;Color
+
+
+:Oval x,y,width,height[,solid=True]
+
+.args
+x = horizontl pixel position
+y = vertical pixel position
+width = width in pixels
+height = height in pixels
+solid = False draws an outline only
+
+.desc
+The @Oval command can be used to draw circles and ovals in 
+solid or outline form.
+
+The shape of the @Oval drawn is the largest that can fit inside
+the specified rectangle.
+
+
+:Color red,green,blue
+
+.args
+red = amount of red (0..255)
+green = amount of green (0..255)
+blue = amount of blue (0..255) 
+
+.desc
+This command sets the current drawing color allowing Lines,
+Rectangles, Ovals and Pixels to be drawn in any color of the
+rainbow.
+
+The actual color is specified by 3 numbers representing
+the amount of red, green and blue mixed together.
+
+The following table demonstrates values of red, green and blue
+required to specify the named colors:
+.table
+Color,Red,Green,Blue
+Black,0,0,0
+Red,255,0,0
+Green,0,255,0
+Blue,0,0,255
+Yellow,255,255,0
+Turquoise,0,255,255
+Purple,255,0,255
+White,255,255,255
+
+:ClsColor red,green,blue
+
+.args
+red = amount of red (0..255)
+green = amount of green (0..255)
+blue = amount of blue (0..255) 
+
+.desc
+The @ClsColor command is used to change the Color used by the @Cls
+command.
+
+See the @Color command for combining values of red, green and blue
+inorder to specify some commonly used colors.
+
+.also
+Cls,Color
+
+
+:Origin x,y
+
+.args
+x = horizontal pixel position
+y = vertical pixel position
+
+.desc
+The @Origina command sets a point of origin for all subsequent 
+drawing commands.
+
+The default @Origin of a drawing buffer is the top left pixel.
+
+After calling @Origin, all drawing commands will treat the pixel
+at location #x,#y as coordinate 0,0
+
+.also
+Plot;Line;Rect;Oval
+
+
+:Viewport x,y,width,height
+
+.args
+x = horizontl pixel position
+y = vertical pixel position
+width = width in pixels
+height = height in pixels
+
+.desc
+
+The @Viewport command allows the cropping of subsequent drawing commands
+to a rectangular region of the current graphics buffer.
+
+This is useful for partitioning the screen into separate errors such as the split screen
+mode common in two player video games.
+
+.also
+Origin
+
+
+:GetColor x,y
+
+.args
+x = horizontal pixel position
+y = vertical pixel position
+
+.desc
+The @GetColor command fetches the color of the pixel at the
+specified coordinates on the current graphics buffer.
+
+The @ColorRed, @ColorGreen and @ColorBlue functions should
+then be used to retrive the color components of the pixel
+specified.
+
+.also
+ColorRed;ColorGreen;ColorBlue
+
+
+:ColorRed()
+
+.desc
+The @ColorRed function returns the red component of the pixel 
+color at the location specified in a prior call to @GetColor
+
+.also
+GetColor;ColorGreen;ColorBlue
+
+
+:ColorGreen()
+
+.desc
+The @ColorGreen function returns the green component of the 
+pixel color at the location specified in a prior call to @GetColor
+
+.also
+GetColor;ColorRed;ColorBlue
+
+
+:ColorBlue()
+
+.desc
+The @ColorBlue function returns the blue component of the pixel 
+color at the location specified in a prior call to @GetColor
+
+.also
+GetColor;ColorRed;ColorGreen
+
+
+::Text and Fonts
+
+
+:Text x,y,string$ [,centerX=False] [,centerY=False]
+
+.args
+x = horizontal pixel position of top left enclosing rectangle
+y = vertical pixel position of the top left enclosing rectangle
+string$ = string/text to print
+centerX = True to center text horizontally
+centerY = True to center text vertically
+
+.desc
+The @Text command prints the #string specified at the pixel
+coordinate #x,#y.
+
+@Text uses the current font which can be modified with the
+@SetFont command and the current color which can be modified
+with the @Color command.
+
+The optional centering parameters allow the specified pixel
+position to be used as the center of the text printed rather
+than representing the top left position of the region.
+
+.also
+SetFont;StringWidth;StringHeight
+
+
+:LoadFont (fontname$[,height=12][,bold=False][,italic=False][,underlined=False])
+
+.args
+fontname$ - name of font to be loaded, e.g. "arial"
+height - height of font in points (default is 12)
+bold - True to load bold version of font
+italic - True to load italic version of font
+underlined - True to load underlined version of font
+
+.desc
+The @LoadFont function loads a font and returns a font handle which can
+subsequently used with commands such as @SetFont and @FreeFont.
+
+.also
+SetFont
+
+
+:SetFont fonthandle
+
+.args
+fonthandle - handle of a font successfully returned by @LoadFont
+
+.desc
+The @SetFont command is used in combination with a prior LoadFont
+command to specify which font subsequent @Text, @Print, @Write,
+@FontWidth, @FontHeigtht, @StringWidth and @StringHeight commands 
+will use.
+
+.also
+Text;FreeFont;Print;Write;FontWidth;FontHeight;StringWidth;StringHeight
+
+
+:FreeFont fonthandle
+
+.args
+fonthandle = A handle to a previously loaded font.
+
+.desc
+Use the @FreeFont command when a font returned by the @LoadFont
+command is no longer required for text drawing duties.
+
+
+:FontWidth()
+
+.desc
+Returns the current width in pixels of the WIDEST character in
+the font.
+
+.also
+FontHeight;SetFont
+
+
+:FontHeight()
+
+.desc
+Returns the current height in pixels of the currently selected font.
+
+.also
+FontWidth;SetFont
+
+
+:StringWidth (string)
+
+.args
+string = any valid string or string variable
+
+.desc
+Returns the width in pixels of the specified string accounting 
+for the current font selected with the most recent @SetFont 
+command for the current graphics buffer.
+
+.also
+SetFont;StringHeight
+
+
+:StringHeight (string)
+
+.args
+string = any valid string or string variable
+
+.desc
+Returns the height in pixels of the specified string accounting 
+for the current font selected with the most recent @SetFont 
+command for the current graphics buffer.
+
+.also
+SetFont;StringWidth
+
+
+::Images
+
+
+:LoadImage (filename$)
+
+.args
+filename$ = the name of the image file to be loaded
+
+.desc
+Reads an image file from disk.
+
+Blitz3D supports BMP, JPG and PNG image formats.
+
+.table
+extension,compression,feature
+bmp, none, can be created with @SaveImage command
+png, good, lossless compression
+jpg, excellent, small loss in image quality
+
+The PNG image format is recomended for general use.
+
+The @LoadImage function returns an image handle that
+can then be used with @DrawImage to draw the image
+on the current graphics buffer.
+
+If the image file contains multiple frames of animation
+use the @LoadAnimImage function instead.
+
+If the image file cannot be located or there is a
+problem loading, @LoadImage will fail and return 0.
+
+.also
+DrawImage;LoadAnimImage;CreateImage;FreeImage;SaveImage
+
+
+
+:LoadAnimImage (filename$,width,height,first,count)
+
+.args
+filename$ = the name of the image file to be loaded
+width=width in pixels of each frame in the image.
+height=height in pixels of each frame in the image.
+first=index of first animation frame in source image to load(usually 0)
+count=number of frames to load
+
+.desc
+The @LoadAnimImage function is an alternative to 
+@LoadImage that can load many frames of animation 
+from a single image file.
+
+The frames must be drawn in similar sized rectangles
+arranged from left to right, top to bottom on the
+image source.
+
+Animation is acheived by selecting a different frame
+of animation to be used each time the image is drawn.
+The optional #frame parameter of commands such as
+@DrawImage select a specific frame of animation 
+to draw of the specified #image loaded with this
+command.
+
+If the image file cannot be located or there is a
+problem loading, @LoadAnimImage will fail and return 0.
+
+.also
+@DrawImage,@LoadImage
+
+
+:CreateImage ( width,height[,frames] )
+
+.args
+width = width in pixels of the new image
+height = height in pixels of the new image
+frames= optional number of frames 
+
+.desc
+The @CreateImage function returns a new image with the
+specified dimensions in pixels containing an optional
+number of animation frames.
+
+Images need not be loaded from files but can instead be
+created and modified by the program. Once an image
+is created with @CreateImage it can be used as the destination
+of a @GrabImage command or it's pixel buffer can be
+accessed directly with the @ImageBuffer command.
+
+.also
+ImageBuffer;FreeImage
+
+
+:MaskImage image,red,green,blue
+
+.args
+image  = a valid image handle
+red = amount of red (0..255)
+green = amount of green (0..255)
+blue = amount of blue (0..255) 
+
+.desc
+
+The color specified by mixing the #red, #green and #blue
+amounts is assigned as the mask color of the specified
+image.
+
+When an image is drawn with the @DrawImage, @TileImage, 
+@DrawRectImage any pixels in the image that are the
+same color as the mask color are not drawn.
+
+@DrawBlock and other block based commands can be used to 
+draw an image and ignore the image's mask color.
+
+By default an image has a mask color of black.
+
+.also
+DrawImage
+
+
+:ImageWidth (image)
+
+.args
+image = a valid image handle
+
+.desc
+Returns the width in pixels of the specified image.
+
+Use this function and @ImageHeight to ascertain the
+exact pixel size of an image's bounding rectangle.
+
+.also
+ImageHeight
+
+
+:ImageHeight (image)
+
+.args
+image = a valid image handle
+
+.desc
+Returns the height in pixels of the specified image.
+
+Use this function and @ImageWidth to ascertain the
+exact pixel size of an image's bounding rectangle.
+
+.also
+Image=Width
+
+
+:SaveImage (image,bmpfile$[,frame] )
+
+.args
+image = a valid image handle
+bmpfile$ = the filename to be used when the image file is created
+frame = optional frame of the image to save
+
+.desc
+@SaveImage saves an image or one of its frames to a .bmp format
+image file.
+
+Returns @True if the save was successful, @False if not.
+
+.hint
+The .bmp suffix should be included at the end of the filename if the 
+image file created by @SaveImage is to be recognized as a valid image 
+by the system and other applications. 
+
+.also
+LoadImage;SaveBuffer
+
+
+:FreeImage image
+
+.args
+image = a valid image handle
+
+.desc
+The @FreeImage command releases all memory used by
+the image specified.
+
+Following a call to @FreeImage the specified image handle
+is no longer and must not be used. It is common practice
+to set any variables used in the program that contain
+the specified image handle to 0.
+
+.also
+LoadImage;CreateImage;CopyImage
+
+
+
+::Drawing with Images
+
+
+:DrawImage image, x,y [,frame=0]
+
+.args
+image = a valid image handle
+x = horizontal pixel location
+y = vertical pixel location
+frame = optional frame number 
+
+.desc
+The @DrawImage command draws an image to the current 
+graphics buffer at the specified pixel location.
+
+The #image parameter must be a valid image loaded
+with @LoadImage or @LoadAnimImage or alternatively 
+created with @CreateImage.
+
+If specified a particular frame of animation from the
+image may be drawn. The image in this situation must 
+be the result of a call to @LoadAnimImage and contain
+the #frame specified.
+
+A faster version of @DrawImage is available for images
+that do not contain a mask or alpha channel called 
+@DrawBlock.
+
+.also
+MaskImage;DrawImageRect;TileImage;LoadImage;DrawBlock
+
+
+:DrawBlock image, x,y [,frame]
+
+.args
+image = a valid image handle
+x = horizontal pixel location
+y = vertical pixel location
+frame = optional frame number 
+
+.desc
+@DrawBlock is similar to @DrawImage except all masking
+and image transparancy is ignored.
+
+.also
+DrawBlockRect;TileBlock;DrawImage
+
+
+
+:DrawImageRect image,x,y,image_x,image_y,width,height,[frame]
+
+.args
+image = a valid image handle
+x = horizontal pixel location
+y = vertical pixel location
+image_x = horizontal pixel location in image
+image_y = vertical pixel location in image
+width = width of rectangle to Draw
+height = height of rectangle to Draw
+frame = optional frame number 
+
+.desc
+The @DrawImageRect command draws a part of an Image on
+to the current graphics buffer at location #x, #y. 
+
+The region of the image used is defined by the rectangle
+at location #image_x,#image_y of size #width,#height.
+
+See @DrawImage for more details about drawing with images.
+
+.also
+DrawImage,DrawBlockRect,TileImage
+
+
+
+:DrawBlockRect image,x,y,image_x,image_y,width,height,[frame]
+
+.args
+image = a valid image handle
+x = horizontal pixel location
+y = vertical pixel location
+image_x = horizontal pixel location in image
+image_y = vertical pixel location in image
+width = width of rectangle to Draw
+height = height of rectangle to Draw
+frame = optional frame number 
+
+.desc
+The @DrawBlockRect command is similar to @DrawImageRect
+but ignores any masking and transparancy in the source
+image.
+
+.also
+DrawImageRect
+
+
+
+:TileImage image,[,x,y[,frames]]
+
+.args
+image = a valid image handle
+x=horizontal pixel offset
+y=vertical pixel offset
+frame = optional frame number 
+
+.desc
+
+The @TileImage command tiles the entire viewport 
+of the current graphics buffer with the specified
+image.
+
+The optional pixel offsets effectively scroll the
+tilemap drawn in the direction specified.
+
+See @DrawImage for more drawing images details.
+
+.also
+TileBlock;DrawImage
+
+
+
+:TileBlock image,[,x,y[,frames]]
+
+.args
+image = a valid image handle
+x=horizontal pixel offset
+y=vertical pixel offset
+frame = optional frame number 
+
+.desc
+Similar to TileImage but ignores transparency.
+
+Use this to tile an entire or portion of the screen 
+with a single repetative image.
+
+
+
+::Image Handles
+
+
+:HandleImage image,x,y
+
+.args
+image = a valid image handle
+x=horizontal pixel offset
+y=vertical pixel offset
+
+.desc
+Sets an image's drawing handle to the specified pixel
+offset.
+
+An image's handle is an offset added to the pixel
+coordinate specified in a @DrawImage command.
+
+Images typically have their handle set to 0,0 which means
+drawing commands draw the image with it's top left pixel
+at the drawing location specified.
+
+The @AutoMidHandle command changes this behavior so that
+all subsequent Images are loaded or created with their
+handle set to the center of the Image.
+
+The @HandleImage command is used to position the handle
+to any given pixel offset after it has been created.
+
+Also See:
+MidHandle;AutoMidHandle;DrawImage;RotateImage
+
+
+:MidHandle image
+
+.args
+image = a valid image handle
+
+.desc
+The @MidHandle command sets the specified image's handle
+to the center of the image. See @HandleImage for more
+details on using image handles.
+
+.also
+HandleImage
+
+
+:AutoMidHandle enable
+
+.args
+enable = True to enable automtic MidHandles, False to disable
+
+.desc
+Enabling @AutoMidHandle causes all subsequent loaded and created
+images to have their handles initialized to the center of the image.
+
+The default setting of the AutoMidHandle setting is disabled
+which dictates all newly create images have their handles set
+to the top left pixel position of the image.
+
+.also
+MidHandle
+
+
+:ImageXHandle (image)
+
+.args
+image = a valid image handle
+
+.desc
+Returns the horizontal pixel position of an image's handle.
+
+.also
+ImageYHandle;HandleImage
+
+
+:ImageYHandle (image)
+
+.args
+image = a valid image handle
+
+.desc
+Returns the vertical pixel position of an image's handle.
+
+.also
+ImageXHandle;HandleImage
+
+
+
+::Image Manipulation
+
+:CopyImage (image)
+
+.args
+image = a valid image handle
+
+.desc
+Returns an identical copy of the specified image.
+
+.also
+FreeImage
+
+
+:GrabImage image,x,y,[frame]
+
+.args
+image = a valid image handle
+x = left most horizontal pixel position to grab from
+y = top most vertical pixel position to grab from
+frame = optional frame in which to store grabbed pixels
+
+.desc
+Copies pixels at the specified offset in the current 
+graphics buffer to the image specified.
+
+@GrabImage is a useful way of capturing the result of 
+a sequence of drawing commands in an image's pixel
+buffer.
+
+.also
+CreateImage;DrawImage
+
+
+:ImageBuffer (image [,frame])
+
+.args
+image = a valid image handle
+frame = optional animation frame
+
+.desc
+The @ImageBuffer function returns a graphics buffer that
+can be used with such commands as @SetBuffer and @LockBuffer.
+
+.also
+SetBuffer,LockBuffer
+
+
+:ScaleImage (image,xscale#,yscale#)
+
+.args
+image = a valid image handle
+xscale# = horizontal scale factor
+yscale# = vertical scale factor
+
+.desc
+The @ScaleImage function returns a copy of an image 
+scaled in each axis by the specified factors.
+
+A negative scale factor also causes the resulting image to be
+flipped in that axis, i.e. ScaleImage image,1,-1 will return
+a copy of image flipped vertically. Other common scale
+factors are 2,2 which produce a double sized image and
+0.5,0.5 which will produce an image half the size of the
+orginal.
+
+The quality of the transformed result can be controlled
+with the @TFormFilter command.
+
+See the @ResizeImage command for a similar command that
+uses a target image size to calculate scale factors.
+
+.hint
+This command is not particularly fast and hence like loading
+it is recomended images are scaled before a game level 
+commences.
+
+.also
+ResizeImage;RotateImage;TFormFilter;TFormImage
+
+
+:ResizeImage (image,width#,height#)
+
+.args
+image = a valid image handle
+width# = horizontal pixel size of new image
+height# = vertical pixel size of new image
+
+.desc
+The @ResizeImage function returns a copy of the
+specified image scaled to the specified pixel
+dimensions.
+
+.hint
+This command is not particularly fast and hence like loading
+it is recomended images are sized before a game level 
+commences.
+
+.also
+ScaleImage;RotateImage;TFormFilter
+
+
+:RotateImage (image,angle#)
+
+.args
+image = a valid image handle
+angle# = angle in degree to rotate the image clockwise
+
+.desc
+The RotateImage function creates a new image by copying
+the specified image and rotating it #angle degrees around
+it's current handle.
+
+.hint
+This command is not particularly fast and hence like loading
+it is recomended images are prerotated before a game level 
+commences.
+
+.also
+HandleImage;ScaleImage;TFormImage;TFormFilter
+
+
+:TFormImage (image,m00#,m10#,m01#,m11#)
+
+.args
+image = a valid image handle
+m00# - first element of 2x2 matrix
+m10# - second element of 2x2 matrix
+m01# - third element of 2x2 matrix
+m11# - fourth element of 2x2 matrix
+
+.desc
+The @TFormImage function is similar in function to the
+@ScaleImage and @RotateImage functions where the image
+returned is a transformed copy of the original image 
+
+Instead of using a scale factor or angle of rotation,
+@TFormImage accepts 4 values that define a 2x2 matrix
+that allows the resultant copy to be the product of
+a transform that is a combination of both scale and
+rotation.
+
+@TFormImage is also useful for shearing an Image.
+
+.hint
+This command is not particularly fast and hence like loading
+it is recomended images are transformed before a game level 
+commences.
+
+.also
+HandleImage;ScaleImage;RotateImage;TFormFilter
+
+
+:TFormFilter enable
+
+.args
+enable = True to enable filtering, False to disable
+
+.desc
+The @TFormFilter command controls the quality of transformation
+acheived when using the @ScaleImage, @RotateImage and @TFormImage
+commands.
+
+Use a paramter of True to enable filtering, which although
+slower produces a higher quality result.
+
+.also
+ScaleImage;RotateImage;TFormImage
+
+
+
+::Collision Functions
+
+
+:RectsOverlap (x1,y1,w1,h1,x2,y2,w2,h2)
+
+.args
+x1 = top left horizontal position of first rectangle
+y1 = top left vertical position of first rectangle
+w1 = width of first rectangle
+h1 = height of first rectangle
+x2 = top left horizontal position of second rectangle
+y2 = top left vertical position of seconf rectangle
+w2 = width of second rectangle
+h2 = height of second rectangle
+
+.desc
+@RectsOverlap returns True if the two rectangular regions
+described overlap.
+
+
+:ImagesOverlap (image1,x1,y1,image2,x2,y2)
+
+.args
+image1 = first image to test
+x1 = image1's x location
+y1 = image1's y location
+image2 = second image to test
+x2 = image2's x location
+y2 = image2's y location 
+
+.desc
+The @ImagesOverlap function returns True if image1 drawn at the 
+specified pixel location would overlap with image2 if drawn at 
+it's specified location.
+
+@ImagesOverlap does not take into account any transparent pixels and 
+hence is faster but less accurate than the comparable @ImagesCollide 
+function.
+
+.also
+ImagesCollide
+
+
+:ImagesCollide (image1,x1,y1,frame1,image2,x2,y2,frame2)
+
+.args
+image1 - first image to test
+x1 - image1's x location
+y1 - image1's y location
+frame1 - image1's frame to test (optional)
+image2 - second image to test
+x2 - image2's x location
+y2 - image2's y location
+frame2 - image2's frame to test (optional)
+
+.desc
+Unlike @ImagesOverlap, @ImagesCollide does respect transparant
+pixels in the source images and will only return True if actual
+solid pixels would overlap if the images were drawn in the
+specified locations.
+
+As @ImagesCollide tests actual pixels from the two images it 
+is slower but more exact than the @ImagesOverlap function.
+
+.also
+ImagesOverlap;RectsOverlap
+
+
+:ImageRectOverlap (image,x,y,rectx,recty,rectw,recth)
+
+.args
+image = a valid image handle
+x = horizontal pixel location of image
+y = vertical pixel location of image
+rectx = horizontal pixel location of rect
+recty = vertical pixel location of rect
+rectw = width of the rect
+recth = height of the rect 
+
+.desc
+The @ImageRectOverlap function returns True if the image specified
+drawn at the location specified would overlap with the rectangle
+described.
+
+@ImageRectOverlap perform a fast rectangular based test ignoring
+the shape of any image mask, see @ImageRectCollide for a more
+exact collision test.
+
+.also
+ImagesOverlap;RectsOverlap;ImageRectCollide
+
+
+:ImageRectCollide (image,x,y,frame,rectx,recty,rectw,recth)
+
+.args
+image = a valid image handle
+x = horizontal pixel location of image
+y = vertical pixel location of image
+frame = image's frame
+rectx = horizontal pixel location of rect
+recty = vertical pixel location of rect
+rectw = width of the rect
+recth = height of the rect 
+
+.desc
+The @ImageRectCollide function returns True if the image specified
+drawn at the location specified will result in any non transparent
+pixels being drawn inside the rectangle described.
+
+Because @ImageRectCollide respects the transparent pixels in an
+image's mask it is slower but more accurate than using the 
+@ImageRectOverlap command.
+
+.also
+ImageRectOverlap
+
+
+
+::Graphics Buffers
+
+
+:SetBuffer buffer
+
+.args
+buffer = a valid graphics buffer
+
+.desc
+The @SetBuffer command is used to set the current graphics buffer
+with the result of a call to either @FrontBuffer, @BackBuffer, 
+@ImageBuffer, @TextureBuffer or the result of a previous call 
+to @GraphicsBuffer e.g. SetBuffer BackBuffer().
+
+@SetBuffer also resets the @Origin to 0,0 and the @Viewport to the
+dimensions of the entire selected buffer.
+
+At the beginning of program execution and following any call
+to @Graphics the current graphics buffer is set to the display's
+@FrontBuffer.
+
+After a call to @Graphics3D the current buffer is set to the
+display's @BackBuffer.
+
+.also
+GraphicsBuffer;FrontBuffer;BackBuffer;ImageBuffer;TextureBuffer
+
+
+:GraphicsBuffer ()
+
+.desc
+Returns the currently selected graphics buffer.
+
+The @GraphicsBuffer function is useful for storing the current
+graphics buffer so it can be restored later.
+
+See @SetBuffer for more information.
+
+.also
+SetBuffer;FrontBuffer;BackBuffer;ImageBuffer
+
+
+:LoadBuffer (buffer, filename$)
+
+.args
+buffer = a valid graphics buffer
+filename$ = the filename of an existing image file
+
+.desc
+Instead of calling @LoadImage and creating a new image
+the @LoadBuffer command reads the contents of a valid image
+file into the contents of an existing image, texture
+or if required the front or back buffer of the current
+display.
+
+
+:SaveBuffer (buffer,filename$)
+
+.args
+buffer = a valid graphics buffer
+filename$ = a legal filename
+
+.desc
+The @SaveBuffer function is similar to the @SaveImage function
+in that it creates a .bmp image file with the specified #filename.
+
+Unlike @SaveImage, @SaveBuffer uses the pixels from the specified
+graphics buffer and so is useful for making screenshots.
+
+.hint
+The .bmp suffix should be included at the end of the filename if the 
+image file created by @SaveBuffer is to be recognized as a valid image 
+by the system and other applications. 
+
+.also
+SaveImage;SetBuffer
+
+
+:ReadPixel ( x,y [,buffer] )
+
+.args
+x - horizontal pixel location
+y - vertical pixel location
+buffer - valid graphics buffer
+
+.desc
+The @ReadPixel function determines the color of a pixel at the
+specified location of the specified graphics buffer.
+
+The return value is an integer with the red, green and blue
+values packed int the low 24 binary bits and a transparancy
+value in the high 8 bits.
+
+If the x,y coordinate falls outside the bounds of the buffer
+a value of BLACK or in the case of an image buffer, the images
+mask color is returned.
+
+If no graphics buffer is specified @ReadPixel uses the current
+graphics buffer, see @SetBuffer for more details.
+
+.also
+WritePixel;CopyPixel;GetColor;ReadPixelFast
+
+
+:WritePixel x,y,color,[buffer]
+
+.args
+x - horizontal pixel location
+y - vertical pixel location
+color - binary packed color value
+buffer - valid graphics buffer
+
+.desc
+The @WritePixel command sets the color of a pixel at the
+specified location of the specified graphics buffer to the
+value #color.
+
+The #color value is an integer with the red, green and blue
+values packed into the low 24 binary bits and if required
+the transparancy value in the high 8 bits.
+
+If the x,y coordinate falls outside the bounds of the buffer
+the @WritePixel command does nothing.
+
+If no graphics buffer is specified @WritePixel uses the current
+graphics buffer, see @SetBuffer for more details.
+
+.also
+ReadPixel;CopyPixel;WritePixelFast;LockBuffer
+
+
+:CopyPixel src_x, src_y, src_buffer, dest_x, dest_y [,dest_buffer]
+
+.args
+src_x - horizontal pixel location
+src_y - vertical pixel location
+src_buffer - valid graphics buffer to read from
+dest_x - horizontal pixel location
+dest_y - vertical pixel location
+dest_buffer - valid graphics buffer to write to
+
+.desc
+The @CopyPixel command sets the color of a pixel at the
+destination location of the destination graphics buffer 
+to the color of the pixel at the source location of
+the source buffer.
+
+If no destination graphics buffer is specified @CopyPixel 
+writes to the the current graphics buffer.
+
+.also
+ReadPixel;WritePixel;CopyPixelFast
+
+
+:CopyRect src_x,src_y,width,height,dest_x,dest_y,[src_buffer],[dest_buffer]
+
+.args
+src_x - horizontal pixel location
+src_y - vertical pixel location
+width - horizontal size of pixel region to copy
+height - vertical size of pixel region to copy
+dest_x - horizontal destination pixel location
+dest_y - vertical destination pixel location
+src_buffer - valid graphics buffer
+dest_buffer - valid graphics buffer
+
+.desc
+The @CopyRect command is similar to @CopyPixel but copies
+a region of pixels #width, #height in size.
+
+If src_buffer and dest_buffer are not specified @CopyRect uses
+the current graphics buffer, see @SetBuffer for more details.
+
+.also
+CopyPixel
+
+
+:LockBuffer buffer
+
+.args
+buffer = any valid graphics buffer
+
+.desc
+@LockBuffer locks the specified graphics buffer.
+
+High speed pixel functions such as @ReadPixelFast, @WritePixelFast 
+and @CopyPixelFast require the graphics buffer be in a locked state.
+
+@UnlockBuffer must be used once the high speed pixel manipulation
+is complete.
+
+Standard drawing commands should not be issued when a buffer is in
+a locked state.
+
+See the other commands for more
+information.
+
+.also
+UnlockBuffer;ReadPixelFast;WritePixelFast;CopyPixelFast
+
+
+:UnlockBuffer buffer
+
+.args
+buffer = any valid locked graphics buffer
+
+.desc
+@UnlockBuffer must be used once the high speed pixel manipulation
+is complete on a locked buffer.
+
+See @LockBuffer for more information.
+
+.also
+LockBuffer;ReadPixelFast;WritePixelFast;CopyPixelFast
+
+
+:ReadPixelFast ( x,y [,buffer] )
+
+.args
+x - horizontal pixel location
+y - vertical pixel location
+buffer - valid graphics buffer
+
+.desc
+@ReadPixelFast is similar in function to @ReadPixel but the buffer
+must be locked with the @LockBuffer command and no bounds checking 
+is performed in the interests of speed.
+
+Warning: like @WritePixelFast extreme care must be taken to ensure
+the pixel position specified falls inside the specified buffers
+area to avoid crashing the computer.
+
+.also
+ReadPixel;LockBuffer;UnlockBuffer;WritePixelFast
+
+
+:WritePixelFast x,y,color,[buffer]
+
+.args
+x - horizontal pixel location
+y - vertical pixel location
+color - binary packed color value
+buffer - valid graphics buffer
+
+.desc
+@WritePixelFast is similar in function to @ReadPixel but the buffer
+must be locked with the @LockBuffer command and no bounds checking 
+is performed in the interests of speed.
+
+Warning: like @ReadPixelFast extreme care must be taken to ensure
+the pixel position specified falls inside the specified buffers
+area to avoid crashing the computer.
+
+.also
+WritePixel;LockBuffer;UnlockBuffer;ReadPixelFast
+
+
+
+::Graphics Modes and Drivers
+
+
+:CountGfxModes()
+
+.desc
+The @CountGfxModes function returns the number of graphics modes
+supported by the current graphics driver.
+
+Use the @GfxModeWidth, @GfxModeHeight and @GfxModeDepth to obtain
+information about each mode for use with the @Graphics command.
+
+Legal graphics modes for these functions are numbered from 1 up 
+to and including the value returned by @CountGFXModes.
+
+.hint
+Use @CountGfxModes3D() instead if @Graphics3D use is required as older
+hardware may support 3D acceleration on only a subset of it's video modes.
+
+.also
+GFXModeWidth;GFXModeHeight;GFXModeDepth;Graphics;SetGfxDriver;CountGfxModes3D
+
+
+:GFXModeWidth (mode)
+
+.desc
+Returns the width in pixels of the specified graphics mode where mode
+is a value from 1 up to and including the result of the CountGfxModes()
+Function.
+
+.also
+CountGFXModes,GFXModeHeight,GFXModeDepth
+
+
+:GFXModeHeight (mode)
+
+.desc
+Returns the height in pixels of the specified graphics mode where mode
+is a value from 1 up to and including the result of the CountGfxModes()
+Function.
+
+.also
+CountGFXModes,GFXModeHeight,GFXModeDepth
+
+
+:GFXModeDepth (mode)
+
+.desc
+Returns the depth in pixels of the specified graphics mode where mode
+is a value from 1 up to and including the result of the CountGfxModes()
+Function.
+
+.also
+CountGFXModes,GFXModeHeight,GFXModeDepth
+
+
+:GfxModeExists (width,height,depth)
+
+.args
+width = width in pixels
+height = height in pixels
+depth = color depth in bits
+
+.desc
+Returns True if the resolution specified is supported by the
+current graphics driver. Calling @Graphics with settings that
+cause this function to return @False will cause your program
+to halt.
+
+For more information see @Graphics.
+
+For an alternative method for verifying legal resolutions
+see the @CountGfxModes function.
+
+.also
+Graphics;CountGFXModes
+
+
+:CountGfxDrivers()
+
+.desc
+@CountGFXDrivers returns the number of video cards and display devices 
+connected to the system.
+
+The @SetGfxDriver command is used to change the current graphics driver.
+
+A return value of larger than 1 means a secondary monitor is present
+and your program may wish to give the user an option for it to be used
+for the purposes of playing your game.
+
+.also
+GfxDriverName;SetGfxDriver
+
+
+:GfxDriverName$ (index)
+
+.args
+index = index number of display device
+
+.desc
+The @GfxDriverName function returns the name of display device
+at the specified index.
+
+The index parameter should be in the range of 1 up to and
+including the value returned by @CountGFXDrivers.
+
+.also
+CountGfxDrivers;SetGfxDriver
+
+
+:SetGfxDriver index
+
+.args
+index = index number of display device
+
+.desc
+The @SetGfxDriver command is used to change the current graphics driver.
+
+The current graphics driver dictates which display device is used on 
+a multimonitor system when the @Graphics command is used. It also
+affects the graphics modes reported by @CountGfxModes and the like.
+
+The index parameter should be in the range of 1 up to and
+including the value returned by @CountGFXDrivers.
+
+.also
+Graphics,CountGfxDrivers;CountGfxModes

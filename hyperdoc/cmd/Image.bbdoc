@@ -1,0 +1,1654 @@
+:LoadImage (Filename)
+
+.args
+filename = string designating full path and filename to image.
+
+.desc
+This command loads an image from disk and assigns it a file handle. You  will use the DrawImage command to display the graphic  later. The demo version of Blitz Basic supports BMP files; the full retail version  of Blitz Basic supports JPG and PNG format as well.
+
+Many multimedia loading commands for fonts, graphics, and sounds require the  use of FILE HANDLES. You'll need to have a good understanding of file handles  if you are going to successfully use Blitz Basic.
+
+A file handle is a variable (usually GLOBAL) that holds  a unique identifier for a loaded item (font, image, sound, music, etc.). This  unique number is used later for subsequent operations to designate the loaded  item. This file handle allocates the memory to hold the item.
+
+You will find file handles used all over Blitz. See the example for some well-documented  code.
+
+Note that when you change the graphics mode using the Graphics command, all images that were loaded will be lost, and all handles will become invalid.  However, with BlitzPlus, the images will sometimes be retained.  Expect more control over this in the next BlitzPlus update.
+
+.also
+LoadAnimImage;CreateImage;FreeImage;SaveImage;DrawImage;Graphics
+
+.code
+; LoadImage and DrawImage example
+
+; Declare a variable to hold the graphic file handle
+Global gfxPlayer
+
+; Set a graphics mode
+Graphics 640,480,16
+
+; Set drawing operations for double buffering
+SetBuffer BackBuffer()
+
+; Load the image and assign its file handle to the variable
+; - This assumes you have a graphic called player.bmp in the
+; same folder as this source code
+gfxPlayer=LoadImage("player.bmp")
+
+; Let's do a loop where the graphic is drawn wherever the
+; mouse is pointing. ESC will exit.
+While Not KeyHit(1)
+Cls ; clear the screen
+DrawImage gfxPlayer,MouseX(),MouseY() ; Draw the image!
+Flip ; flip the image into view and clear the back buffer
+Wend
+
+:CopyImage (handle)
+
+.args
+handle=the variable you gave the handle to when you loaded the image
+
+.desc
+Instead of loading a graphic twice in two different handles, you can load  the image ONCE then use the CopyImage command to make as many copies in memory  as you want.
+
+Why would you want to do this? So you still have a copy of the original image  in case you want to alter a copy later for another purpose.
+
+.code
+; CopyImage Example
+
+; Load an image and give its handle to gfxOld variable
+gfxOld=LoadImage("mypicture.bmp")
+
+; Duplicate the gfxOld image to a new handle variable
+gfxNew=CopyImage(gfxOld)
+
+
+:CreateImage (width,height[,frames])
+
+.args
+width=width of the new image (or its frames)
+height=height of the new image
+frames= optional number of frames (assumed to be a single frame)
+
+.desc
+Sometimes you want to create a completely new graphic on the fly (using  other images, drawing commands, etc.) instead of loading one. This command will  let you create a new image with a single frame or multiple frames for animation.  You specify the width, height, and optional number of frames. The example should  be pretty self-explainatory.
+
+.code
+; CreateImage/TileImage/ImageBuffer example
+
+; Again, we'll use globals even tho we don't need them here
+; One variable for the graphic we'll create, one for a timer
+Global gfxStarfield, tmrScreen
+
+; Declare graphic mode
+Graphics 640,480,16
+
+; Create a blank image that is 32 pixels wide and 32 high with 10 frames of  32x32
+gfxStarfield=CreateImage(32,32,10)
+
+; loop through each frame of the graphic we just made
+For t = 0 To 9
+; Set the drawing buffer to the graphic frame so we can write on it
+SetBuffer ImageBuffer(gfxStarfield,t)
+; put 50 stars in the frame at random locations
+For y = 1 To 50
+Plot Rnd(32),Rnd(32)
+Next
+Next
+
+; Double buffer mode for smooth screen drawing
+SetBuffer BackBuffer()
+
+; Loop until ESC is pressed
+While Not KeyHit(1)
+
+; Only update the screen every 300 milliseconds. Change 300 for faster or
+; slower screen updates
+If MilliSecs() > tmrScreen+300 Then 
+Cls ; clear the screen
+
+; Tile the screen with a random frame from our new graphic starting at
+; x=0 and y=0 location.
+TileImage gfxStarfield,0,0,Rnd(9)
+Flip ; Flip the screen into view
+tmrScreen=MilliSecs() ; reset the time
+End If
+Wend
+
+:LoadAnimImage (filename,width,height,first,count)
+
+.args
+filename = string designating full path and filename to image.
+width=width in pixels of each frame in the image.
+height=height in pixels of each frame in the image.
+first=the frame to start with (usually 0)
+count=how many frames you are using of the imagestrip
+
+.desc
+While similar to LoadImage, the LoadAnimImage  loads a single image that is made up of 'frames' of seperate images (presumably  to be used as frames of a graphic animation).
+
+Like the LoadImage command, this command returns  a file handle - a unique number to denote the graphic. Use a variable (usually GLOBAL) to contain this number, as you will need it  to actually DRAW the image with the DrawImage command.  See LoadImage command for more details.
+
+The imagestrip itself consists of 2 or more frames, arranged in a single graphic image. There is no spaces between the frames, and each frame must be the same width and height. When loaded, the frames will be indexed in a left-to-right, top-to-bottom fashion, starting in the top left corner. For examples, look at the file kaboom.bmp  or sparks.bmp included in the C:Program FilesBlitzBasicsamplesgraphics folder  of your computer. There are some free utilities floating around to help you  do this.
+
+When drawing the image to the screen with the DrawImage  command, you specify which frame to draw with the frame parameter.
+
+To actually make your image animate, you'll need to cycle through the frames  (like a flip book, cartoon, or any other video) quickly to give the illusion  of motion. Our example will show you how to use one of the sample imagestrips  and make it animate. While it may seem confusing, we are going to do some timer  work as well as a little weird math.
+
+Please look over the example (if your like me, over and over :). Note: You may  need to change the location of the file to suit your system.
+
+.also
+LoadImage
+
+.code
+; LoadAnimImage/MaskImage Example
+; With animation timers
+
+; Even though we don't have any functions, let's do variables global
+; One variable will hold the handle for the graphic, one will hold the
+; current frame we are displaying, and one will hold the milliseconds
+; timer so we can adjust the animation speed.
+Global gfxSparks, frmSparks, tmrSparks
+
+; Standard graphic declaration and double buffering setup
+Graphics 640,480,16
+SetBuffer BackBuffer()
+
+; Load the imagestrip up and denote the frames 32x32 - for a total of 3 frames
+gfxSparks=LoadAnimImage("c:Program FilesBlitzBasicsamplesGraphicsspark.bmp",32,32,0,3)
+
+; We mask the image's color pink to be the 'transparent' color - look at the
+; image in your favorite editor to see more why we use masking.
+MaskImage gfxSparks,255,0,255
+
+; Loop until ESC
+While Not KeyHit(1)
+Cls ; Standard clear screen
+
+; The next statment checks to see if 100 milliseconds has passes since we
+; last changed frames. Change the 100 to higher and lower values to 
+; make the animation faster or slower.
+If MilliSecs() > tmrSparks + 100 Then
+tmrSparks=MilliSecs() ; 'reset' the timer
+frmSparks=( frmSparks + 1 ) Mod 3 ; increment the frame, flip to 0 if we are  out
+End If 
+DrawImage gfxSparks,MouseX(),MouseY(),frmSparks ; draw the image
+Flip ; show the buffer
+Wend
+
+:FreeImage handle
+
+.args
+handle=variable that holds the image handle of a previously loaded image
+
+.desc
+When you are done with an image, use this command to delete the image from memory and free up that memory for other use. Good housekeeping. Get in the habit!
+
+Note that the variable to the Image is not reset to 0 upon using FreeImage, nor will any other variables pointing to the same Image.  If you try to access the handle again, it will result in an error.  It is good practice to set the handle to zero immediately after freeing the image, as you can then check whether an image has already been freed or not.
+
+.also
+LoadImage;SaveImage
+
+.code
+; FreeImage command
+
+; Global, as always, for graphics
+Global gfxPlayer
+
+; Enter graphics mode and start double buffering
+Graphics 640,480,16
+SetBuffer BackBuffer()
+
+; Load the image-assign the handle to gfxPlayer
+gfxPlayer=LoadImage("player.bmp")
+
+; draw the image at random until ESC pressed
+While Not KeyHit(1)
+Cls
+DrawImage gfxPlayer,Rnd(640),Rnd(480)
+Flip
+Wend
+
+; Erase the image from memory!
+FreeImage gfxPlayer
+
+:SaveImage (image,bmpfile$[,frame] )
+
+.args
+image = variable handle to the image to save
+bmpfile$ = string with full path and filename to save to
+frame = optional; which frame of the image to save
+
+.desc
+Saves an image or one of its frames to hard drive. You will need an image in memory to save. This returns a 1 if the save was successful, 0 if not.
+
+.code
+; SaveImage example
+
+; Set Graphics Mode
+Graphics 800,600,16
+
+; Load an image to tile (your location might vary)
+gfxBall=LoadImage("C:Program Files\Blitz Basic\samples\ball.bmp")
+
+; Save the image to the c: drive ...
+ok=SaveImage (gfxBall,"c:
+ewball.bmp")
+
+; Print results
+If ok=1 Then 
+Print "Save successful!"
+Else
+Print "There was an error saving!"
+End If
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+Wend
+
+:GrabImage image,x,y,[frame]
+
+.args
+image = variable of image handle
+x = starting x location to grab
+y = starting y location to grab
+frame = optional frame to insert the grabbed image into 
+
+.desc
+Quite possibly one of the most useful yet underdocumented, confusing commands  in the Blitz Basic language is GrabImage.
+
+This command allows you to grab a portion of the current drawing buffer (this  could be an image too if you've set it as an ImageBuffer)  and stick it into an image.
+
+There are a million and one uses for this command, so I'll let you use your  imagination. However, the command doesn't make much sense as it is documented,  so let me clarify.
+
+First, you must use CreateImage to create a new  blank image in which to grab to. Whatever size you create the image, THAT is  how much of the buffer will be grabbed from the x,y location you specify in  GrabImage.
+
+For example, you create a new image with a size of 50 pixels by 50 pixels. When  you call GrabImage, you choose x=100, y=100. The area you will grab and put  into your new image will be 100,100 to 150,150. If you attempt to GrabImage  into an image variable that hasn't been created yet, you will get an error.
+
+Note: You can REPLACE an existing image with a grabbed one.
+
+See the example for a more practical look. 
+
+.code
+; GrabImage example
+
+; Turn on graphics
+Graphics 640,480,16
+
+; We'll be drawing right to the front buffer
+SetBuffer FrontBuffer()
+
+; You must create an empty image to grab from first
+gfxGrab=CreateImage(100,100)
+
+; Draw random rectangles on the screen until the
+; user presses ESC
+While Not KeyHit(1)
+; random color
+Color Rnd(255),Rnd(255),Rnd(255)
+; super random rectangles
+Rect Rnd(640),Rnd(480),Rnd(100),Rnd(100),Rnd(1)
+Delay 50
+Wend
+
+; Now, grab an image, starting at 100,100 and put it in gfxGrab
+GrabImage gfxGrab,100,100
+
+; Clear screen and show user the grabbed image
+Cls
+Text 0,0, "Here is your grabbed image! Press a mouse key ..."
+DrawImage gfxgrab,50,50
+
+; Wait for a mouse press
+WaitMouse()
+
+
+:ImageBuffer (handle[,frame])
+
+.args
+handle=variable holding the image's handle
+frame=optional frame to draw to if using an imagestrip image 
+
+.desc
+There are 1000 reasons for this command. Simply put, you may want to 'draw'  on an existing image you've loaded (LoadImage or LoadAnimImage) or created (CreateImage).  You could, for example, have a blank wall graphic and you want to add 'graffiti'  to it based on the user action (Jet Grind Radio baybeee! Sorry...). Instead  of trying to draw a dozen images all over the wall, just use the SetBuffer command to denote the wall graphic as  the 'target' buffer, and draw away! Next time you display that graphic (DrawImage),  you will see your changes! This is a powerful command!
+
+.code
+; CreateImage/TileImage/ImageBuffer example
+
+; Again, we'll use globals even tho we don't need them here
+; One variable for the graphic we'll create, one for a timer
+Global gfxStarfield, tmrScreen
+
+; Declare graphic mode
+Graphics 640,480,16
+
+; Create a blank image that is 320 pixels wide and 32 high with 10 frames of  32x32
+gfxStarfield=CreateImage(32,32,10)
+
+; loop through each frame of the graphic we just made
+For t = 0 To 9
+; Set the drawing buffer to the graphic frame so we can write on it
+SetBuffer ImageBuffer(gfxStarfield,t)
+; put 50 stars in the frame at random locations
+For y = 1 To 50
+Plot Rnd(32),Rnd(32)
+Next
+Next
+
+; Double buffer mode for smooth screen drawing
+SetBuffer BackBuffer()
+
+; Loop until ESC is pressed
+While Not KeyHit(1)
+
+; Only update the screen every 300 milliseconds. Change 300 for faster or
+; slower screen updates
+If MilliSecs() > tmrScreen+300 Then 
+Cls ; clear the screen
+
+; Tile the screen with a random frame from our new graphic starting at
+; x=0 and y=0 location.
+TileImage gfxStarfield,0,0,Rnd(9)
+Flip ; Flip the screen into view
+tmrScreen=MilliSecs() ; reset the time
+End If
+Wend 
+
+
+:DrawImage image, x,y [,frame]
+
+.args
+image = variable image pointer previously designated
+x = the 'x' location of the screen to display the graphic
+y = the 'y' location of the screen to display the graphic
+frame = the frame number of the AnimImage to display (optional: default is 0)
+
+.desc
+This command draws a previously loaded image. This command draws both single image graphics (loaded with the LoadImage  command) as well as animated images (loaded with the LoadAnimImage command).
+
+You specify where on the screen you wish the image to appear. You can actually  'draw' off the screen as well by using negative values or positive values that  are not visible 'on the screen'.
+
+Finally, if you are using an animated image (loaded with the LoadAnimImage), you can specify which frame  of the imagestrip is displayed with the DrawImage command.
+
+One of the most common problems new Blitz programmers face when using drawing  commands is that even though they draw the graphic to the screen, they never  see it!
+
+Remember, Blitz Basic is fast ... too fast for the human eye. You will have  to either continuously draw the image over and over again (like the way a cartoon  or TV works), clearing the screen each time a change is made (this is called  double buffering); or you will need to delay Blitz's execution long enough in  'human time' to let you SEE the picture. We will do the double buffering approach.
+
+.also
+DrawBlock
+
+.code
+; LoadImage and DrawImage example
+
+; Declare a variable to hold the graphic file handle
+Global gfxPlayer
+
+; Set a graphics mode
+Graphics 640,480,16
+
+; Set drawing operations for double buffering
+SetBuffer BackBuffer()
+
+; Load the image and assign its file handle to the variable
+; - This assumes you have a graphic called player.bmp in the
+; same folder as this source code
+gfxPlayer=LoadImage("player.bmp")
+
+; Let's do a loop where the graphic is drawn wherever the
+; mouse is pointing. ESC will exit.
+While Not KeyHit(1)
+Cls ; clear the screen
+DrawImage gfxPlayer,MouseX(),MouseY() ; Draw the image!
+Flip ; flip the image into view and clear the back buffer
+Wend
+
+:DrawImageRect image,x,y,rect_x,rect_y,rect_width,rect_height,[frame]
+
+.args
+image = variable holding the image handle
+x = x location on the screen to draw the image
+y = y location on the screen to draw the image
+rect_x = starting x location within the image to draw
+rect_y = starting y location within the image to draw
+rect_width = the height of the area to draw
+rect_height = the width of the area to draw
+frame = optional frame number of image to draw 
+
+.desc
+This command will let you draw a rectangular PORTION of an image to the  designated location on the screen. The transparent/masked portions of the original  image will be drawn transparent, just as you normally would draw an image.
+
+This is handy if you are doing something like revealing part of a screen when  the player uncovers something (think QIX). You could load the 'picture' into  an image, then when the player clears a rectangular region, you could paste  that portion of the final image onto the playfield. If you want to draw the  image portion with no transparency or mask, use  DrawBlockRect instead.
+
+.code
+; DrawImageRect Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create new empty graphic to store our circle in
+gfxCircle=CreateImage(50,50)
+
+; Draw the circle image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+SetBuffer FrontBuffer()
+
+
+; Let's draw portions of the circle randomly
+While Not KeyHit(1)
+; We take random sized portions of the circle and put them
+; at a random location ... wash, rinse, and repeat
+DrawImageRect gfxCircle,Rnd(640),Rnd(480),0,0,Rnd(50),Rnd(50),0
+Delay 100
+Wend
+
+
+:DrawBlockRect image,x,y,rect_x,rect_y,rect_width,rect_height,[frame]
+
+.args
+image = variable holding the image handle
+x = x location on the screen to draw the image
+y = y location on the screen to draw the image
+rect_x = starting x location within the image to draw
+rect_y = starting y location within the image to draw
+rect_width = the height of the area to draw
+rect_height = the width of the area to draw
+frame = optional frame number of image to draw 
+
+.desc
+This command will let you draw a rectangular PORTION of an image to the  designated location on the screen. The transparent/masked portions of the original  image will be ignored and drawn with the image.
+
+This is handy if you are doing something like revealing part of a screen when  the player uncovers something (think QIX). You could load the 'picture' into  an image, then when the player clears a rectangular region, you could paste  that portion of the final image onto the playfield. If you want to draw the  image portion with transparency or masking, use  DrawImageRect instead.
+
+.code
+; DrawBlockRect Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create new empty graphic to store our circle in
+gfxCircle=CreateImage(50,50)
+
+; Draw the circle image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+SetBuffer FrontBuffer()
+
+; Set the screen to white so you can see the transparent areas
+ClsColor 255,255,255
+Cls 
+
+; Let's draw portions of the circle randomly
+While Not KeyHit(1)
+; We take random sized portions of the circle and put them
+; at a random location ... wash, rinse, and repeat
+DrawBlockRect gfxCircle,Rnd(640),Rnd(480),0,0,Rnd(50),Rnd(50),0
+Delay 100
+Wend
+
+
+:DrawBlock image, x,y [,frame]
+
+.args
+image = variable of the image pointer
+x = x location to draw the image
+y = y location to draw the image
+frame = image's frame to draw (optional - default is 0)
+
+.desc
+This is similar to the DrawImage command except  that any transparency or MaskImage is ignored and  the entire image (including masked colors) is drawn. The frame is optional.
+
+.also
+DrawImage
+
+.code
+; DrawBlock Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create new empty graphic to store our circle in
+gfxCircle=CreateImage(50,50)
+
+; Draw the circle image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+
+; Let's not forget to put the drawing buffer back!
+SetBuffer BackBuffer()
+; Set the CLS color to white
+ClsColor 255,255,255
+
+; Let the user move the circle graphic around a white screen
+; putting the graphic at the MouseX,Y coordinates
+While Not KeyHit(1)
+Cls
+DrawBlock gfxCircle,MouseX(),MouseY()
+Flip
+Wend
+
+:TileImage handle,[x],[y],[frames]
+
+.args
+handle= variable holding the image's handle
+x=starting x location of the tile; assumed 0
+y=starting y location of the tile; assumed 0
+frames=the frame of the image to tile; optional with imagestrip 
+
+.desc
+If you want to make a starfield or other easy tiled background, this is  YOUR command. All you have to do is specify the image handle (an image loaded  with the LoadImage or LoadAnimImage command). Optionally, you can  specify a starting x and y location, as well as an optional frame. You can milk  some serious parallax effects with a simple imagestrip with a couple of various  starfields and the TileImage command.
+
+.code
+; CreateImage/TileImage/ImageBuffer example
+
+; Again, we'll use globals even tho we don't need them here
+; One variable for the graphic we'll create, one for a timer
+Global gfxStarfield, tmrScreen
+
+; Declare graphic mode
+Graphics 640,480,16
+
+; Create a blank image that is 320 pixels wide and 32 high with 10 frames of  32x32
+gfxStarfield=CreateImage(32,32,10)
+
+; loop through each frame of the graphic we just made
+For t = 0 To 9
+; Set the drawing buffer to the graphic frame so we can write on it
+SetBuffer ImageBuffer(gfxStarfield,t)
+; put 50 stars in the frame at random locations
+For y = 1 To 50
+Plot Rnd(32),Rnd(32)
+Next
+Next
+
+; Double buffer mode for smooth screen drawing
+SetBuffer BackBuffer()
+
+; Loop until ESC is pressed
+While Not KeyHit(1)
+
+; Only update the screen every 300 milliseconds. Change 300 for faster or
+; slower screen updates
+If MilliSecs() > tmrScreen+300 Then 
+Cls ; clear the screen
+
+; Tile the screen with a random frame from our new graphic starting at
+; x=0 and y=0 location.
+TileImage gfxStarfield,0,0,Rnd(9)
+Flip ; Flip the screen into view
+tmrScreen=MilliSecs() ; reset the time
+End If
+Wend 
+
+
+:TileBlock image [,x,y,frame]
+
+.args
+image = file handle variable holding the loaded image
+x = x coordinate offset(optional)
+y = y coordinate offset (optional)
+frame = frame of the image to use (optional) 
+
+.desc
+Similar to TileImage but ignores transparency.  Use this to tile an entire or portion of the screen with a single repetative  image.
+
+.code
+; TileBlock example
+Graphics 800,600,16
+
+; Load an image to tile (your location might vary)
+gfxBall=LoadImage("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Tile the graphic without transparency
+TileBlock gfxBall
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+Wend
+
+
+:MaskImage handle,red,green,blue
+
+.args
+handle=the variable you assigned the handle to when you loaded the image.
+red=the red color value (0-255)
+green=the green color value (0-255)
+blue=the blue color value (0-255)
+
+.desc
+Blitz Basic assumes that when you load an image (using LoadImage or LoadAnimImage)  for drawing (using DrawImage command), you want  the color black (RGB color 0,0,0) on your image to be transparent (or see through).  There WILL come a time when you want some other color to be that masked color.  This command will let you set that mask color using the color's RGB values (I  use Paint Shop Pro to determing the Red, Green, and Blue values). The example  is a bit bloated for other commands, but I'm pretty sure you'll understand.
+
+.code
+; LoadAnimImage/MaskImage Example
+; With animation timers
+
+; Even though we don't have any functions, let's do variables global
+; One variable will hold the handle for the graphic, one will hold the
+; current frame we are displaying, and one will hold the milliseconds
+; timer so we can adjust the animation speed.
+Global gfxSparks, frmSparks, tmrSparks
+
+; Standard graphic declaration and double buffering setup
+Graphics 640,480,16
+SetBuffer BackBuffer()
+
+; Load the imagestrip up and denote the frames 32x32 - for a total of 3 frames
+gfxSparks=LoadAnimImage("c:Program FilesBlitzBasicsamplesGraphicsspark.bmp",32,32,0,3)
+
+; We mask the image's color pink to be the 'transparent' color - look at the
+; image in your favorite editor to see more why we use masking.
+MaskImage gfxSparks,255,0,255
+
+; Loop until ESC
+While Not KeyHit(1)
+Cls ; Standard clear screen
+
+; The next statment checks to see if 100 milliseconds has passes since we
+; last changed frames. Change the 100 to higher and lower values to 
+; make the animation faster or slower.
+If MilliSecs() > tmrSparks + 100 Then
+tmrSparks=MilliSecs() ; 'reset' the timer
+frmSparks=( frmSparks + 1 ) Mod 3 ; increment the frame, flip to 0 if we are  out
+End If 
+DrawImage gfxSparks,MouseX(),MouseY(),frmSparks ; draw the image
+Flip ; show the buffer
+Wend
+
+:HandleImage image,x,y
+
+.args
+image = variable holding the file handle to the image
+x = x location of the new image handle location
+y = y location of the new image handle location 
+
+.desc
+When an image is loaded with LoadImage, the  image handle (the location within the image where the image is 'drawn from')  is always defaulted to the top left corner (coordinates 0,0). This means if  you draw an image that is 50x50 pixels at screen location 200,200, the image  will begin to be drawn at 200,200 and extend to 250,250.
+
+This command moves the image handle from the 0,0 coordinate of the image to  the specified x and y location in the image. You can retrieve an image's current  location handle using the ImageXHandle and ImageYHandle. Finally, you can make all images  automatically load with the image handle set to middle using the AutoMidHandle command.
+
+Note about the term 'handle'. There are two types of 'handles' we discuss in  these documents. One is the location within an image - as discussed in this  command. The other is a 'file handle', a variable used to hold an image, sound,  or font loaded with a command. See LoadImage for  more information about file handles.
+
+Also See: MidHandle 
+
+.code
+;HandleImage Example
+
+Graphics 800,600,16
+
+gfxPlayer=LoadImage("player.bmp")
+HandleImage gfxPlayer,20,20
+DrawImage gfxPlayer,0,0
+WaitKey
+
+
+:MidHandle image
+
+.args
+image = variable holding the file handle to the image
+
+.desc
+When an image is loaded with LoadImage, the  image handle (the location within the image where the image is 'drawn from')  is always defaulted to the top left corner (coordinates 0,0). This means if  you draw an image that is 50x50 pixels at screen location 200,200, the image  will begin to be drawn at 200,200 and extend to 250,250.
+
+This command moves the image handle from the 0,0 coordinate of the image to  the exact middle of the image. Therefore, in the same scenario above, if you  were to draw a 50x50 pixel image at screen location 200,200 with its image handle  set to Mid with this command, the image would start drawing at 175,175 and extend  to 225,225.
+
+You can manual set the location of the image's handle using the HandleImage command. You can retrieve an image's  handle using the ImageXHandle and ImageYHandle. Finally, you can make all images  automatically load with the image handle set to middle using the AutoMidHandle command.
+
+Note about the term 'handle'. There are two types of 'handles' we discuss in  these documents. One is the location within an image - as discussed in this  command. The other is a 'file handle', a variable used to hold an image, sound,  or font loaded with a command. See LoadImage for  more information about file handles.
+
+.code
+; MidHandle/ImageXHandle()/ImageYHandle()/AutoMidHandle
+
+; Initiate Graphics Mode
+Graphics 640,480,16
+
+; Set up the image file handle as a global
+Global gfxBall
+
+; Load the image - you may need to change the location of the file
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ...
+While Not KeyHit(1)
+Text 0,0,"Default Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall) ; Print the location of the image  handle x location
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall) ; Print the location of the image  handle y location
+DrawImage gfxBall,200,200,0 ; draw the image at 200,200
+Wend
+
+; Clear the screen
+Cls
+
+; Set the ball's handle to the center of the image
+MidHandle gfxBall
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"New Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+; Makes all images load up with their handles in the center of the image
+AutoMidHandle True
+Cls
+
+; Load the image again
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"Automatic image handle of gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+
+:AutoMidHandle true/false
+
+.args
+true = images load with midhandle set as default
+false = images load with default image handles at 0,0 
+
+.desc
+When an image is loaded with LoadImage, the  image handle (the location within the image where the image is 'drawn from')  is always defaulted to the top left corner (coordinates 0,0). This means if  you draw an image that is 50x50 pixels at screen location 200,200, the image  will begin to be drawn at 200,200 and extend to 250,250.
+
+The MidHandle command moves the image's handle to  the middle of the image. See this command for more information about the image's  handle.
+
+This command eliminates the need for the MidHandle  command by making ALL subsequently loaded images default to having their image  handles set to mid.
+
+Note about the term 'handle'. There are two types of 'handles' we discuss in  these documents. One is the location within an image - as discussed in this  command. The other is a 'file handle', a variable used to hold an image, sound,  or font loaded with a command. See LoadImage for  more information about file handles.
+
+.code
+; MidHandle/ImageXHandle()/ImageYHandle()/AutoMidHandle
+
+; Initiate Graphics Mode
+Graphics 640,480,16
+
+; Set up the image file handle as a global
+Global gfxBall
+
+; Load the image - you may need to change the location of the file
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ...
+While Not KeyHit(1)
+Text 0,0,"Default Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall) ; Print the location of the image  handle x location
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall) ; Print the location of the image  handle y location
+DrawImage gfxBall,200,200,0 ; draw the image at 200,200
+Wend
+
+; Clear the screen
+Cls
+
+; Set the ball's handle to the center of the image
+MidHandle gfxBall
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"New Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+; Makes all images load up with their handles in the center of the image
+AutoMidHandle True
+Cls
+
+; Load the image again
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"Automatic image handle of gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+
+:ScaleImage image,xscale#,yscale#
+
+.args
+image = file handle variable to a previously loaded image
+xscale# = the amount to scale the image horizontally
+yscale# = the amount to scale the image vertically 
+
+.desc
+Use this command to rescale an image to a new size using a floating point  percentage (1.0 = 100%, 2.0 = 200%, etc). Using a negative value perform image  flipping. You must've previously loaded the image with LoadImage or LoadAnimImage.
+
+This is NOT intended for REAL TIME scaling of images! Precalculate your images  before running your program, or you will likely see massively slow renderings  of graphics.
+
+.code
+; ScaleImage example
+
+; Set Graphics Mode
+Graphics 800,600,16
+
+; Randomize the random seed
+SeedRnd MilliSecs()
+
+; Load an image to tile (your location might vary)
+gfxBall=LoadImage("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Scale it randomly from 50% to 150% both x and y
+ScaleImage gfxBall,Rnd(-2.0,2.0),Rnd(-2.0,2.0)
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+DrawImage gfxball,Rnd(800),Rnd(600)
+VWait 
+Wend
+
+
+:ResizeImage image,width#,height#
+
+.args
+image = file handle for previously loaded image
+width# = new width in pixels
+height# = new height in pixels 
+
+.desc
+Similar to ScaleImage, but uses pixel values  instead of percentages. Use this command to resize an image previously loaded  with LoadImage or LoadAnimImage.
+
+This is NOT intended for REAL TIME scaling of images! Precalculate your images  before running your program, or you will likely see massively slow renderings  of graphics.
+
+.code
+; ResizeImage example
+
+; Set Graphics Mode
+Graphics 800,600,16
+
+; Randomize the random seed
+SeedRnd MilliSecs()
+
+; Load an image to tile (your location might vary)
+gfxBall=LoadImage("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Size it randomly from 300 to -300 both x and y
+ResizeImage gfxBall,Rnd(-300,300),Rnd(-300,300)
+
+; Wait for ESC to hit
+While Not KeyHit(1)
+DrawImage gfxball,Rnd(800),Rnd(600)
+VWait 
+Wend
+
+
+:RotateImage image,value#
+
+.args
+image = variable containing the image handle
+value# = floating number from 0 to 360 degrees
+
+.desc
+I'm going to start this description off with:
+
+This command is not fast enough to render rotations in real time!
+
+Now, the purpose of this command is to rotate an image a specified number of  degrees. Since it is slow, you will need to pre-calculate rotated images with  this command. This means, before the program actually displays the images you  rotate, you will want to rotate them ahead of time.
+
+This command automatically dithers/anti-aliases the rotated graphic image, so  it might mess with your transparency. To avoid this issue, use the TFormFilter command. This will render the rotated  images with bi-linear filtering.
+
+I'm going to end this command with:
+
+This command is not fast enough to render rotations in real time!
+
+.code
+; RotateImage/TFormFilter Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Change the 0 to a 1 to see the difference
+; between filter on and off.
+TFormFilter 0
+
+; Create new empty graphic to store our circle in
+gfxBox=CreateImage(50,50)
+
+; Draw the box image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxBox)
+Color 255,0,0
+; Note the extra space between the box and the edge of the graphic
+Rect 10,10,30,30,1
+SetBuffer FrontBuffer()
+
+While Not KeyHit(1)
+; Make a copy of the image so we are always using a fresh one each time
+; we rotate it.
+gfxTemp=CopyImage(gfxBox)
+; Rotate it a random value and draw it at a random location
+RotateImage gfxTemp,Rnd(360)
+DrawImage gfxTemp,Rnd(640),Rnd(480)
+Wend
+
+:TFormImage image,a#,b#,c#,d#
+
+.args
+image - image handle
+a# - 1,1 element of 2x2 matrix
+b# - 2,1 element of 2x2 matrix
+c# - 1,2 element of 2x2 matrix
+d# - 2,2 element of 2x2 matrix
+
+.desc
+Transforms an image based on a 2x2 matrix.  The input parameters relate to the elements of the matrix as below:
+
+( a# b# )
+( c# d# )
+
+The image is treated as a matrix and is multiplied by the matrix above.  Unless you understand matrix manipulation thoroughly, it is unlikely that you will find this command useful.
+
+Common uses for this command might be to rotate or scale images.  These are available independently using @ScaleImage and @RotateImage.  However, using this command it is possible to do both operations simultaneously.  It is also possible to shear images using this command.
+
+It is strongly recommended that you run the (rather lengthy) example below to better understand how this command can be used.
+
+.also
+ScaleImage;RotateImage
+
+.code
+; Set up the Blitz evironment and user controlled input parameters
+Global a#=1 ; This controls the horizontal scale, negative values cause the image to flip.  Zero is invalid.
+Global b#=0 ; This shears the image vertically
+Global c#=0 ; This shears the image horizontally
+Global d#=1 ; This controls the vertical scale, negative values cause the image to flip.  Zero is invalid.
+Graphics 600,400,16
+
+; Create an image that we can manipulate
+Global img=CreateImage(50,50) 
+SetBuffer ImageBuffer(img) 
+Color 255,0,0 : Rect 0,0,25,25,1
+Color 255,255,0 : Rect 25,25,25,25,1
+Color 0,255,0 : Rect 25,0,25,25,1
+Color 0,0,255 : Rect 0,25,25,25,1
+
+; Set up drawing & timing stuff
+SetBuffer BackBuffer() 
+timer=CreateTimer(30)
+
+Repeat	
+	; deal with keyboard inputs
+	If KeyDown(42) Or KeyDown(54) Then inc#=-0.1 Else inc#=0.1
+	If KeyDown(30) Then a#=a#+inc#
+	If KeyDown(48) Then b#=b#+inc#
+	If KeyDown(46) Then c#=c#+inc#
+	If KeyDown(32) Then d#=d#+inc#
+	If KeyHit(57) Then RunDemo()
+	If KeyHit(1) Then Exit
+	
+	; draw the screen
+	DrawScreen()	
+	WaitTimer timer
+Forever
+End
+
+; Rolling Demo
+Function RunDemo()
+	degrees=0 ; the number of degrees by which to rotate the image
+	scale#=1.0 ;  the scale of the image
+	timer=CreateTimer(10)
+	Repeat
+		a#=scale#:b#=0:c#=0:d#=scale# ; reset the matrix
+		; increase the degrees (or reset if >360)
+		If degrees<360 Then degrees=degrees+4 Else degrees=0
+		; and set up the matrix multipliers.  The explanation as to why these work can be found in most good
+		; mathematics text books, and is too involved to go into here!
+		ma#=Cos(degrees) 
+		mb#=Sin(degrees) 
+		mc#=-Sin(degrees) 
+		md#=Cos(degrees) 
+		; multiply the two matrices.  
+		na#=a#*ma#+b#*mc# 
+		nb#=a#*mb#+b#*md# 
+		nc#=c#*ma#+d#*mc# 
+		nd#=c#*mb#+d#*md# 
+		a#=na#:b#=nb#:c#=nc#:d#=nd#
+		
+		; handle input and draw the screen
+		If KeyHit(1) Then Exit
+		If KeyDown(200) And scale#<2.0 Then scale#=scale#+0.1
+		If KeyDown(208) And scale#>0.1 Then scale#=scale#-0.1
+		DrawScreen(True)
+		WaitTimer timer
+	Forever
+	a#=1:b#=0:c#=0:d#=1 ; reset the matrix
+	FlushKeys()
+End Function
+
+; Draw stuff on the screen, including transforming the image
+Function DrawScreen(demo=False)
+	ClsColor 0,0,0
+	Cls
+	DrawBlock img,10,10
+	Text 100,5,"TFORMIMAGE EXAMPLE"
+	Text 100,20,"The command format is: TFormImage image, a, b, c, d"
+	If Not demo Then
+		Text 100,35,"Press 'Space' for a rolling demo"
+		Text 100,50,"Use the keys a, b, c, and d to increase the parameters"
+		Text 100,65,"Also hold down shift to decrease each of these parameters"
+	Else
+		Text 100,35,"Use the up and down arrow keys to change the scale"
+	End If
+	Text 100,80,"Press 'Escape' to exit"
+	Text 10,110,"Current Parameters:"
+	
+	; ######################## This is where we actually use TFormImage using the input parameters
+	Text 20,125,"TFormImage image, "+a#+", "+b#+", "+c#+", "+d#
+	img2=CopyImage(img) 
+	TFormImage img2,a#,b#,c#,d#
+	; #############################################################################
+	
+	If demo Then
+		DrawBlock img2,300,280
+	Else
+		DrawBlock img2,300-ImageWidth(img2)/2,280-ImageHeight(img2)/2
+	EndIf
+	Flip
+End Function
+
+:TFormFilter enable
+
+.args
+enable = 0 to turn off filtering; 1 to turn it on
+
+.desc
+This command will enable or disable bi-linear filtering on images that are  convoluted (altered) by commands like TFormImage  and RotateImage.
+
+This filtering allows the convoluted graphics to have smoother, more aliased  edges. This also makes the operations slower. The bi-linear filtering can also  create non-transparent edges what will mess with your transparency. Experiment  for the best results.
+
+Try changing the example to see the difference. 
+
+.code
+; RotateImage/TFormFilter Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Remove the line below to see the difference
+; between filter on and off.
+TFormFilter 0
+
+; Create new empty graphic to store our circle in
+gfxBox=CreateImage(50,50)
+
+; Draw the box image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxBox)
+Color 255,0,0
+; Note the extra space between the box and the edge of the graphic
+Rect 10,10,30,30,1
+SetBuffer FrontBuffer()
+
+While Not KeyHit(1)
+; Make a copy of the image so we are always using a fresh one each time
+; we rotate it.
+gfxTemp=CopyImage(gfxBox)
+; Rotate it a random value and draw it at a random location
+RotateImage gfxTemp,Rnd(360) 
+DrawImage gfxTemp,Rnd(640),Rnd(480)
+Wend
+
+
+:ImageWidth (image handle)
+
+.args
+image handle = variable assigned when the image was loaded
+
+.desc
+Use this command and ImageHeight to return  the size of the given image (using the handle assigned when the image was loaded  with LoadImage) in pixels.
+
+.code
+; ImageHeight/ImageWidth Example
+
+; Global, as always, for graphics
+Global gfxPlayer
+
+; Enter graphics mode and start double buffering
+Graphics 640,480,16
+SetBuffer BackBuffer()
+
+; Load the image-assign the handle to gfxPlayer
+gfxPlayer=LoadImage("player.bmp")
+
+; Print the image dimensions
+Print "The image height is: " + ImageHeight(gfxPlayer)
+Print "The image width is: " + ImageWidth(gfxPlayer)
+
+; Wait until ESC is pressed so you can see the output
+While Not KeyHit(1)
+Wend
+
+
+:ImageHeight (image handle)
+
+.args
+image handle = variable assigned when the image was loaded
+
+.desc
+Use this command and ImageWidth to return the  size of the given image (using the handle assigned when the image was loaded  with LoadImage) in pixels.
+
+.code
+; ImageHeight/ImageWidth Example
+
+; Global, as always, for graphics
+Global gfxPlayer
+
+; Enter graphics mode and start double buffering
+Graphics 640,480,16
+SetBuffer BackBuffer()
+
+; Load the image-assign the handle to gfxPlayer
+gfxPlayer=LoadImage("player.bmp")
+
+; Print the image dimensions
+Print "The image height is: " + ImageHeight(gfxPlayer)
+Print "The image width is: " + ImageWidth(gfxPlayer)
+
+; Wait until ESC is pressed so you can see the output
+While Not KeyHit(1)
+Wend
+
+
+:ImageXHandle image
+
+.args
+image = variable holding the image's file handle 
+
+.desc
+It is occasionally useful to determine the location of an image's image  handle. This command returns the X coordinate. Use ImageYHandle to get the Y coordinate. Please  see MidHandle for more information on the image's  image handle. 
+Note about the term 'handle'. There are two types of 'handles' we discuss in  these documents. One is the location within an image - as discussed in this  command. The other is a 'file handle', a variable used to hold an image, sound,  or font loaded with a command. See LoadImage for  more information about file handles.
+
+.code
+; MidHandle/ImageXHandle()/ImageYHandle()/AutoMidHandle
+
+; Initiate Graphics Mode
+Graphics 640,480,16
+
+; Set up the image file handle as a global
+Global gfxBall
+
+; Load the image - you may need to change the location of the file
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ...
+While Not KeyHit(1)
+Text 0,0,"Default Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall) ; Print the location of the image  handle x location
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall) ; Print the location of the image  handle y location
+DrawImage gfxBall,200,200,0 ; draw the image at 200,200
+Wend
+
+; Clear the screen
+Cls
+
+; Set the ball's handle to the center of the image
+MidHandle gfxBall
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"New Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+; Makes all images load up with their handles in the center of the image
+AutoMidHandle True
+Cls
+
+; Load the image again
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"Automatic image handle of gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+
+:ImageYHandle image
+
+.args
+image = variable holding the image's file handle 
+
+.desc
+It is occasionally useful to determine the location of an image's image  handle. This command returns the Y coordinate. Use ImageXHandle to get the X coordinate. Please  see MidHandle for more information on the image's  image handle. 
+Note about the term 'handle'. There are two types of 'handles' we discuss in  these documents. One is the location within an image - as discussed in this  command. The other is a 'file handle', a variable used to hold an image, sound,  or font loaded with a command. See LoadImage for  more information about file handles.
+
+.code
+; MidHandle/ImageXHandle()/ImageYHandle()/AutoMidHandle
+
+; Initiate Graphics Mode
+Graphics 640,480,16
+
+; Set up the image file handle as a global
+Global gfxBall
+
+; Load the image - you may need to change the location of the file
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ...
+While Not KeyHit(1)
+Text 0,0,"Default Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall) ; Print the location of the image  handle x location
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall) ; Print the location of the image  handle y location
+DrawImage gfxBall,200,200,0 ; draw the image at 200,200
+Wend
+
+; Clear the screen
+Cls
+
+; Set the ball's handle to the center of the image
+MidHandle gfxBall
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"New Image Handle for gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+; Makes all images load up with their handles in the center of the image
+AutoMidHandle True
+Cls
+
+; Load the image again
+gfxBall=LoadImage ("C:Program FilesBlitz Basicsamplesall.bmp")
+
+; Until the user presses ESC key ... show the new information
+While Not KeyHit(1)
+Text 0,0,"Automatic image handle of gfxBall... Press ESC ..."
+Text 0,14,"X handle-" + ImageXHandle(gfxBall)
+Text 0,28,"Y handle-" + ImageYHandle(gfxBall)
+DrawImage gfxBall,200,200,0
+Wend
+
+
+:ImagesOverlap (image1,x1,y1,image2,x2,y2)
+
+.args
+image1 = first image to test
+x1 = image1's x location
+y1 = image1's y location
+image2 = second image to test
+x2 = image2's x location
+y2 = image2's y location 
+
+.desc
+This is a very fast, simple collision type command that will allow you to  determine whether or not two images have overlapped each other. This does not  take into account any transparent pixels (see ImagesCollide).
+
+As with any collision detection system in Blitz, you will need to know the variable  names of the two images, and their X and Y locations at the moment collision  checking occurs.
+
+In many cases, you might be able to get away with using this more crude, yet  quite fast method of collision detection. For games where your graphics are  very squared off and pixel-perfect accuracy isn't a must, you can employ this  command to do quick and dirty overlap checking.
+
+The example blatently uses graphics that are much smaller than their container  to show you how inaccurate this command can be - if not used wisely. The ImagesCollide example is identical to this one  - and shows how pixel-perfect collision works.
+
+You might be able to get away with this on some more classical games like Robotron,  Defender, Dig Dug, etc. 
+
+.code
+; ImagesOverlap Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create two new empty graphics to store our circle and box in
+gfxBox=CreateImage(50,50)
+gfxCircle=CreateImage(50,50)
+
+; Draw the box image first
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxBox)
+; Change drawing color to blue
+Color 0,0,255
+;Draw our box (note that it has a 10 pixel space around it)
+Rect 10,10,30,30,1
+
+; Repeat for the circle graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+
+; Let's not forget to put the drawing buffer back!
+SetBuffer BackBuffer()
+
+; Locate our box to a random, visible screen location
+boxX=Rnd(50,610)
+boxY=Rnd(50,430)
+
+; Repeat the loop until we've had a collision
+Repeat 
+; Attach our mouse to the circle to move it
+circleX=MouseX()
+circleY=MouseY()
+; Standard double buffer technique; clear screen first
+Cls
+; Draw our objects at the designated location
+DrawImage gfxBox,boxX,boxY
+DrawImage gfxCircle,circleX,circleY
+; Standard double buffer technique; flip after all drawing is done
+Flip
+; We test the locations of our box and circle to see if they have overlapped
+Until ImagesOverlap (gfxBox,boxX,boxY,gfxCircle,circleX,circleY)
+
+; Loop is over, we must've collided!
+Text 0,0, "WE'VE HAD A COLLISION! PRESS A MOUSE BUTTON"
+; Can't see the text until we flip ..
+Flip
+; Wait for a mouse click
+WaitMouse()
+; End our graphics mode
+EndGraphics
+
+
+:ImagesCollide (image1,x1,y1,frame1,image2,x2,y2,frame2)
+
+.args
+image1 - first image to test
+x1 - image1's x location
+y1 - image1's y location
+frame1 - image1's frame to test (optional)
+
+image2 - second image to test
+x2 - image2's x location
+y2 - image2's y location
+frame2 - image2's frame to test (optional)
+
+.desc
+This is THE command to get pixel-perfect collisions between images. It will  not consider transparent pixels during the collision check (basically, only  the 'meat' of the image will invoke a collision). This makes it perfect for  most situations where you have odd-shaped graphics to text against.
+
+The ImagesOverlap command is MUCH faster, however,  but can only determine if ANY of the two images have overlapped (this INCLUDES  transparent pixels). This method works if you have graphics that completely  fill their container and/or you don't plan on needing pinpoint accuracy.
+
+As with any collision detection system in Blitz, you will need to know the variable  names of the two images, and their X and Y locations at the moment collision  checking occurs.
+
+The example blatently uses graphics that are much smaller than their container  to show you how accurate this command really is. The ImagesOverlap example is identical to this one - and shows how inaccurate the overlapping method can be with graphics of this nature.
+
+.code
+; ImagesCollide Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create two new empty graphics to store our circle and box in
+gfxBox=CreateImage(50,50)
+gfxCircle=CreateImage(50,50)
+
+; Draw the box image first
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxBox)
+; Change drawing color to blue
+Color 0,0,255
+;Draw our box (note that it has a 10 pixel space around it)
+Rect 10,10,30,30,1
+
+; Repeat for the circle graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+
+; Let's not forget to put the drawing buffer back!
+SetBuffer BackBuffer()
+
+; Locate our box to a random, visible screen location
+boxX=Rnd(50,610)
+boxY=Rnd(50,430)
+
+; Repeat the loop until we've had a collision
+Repeat 
+; Attach our mouse to the circle to move it
+circleX=MouseX()
+circleY=MouseY()
+; Standard double buffer technique; clear screen first
+Cls
+; Draw our objects at the designated location
+DrawImage gfxBox,boxX,boxY
+DrawImage gfxCircle,circleX,circleY
+; Standard double buffer technique; flip after all drawing is done
+Flip
+; We test the locations of our box and circle to see if they have pixel collided
+Until ImagesCollide (gfxBox,boxX,boxY,0,gfxCircle,circleX,circleY,0)
+
+; Loop is over, we must've collided!
+Text 0,0, "WE'VE HAD A COLLISION! PRESS A MOUSE BUTTON"
+; Can't see the text until we flip ..
+Flip
+; Wait for a mouse click
+WaitMouse()
+; End our graphics mode
+EndGraphics
+
+:RectsOverlap (rect1 X,rect1 Y,rect1 Width,rect1 Height,rect2 X,rect2 Y,rect2 Width,rect2 Height)
+
+.args
+rect1 X = rectangle 1 x location
+rect1 Y = rectangle 1 y location
+rect1 Width = rectangle 1 width
+rect1 Height = rectangle 1 height
+rect2 X = rectangle 2 x location
+rect2 Y = rectangle 2 y location
+rect2 Width = rectangle 2 width
+rect2 Height = rectangle 2 height 
+
+.desc
+This command will take two rectangular locations on the screen and see if  they overlap. You will need to know the x, y, width, and height of both regions  to test.
+
+I'm still trying to find a real good logical use for this command with all the  other collision commands available to you like ImagesOverlap, ImagesCollide, ImageRectOverlap, and ImageRectCollide. My guess is that this is  the absolute fastest possible collision method available and useful to those  wishing to write their own collision routines.
+
+Unlike the other collision commands, there is no image to detect a collision  with - simply one rectangular location overlapping another. You could probably  use this command instead of the ImageRectOverlap  command, as they are really basically doing the same thing (and I betcha this  is faster).
+
+This would be useful for very easy-going 'Monkey Island' games to check the  position of your pointer against a screen location (or 'hot spot') when pixel  perfect accuracy (heck, image graphics in general) are not really needed. 
+
+.code
+; RectsOverlap Example
+; Flashing graphics warning! Gets hypnotic ...
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Double buffering, and randomize the randomizer
+SetBuffer BackBuffer()
+SeedRnd MilliSecs()
+
+; Repeat the loop until ESC pressed
+While Not KeyHit(1)
+
+; Generate a random rectangle
+rect1X=Rnd(50,610)
+rect1Y=Rnd(50,430)
+rect1W=20
+rect1H=20
+
+; And another
+rect2X=Rnd(50,610)
+rect2Y=Rnd(50,430)
+rect2W=20
+rect2H=20
+; Clear the screen standard double buffering
+Cls
+; Draw our rectangle2 in random colors
+Color Rnd(255),Rnd(255),Rnd(255)
+Rect rect1X,rect1Y,rect1W,rect1H,0
+Color Rnd(255),Rnd(255),Rnd(255)
+Rect rect2X,rect2Y,rect2W,rect2H,0
+
+; Did they collide? If so, print a message and exit the loop!
+If RectsOverlap (rect1X,rect1Y,rect1W,rect1H,rect2X,rect2Y,rect2W,rect2H) Then
+Text 0,0, "Our boxes finally collided! Press a mouse button..."
+; We do a flip here to ensure the text message gets seen too!
+Flip
+Exit ; exit the While/Wend loop
+End If
+; Flip the rects into view, wait 1/10th of a sec, repeat
+Flip
+Delay 100
+Wend
+; Wait for a mouse click
+WaitMouse()
+; End our graphics mode
+EndGraphics
+
+
+:ImageRectOverlap (image,x,y,rect x,rect y,rect width,rect height)
+
+.args
+image = Image to test collision against
+x = image's x location
+y = image's y location
+rect x = x location start of the rect to test
+rect y = y location start of the rect
+rect width = width of the rect
+rect height = height of the rect 
+
+.desc
+There are many times when you need to see if an image has collided with  (or is touching) a specific rectangular area of the screen. This command performs  a collision detection between the image of your choice and a specified rectangle  on the screen. Transparent pixels are ignored during the collision process,  making this command a bit inaccurate for odd shaped graphics. See ImageRectCollide for pixel perfect collisions  between an image and rectangular area of the screen.
+
+The usefulness of this comes into play when you think of a game like Monkey  Island - when you might have a backdrop on the screen showing a room that has  items in it the player can interact with using a mouse pointer graphic. In some  cases, the items on the screen you wish to interact with will be seperate (often  animated or moving) images of their own. For this situation, you would be better  off using ImagesCollide or ImagesOverlap to detect the collision between  pointer graphic and the image.
+
+Howevever, should your program just need to detect a graphic (like a mouse pointer)  over at a particular location/region of the screen (often called a 'hot spot'),  this command works great!
+
+As with any collision in Blitz, you will need to know the PRECISE location of  the graphic you wish to test collision with, as well as the x, y, width, and  height of the screen area (rect) you wish to test.
+
+The example blatently uses graphics that are much smaller than their container  to show you how inaccurate this command can really be - if not used carefully.  The ImageRectCollide example is identical  to this one - and shows how accurate the pixel-perfect collision method can  be with graphics of this nature. 
+
+.code
+; ImageRectOverlap Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create new empty graphic to store our circle in
+gfxCircle=CreateImage(50,50)
+
+; Draw the circle image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+
+; Let's not forget to put the drawing buffer back!
+SetBuffer BackBuffer()
+Color 0,0,255
+
+; Locate our box to a random, visible screen location
+hotX=Rnd(50,610)
+hotY=Rnd(50,430)
+hotW=Rnd(20,100)
+hotH=Rnd(20,100)
+
+; Repeat the loop until we've had a collision
+Repeat 
+; Attach our mouse to the circle to move it
+circleX=MouseX()
+circleY=MouseY()
+; Standard double buffer technique; clear screen first
+Cls
+; Draw our rectangle
+Rect hotX,hotY,hotW,hotH,0
+DrawImage gfxCircle,circleX,circleY
+; Standard double buffer technique; flip after all drawing is done
+Flip
+; We test the locations of our rectangle area and circle to see if they have  overlapped
+Until ImageRectOverlap (gfxCircle,circleX,circleY,hotX,hotY,hotW,hotH)
+
+; Loop is over, we must've collided!
+Text 0,0, "WE'VE HAD A COLLISION! PRESS A MOUSE BUTTON"
+; Can't see the text until we flip ..
+Flip
+; Wait for a mouse click
+WaitMouse()
+; End our graphics mode
+EndGraphics
+
+
+:ImageRectCollide (image,x,y,frame,rect x,rect y,rect width,rect height)
+
+.args
+image = Image to test collision against
+x = image's x location
+y = image's y location
+frame = image's frame
+rect x = x location start of the rect to test
+rect y = y location start of the rect
+rect width = width of the rect
+rect height = height of the rect 
+
+.desc
+There are many times when you need to see if an image has collided with  (or is touching) a specific rectangular area of the screen. This command performs  pixel perfect accurate collision detection between the image of your choice  and a specified rectangle on the screen.
+
+The usefulness of this comes into play when you think of a game like Monkey  Island - when you might have a backdrop on the screen showing a room that has  items in it the player can interact with using a mouse pointer graphic. In some  cases, the items on the screen you wish to interact with will be seperate (often  animated or moving) images of their own. For this situation, you would be better  off using ImagesCollide or ImagesOverlap to detect the collision between  pointer graphic and the image.
+
+Howevever, should your program just need to detect a graphic (like a mouse pointer)  over at a particular location/region of the screen (often called a 'hot spot'),  this command works great!
+
+As with any collision in Blitz, you will need to know the PRECISE location of  the graphic you wish to test collision with, as well as the x, y, width, and  height of the screen area (rect) you wish to test.
+
+The example blatently uses graphics that are much smaller than their container  to show you how accurate this command really is. The ImageRectOverlap example is identical to  this one - and shows how inaccurate the overlapping method can be with graphics  of this nature. 
+
+.code
+; ImageRectCollide Example
+
+; Turn on graphics mode
+Graphics 640,480,16
+
+; Create new empty graphic to store our circle in
+gfxCircle=CreateImage(50,50)
+
+; Draw the circle image
+; Set drawing operations to point to our new empty graphic
+SetBuffer ImageBuffer(gfxCircle)
+Color 255,0,0
+; Note the extra space between the circle and the edge of the graphic
+Oval 10,10,30,30,1
+
+; Let's not forget to put the drawing buffer back!
+SetBuffer BackBuffer()
+Color 0,0,255
+
+; Locate our box to a random, visible screen location
+hotX=Rnd(50,610)
+hotY=Rnd(50,430)
+hotW=Rnd(20,100)
+hotH=Rnd(20,100)
+
+; Repeat the loop until we've had a collision
+Repeat 
+; Attach our mouse to the circle to move it
+circleX=MouseX()
+circleY=MouseY()
+; Standard double buffer technique; clear screen first
+Cls
+; Draw our rectangle
+Rect hotX,hotY,hotW,hotH,0
+DrawImage gfxCircle,circleX,circleY
+; Standard double buffer technique; flip after all drawing is done
+Flip
+; We test the locations of our rectangle area and circle to see if they have  pixel collided
+Until ImageRectCollide (gfxCircle,circleX,circleY,0,hotX,hotY,hotW,hotH)
+
+; Loop is over, we must've collided!
+Text 0,0, "WE'VE HAD A COLLISION! PRESS A MOUSE BUTTON"
+; Can't see the text until we flip ..
+Flip
+; Wait for a mouse click
+WaitMouse()
+; End our graphics mode
+EndGraphics
+
+

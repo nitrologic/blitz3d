@@ -1,0 +1,1168 @@
+:Pi
+
+.args
+None
+
+.desc
+Returns the value of Pi to 6 digits (3.141592). Needed for geometric math  routines.
+
+.code
+; Pi example
+
+Print "The Value of Pi is:" + Pi
+
+
+:Int( value )
+
+.args
+value = a number, or a string which represents a number
+
+.desc
+Converts the value to the nearest integer.
+
+
+This is the same as Blitz's automatic type conversion.
+
+So the two commands...
+
+
+n = value
+
+n = Int( value )
+
+
+... do exactly the same thing when n is an integer variable.
+
+
+If Int is applied to a string it converts as much as possible:
+
+
+Int( "10" ) ........ result is 10
+
+Int( "3.7" ) ....... result is 3, stops at "." which can't be part of an integer
+
+Int( "junk3" ) .... result is 0, stops at "j"
+
+Int converts floating point numbers by rounding to the nearest integer.
+
+What about numbers exactly halfway between integers?
+
+The rounding is to the nearest even integer:
+
+Int( 2.5 ) ... produces 2
+
+Int( 3.5 ) ... produces 4
+
+.also
+Floor; Ceil
+
+.code
+; Ceil / Floor / Int example, three kinds of rounding.
+
+; Move mouse. Escape quits.
+
+Graphics 640, 480
+
+Const KEY_ESC = 1
+
+SetBuffer BackBuffer()
+Origin 320, 240
+
+MoveMouse 320, 240  :  HidePointer
+
+While Not KeyDown( KEY_ESC )
+
+Cls
+
+my = MouseY() - 240
+Color 100, 100, 0
+Line -320, my, 319, my
+
+DrawNumberLine
+
+y# = Float( -my ) / 32
+
+Text 100, 50, "          y = "  + y
+Text 100, 70, "  Ceil( y ) = "  + Ceil( y )
+Text 100, 90, " Floor( y ) = "  + Floor( y )
+Text 100, 110, "   Int( y ) = " + Int( y )
+
+Flip
+
+Wend
+End
+
+Function DrawNumberLine( )  ; vertical line with numeric labels
+
+Color 255, 255, 255
+Line 0, -240, 0, 239
+
+For n = -7 To 7
+yn = -32 * n
+Line -2, yn, 2, yn
+Text -30, yn - 6, RSet( n, 2 )
+Next
+
+End Function
+
+:Float#( value )
+
+.args
+value = a number, or a string which represents a number
+
+.desc
+This is the same as Blitz's automatic type conversion.
+
+So the two commands...
+
+
+y# = value
+
+y# = Float( value )
+
+
+... do exactly the same thing.
+
+
+If Float is applied to a string it converts as much as possible:
+
+
+Float( "10" ) ...... result is 10.0
+
+Float( "3junk" ) .. result is 3.0
+
+Float( "junk3" ) .. result is 0.0
+
+
+In the latter two examples Float() stops converting when it sees "j".
+
+
+The typical use is to force floating point arithmetic:
+
+
+y# = 12 / 5 .............. result is 2.0 because 12 / 5 = 2 ( integer division )
+
+y# = float( 12 ) / 5 .... result is 2.4
+
+.code
+; Float example
+; =============
+
+Print "Enter some text to be converted using Float()."
+Print "Hit ENTER to exit."
+
+Repeat
+s$ = Input$(">")
+If s$<>"" Then
+Print "Float("+Chr$(34)+s$+Chr$(34)+")=" + Float(s$)
+End If
+Until s$=""
+
+End
+
+:Floor# ( y# )
+
+.args
+y = any number
+
+.desc
+Rounds downward, i.e. in the direction of -Infinity.
+
+
+It is a common mistake to think this simply sets everything after the decimal point to zero.
+
+But this is true only for positive numbers:
+
+
+Floor(  1.75 ) ....... 1.0
+
+Floor( -1.75 ) .... -2.0
+
+.also
+Ceil; Int
+
+.code
+; Ceil / Floor / Int example, three kinds of rounding.
+
+; Move mouse. Escape quits.
+
+Graphics 640, 480
+
+Const KEY_ESC = 1
+
+SetBuffer BackBuffer()
+Origin 320, 240
+
+MoveMouse 320, 240  :  HidePointer
+
+While Not KeyDown( KEY_ESC )
+
+Cls
+
+my = MouseY() - 240
+Color 100, 100, 0
+Line -320, my, 319, my
+
+DrawNumberLine
+
+y# = Float( -my ) / 32
+
+Text 100, 50, "          y = "  + y
+Text 100, 70, "  Ceil( y ) = "  + Ceil( y )
+Text 100, 90, " Floor( y ) = "  + Floor( y )
+Text 100, 110, "   Int( y ) = " + Int( y )
+
+Flip
+
+Wend
+End
+
+Function DrawNumberLine( )  ; vertical line with numeric labels
+
+Color 255, 255, 255
+Line 0, -240, 0, 239
+
+For n = -7 To 7
+yn = -32 * n
+Line -2, yn, 2, yn
+Text -30, yn - 6, RSet( n, 2 )
+Next
+
+End Function
+
+:Ceil# ( y# )
+
+.args
+y = any number
+
+.desc
+As with Floor there is often some confusion with negative numbers:
+
+
+Ceil(  1.75 ) ...... 2.0
+
+Ceil( -1.75 ) ... -1.0
+
+
+.also
+Floor; Int
+
+.code
+; Ceil / Floor / Int example, three kinds of rounding.
+
+; Move mouse. Escape quits.
+
+Graphics 640, 480
+
+Const KEY_ESC = 1
+
+SetBuffer BackBuffer()
+Origin 320, 240
+
+MoveMouse 320, 240  :  HidePointer
+
+While Not KeyDown( KEY_ESC )
+
+Cls
+
+my = MouseY() - 240
+Color 100, 100, 0
+Line -320, my, 319, my
+
+DrawNumberLine
+
+y# = Float( -my ) / 32
+
+Text 100, 50, "          y = "  + y
+Text 100, 70, "  Ceil( y ) = "  + Ceil( y )
+Text 100, 90, " Floor( y ) = "  + Floor( y )
+Text 100, 110, "   Int( y ) = " + Int( y )
+
+Flip
+
+Wend
+End
+
+Function DrawNumberLine( )  ; vertical line with numeric labels
+
+Color 255, 255, 255
+Line 0, -240, 0, 239
+
+For n = -7 To 7
+yn = -32 * n
+Line -2, yn, 2, yn
+Text -30, yn - 6, RSet( n, 2 )
+Next
+
+End Function
+
+:Sgn (number)
+
+.args
+number=float or integer 
+
+.desc
+This function is used to determine whether a number or value is greater  than 0, equal to 0 or less than 0. Note: non-integer values return the sign  to 7 signigicant figures. (e.g. -1.000000)
+
+.code
+Print Sgn(10) ; prints 1
+Print Sgn(5.5) ; prints 1.000000
+Print Sgn(0) ; prints 0
+Print Sgn(0.0) ; prints 0.000000
+Print Sgn(-5.5) ; prints -1.000000
+Print Sgn(-10) ; prints -1
+
+
+:Abs (number)
+
+.args
+number = any valid number or numeric variable
+
+.desc
+Use this command to return the absolute value of a number; meaning its positive  value. A negative 3 would become a positive 3. If what you want is a number  without a fraction (say, convert 3.1415 into 3) use the Int() command.
+
+.code
+number=-3
+
+Print "The absolute value of " + number + " is: " + Abs(number)
+
+WaitKey()
+
+
+:Mod
+
+.args
+None
+
+.desc
+Basically, this will divide your number as many times as possible by the  divisor, then return you the remaining amount.
+
+.code
+; MOD Example
+
+; Divide 10 by 3 until you reach a point that you can't ; Then print the remaining  value - in this case, 1 Print 10 MOD 3
+
+
+:Sqr (float)
+
+.args
+float = any floating point number (integers are converted on the fly)
+
+.desc
+This command will return the square root of a specified value. The value  returned is a floating point number.
+
+.code
+; sqr# example
+
+value=25
+
+print "The square root of our value is: " + sqr#(value)
+waitkey()
+
+
+:Sin# ( degrees# )
+
+.args
+degrees# = angle in degrees.
+
+.desc
+Sine of an angle. The angle is measured in degrees. 
+
+
+For angles between 0 and 90 degrees this is defined by the sides of a right triangle. The sine is the side opposite the angle divided by the hypotenuse. 
+
+
+Outside of 0 to 90 the definition uses a circle with radius=1. The angle is placed at the center of the circle, with one side on the positive x-axis. The other side hits the circle at some point. The y coordinate of this point is the sine of the angle. 
+
+
+The positive y-axis corresonds to +90 degrees. This is a common source of confusion in Blitz. With screen coordinates ( pixels ) the y-axis points downward. But in the 3d world the y-axis typically points upward. 
+
+
+Another possible snag is the size of the angle. In principle, the sine function repeats every 360 degrees. So Sin(-360), Sin(0), Sin(360), Sin(720) etc. should all be exactly the same. But in practice the accuracy decreases as the angle gets farther away from zero. 
+
+.also
+ASin, Cos, ACos, Tan, Atan, ATan2
+
+.code
+; Sin / Cos / Tan example. 
+
+; Left/Right arrow keys change angle. Escape quits. 
+
+Const width = 640, height = 480 
+Const radius# = .2 * height 
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics width, height 
+SetBuffer BackBuffer( ) 
+Origin width / 3, height / 2 
+
+angle# = 0.0 
+
+While Not KeyDown( KEY_ESC ) 
+
+; NOTE: It is usually best to avoid very large angles. 
+; The 'If angle...' lines show one way to do this. 
+; Mod is another possibility. 
+
+If KeyDown( KEY_LEFT ) Then angle = angle - .5 
+; If angle < 0.0 Then angle = angle + 360 
+
+If KeyDown( KEY_RIGHT ) Then angle = angle + .5 
+; If angle >= 360.0 Then angle = angle - 360 
+
+Cls 
+
+Color 80, 80, 0 ; pale yellow circle 
+Oval -radius, -radius, 2 * radius, 2 * radius, False 
+
+For a# = 0.0 To Abs( angle Mod 360 ) Step .5 
+
+x# = radius * Cos( a ) ; (x,y) is a point on the circle 
+y# = radius * Sin( a ) ; corresponding to angle a. 
+
+If ( angle Mod 360 < 0 ) Then y = -y ; reverse for negative angle 
+WritePixel x, y, $ffff00 ; bright yellow 
+
+Next 
+
+Color 255, 255, 0 ; yellow 
+Line 0, 0, radius * Cos( angle ), radius * Sin( angle ) 
+
+Color 0, 255, 0 ; green 
+Line 0, 0, radius * Cos( angle ), 0 
+Text radius * 1.5, 10, "Cos( angle ) = " + Cos( angle ) 
+
+Color 255, 0, 0 ; red 
+Line radius * Cos( angle ), 0, radius * Cos( angle ), radius * Sin( angle ) 
+Text radius * 1.5, -10, "Sin( angle ) = " + Sin( angle ) 
+
+Color 255, 255, 255 
+Text radius * 1.5, -30, " angle = " + angle 
+Text radius * 1.5, 30, "Tan( angle ) = " + Tan( angle ) 
+
+Flip 
+
+Wend 
+
+End
+
+:Cos# ( degrees# )
+
+.args
+degrees# = angle in degrees.
+
+.desc
+For angles between 0 and 90 degrees this is defined by the sides of a right triangle. The cosine is the side adjacent to the angle divided by the hypotenuse.
+
+
+Outside of 0 to 90 the definition uses a circle with radius=1. The angle is placed at the center of the circle, with one side on the positive x-axis. The other side hits the circle at some point. The x coordinate of this point is the cosine of the angle.
+
+
+The positive y-axis corresonds to +90 degrees. This is a common source of confusion in Blitz. With screen coordinates ( pixels ) the y-axis points downward. But in the 3d world the y-axis typically points upward.
+
+
+Another possible snag is the size of the angle. In principle, the cosine function repeats every 360 degrees. So Cos(-360), Cos(0), Cos(360), Cos(720) etc. should all be exactly the same. But in practice the accuracy decreases as the angle gets farther away from zero.
+
+.also
+ASin, Cos, ACos, Tan, Atan, ATan2
+
+.code
+; Sin / Cos / Tan example.
+
+; Left/Right arrow keys change angle. Escape quits.
+
+Const width = 640, height = 480
+Const radius# = .2 * height
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics width, height
+SetBuffer BackBuffer( )
+Origin width / 3, height / 2
+
+angle# = 0.0
+
+While Not KeyDown( KEY_ESC )
+
+; NOTE: It is usually best to avoid very large angles.
+;       The 'If angle...' lines show one way to do this.
+;		Mod is another possibility. 
+
+If KeyDown( KEY_LEFT ) Then angle = angle - .5
+;	If angle < 0.0 Then angle = angle + 360
+
+If KeyDown( KEY_RIGHT ) Then angle = angle + .5
+;	If angle >= 360.0 Then angle = angle - 360
+
+Cls
+
+Color 80, 80, 0		; pale yellow circle
+Oval -radius, -radius, 2 * radius, 2 * radius, False
+
+For a# = 0.0 To Abs( angle Mod 360 ) Step .5
+
+x# = radius * Cos( a )	; (x,y) is a point on the circle
+y# = radius * Sin( a )	; corresponding to angle a.
+
+If ( angle Mod 360 < 0 ) Then y = -y	; reverse for negative angle		
+WritePixel x, y, $ffff00		; bright yellow
+
+Next
+
+Color 255, 255, 0		; yellow
+Line 0, 0, radius * Cos( angle ), radius * Sin( angle ) 
+
+Color 0, 255, 0			; green
+Line 0, 0, radius * Cos( angle ), 0
+Text radius * 1.5,  10, "Cos( angle ) = " + Cos( angle )
+
+Color 255, 0, 0			; red
+Line radius * Cos( angle ), 0, radius * Cos( angle ), radius * Sin( angle ) 	
+Text radius * 1.5, -10, "Sin( angle ) = " + Sin( angle )
+
+Color 255, 255, 255
+Text radius * 1.5, -30, "     angle =   " + angle
+Text radius * 1.5,  30, "Tan( angle ) = " + Tan( angle ) 
+
+Flip
+
+Wend
+
+End
+
+:Tan# ( degrees# )
+
+.args
+degrees# = angle in degrees.
+
+.desc
+Tangent of an angle. The angle is measured in degrees.
+
+
+For angles between 0 and 90 degrees this is defined by the sides of a right triangle. The tangent is the side opposite the angle divided by the side adjacent to the angle.
+
+
+In general, tangent is defined as sine divided by cosine.
+
+
+The positive y-axis corresonds to +90 degrees. This is a common source of confusion in Blitz. With screen coordinates ( pixels ) the y-axis points downward. But in the 3d world the y-axis typically points upward.
+
+
+Another possible snag is the size of the angle. In principle, the tangent function repeats every 180 degrees. So Tan(-180), Tan(0), Tan(180), Tan(360) etc. should all be exactly the same. But in practice the accuracy decreases as the angle gets farther away from zero.
+
+.code
+; Sin / Cos / Tan example.
+
+; Left/Right arrow keys change angle. Escape quits.
+
+Const width = 640, height = 480
+Const radius# = .2 * height
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics width, height
+SetBuffer BackBuffer( )
+Origin width / 3, height / 2
+
+angle# = 0.0
+
+While Not KeyDown( KEY_ESC )
+
+; NOTE: It is usually best to avoid very large angles.
+;       The 'If angle...' lines show one way to do this.
+;		Mod is another possibility. 
+
+If KeyDown( KEY_LEFT ) Then angle = angle - .5
+;	If angle < 0.0 Then angle = angle + 360
+
+If KeyDown( KEY_RIGHT ) Then angle = angle + .5
+;	If angle >= 360.0 Then angle = angle - 360
+
+Cls
+
+Color 80, 80, 0		; pale yellow circle
+Oval -radius, -radius, 2 * radius, 2 * radius, False
+
+For a# = 0.0 To Abs( angle Mod 360 ) Step .5
+
+x# = radius * Cos( a )	; (x,y) is a point on the circle
+y# = radius * Sin( a )	; corresponding to angle a.
+
+If ( angle Mod 360 < 0 ) Then y = -y	; reverse for negative angle		
+WritePixel x, y, $ffff00		; bright yellow
+
+Next
+
+Color 255, 255, 0		; yellow
+Line 0, 0, radius * Cos( angle ), radius * Sin( angle ) 
+
+Color 0, 255, 0			; green
+Line 0, 0, radius * Cos( angle ), 0
+Text radius * 1.5,  10, "Cos( angle ) = " + Cos( angle )
+
+Color 255, 0, 0			; red
+Line radius * Cos( angle ), 0, radius * Cos( angle ), radius * Sin( angle ) 	
+Text radius * 1.5, -10, "Sin( angle ) = " + Sin( angle )
+
+Color 255, 255, 255
+Text radius * 1.5, -30, "     angle =   " + angle
+Text radius * 1.5,  30, "Tan( angle ) = " + Tan( angle ) 
+
+Flip
+
+Wend
+
+End
+
+:ASin# ( s# )
+
+.args
+s = a number in the range -1 to +1
+
+It is considered to be the sine of an angle.
+
+.desc
+ASin( s ) is an angle which has sine = s.
+
+It is in the range -90 to +90 degrees.
+
+.code
+; ASin example
+
+; NaN means "Not a Number", the numerical result is invalid.
+
+Const width = 640, height = 480
+
+Graphics width, height
+
+
+Local S#, AS#   ; Sin and ASin
+
+Print "    S    ASin( S )"
+Print "=================="
+
+For n = -11 To 11
+
+S = n / 10.0
+AS = ASin( S ) 
+Print RSet(S, 6) + RSet( AS, 10)
+
+Next
+
+WaitKey()  :  End
+
+:ACos# ( c# )
+
+.args
+c = a number in the range -1 to +1.
+
+It is considered to be the cosine of an angle.
+
+.desc
+ACos( c ) is an angle which has cosine = c.
+It is in the range 0 to +180 degrees.
+
+.code
+; ACos example
+
+; NaN means "Not a Number", the numerical result is invalid.
+
+Const width = 640, height = 480
+
+Graphics width, height
+
+
+Local C#, AC#   ; Cos and ACos
+
+Print "    C    ACos( C )"
+Print "=================="
+
+For n = -11 To 11
+
+C = n / 10.0
+AC = ACos( C ) 
+Print RSet(C, 6) + RSet( AC, 10)
+
+Next
+
+WaitKey()  :  End
+
+:ATan# ( t# )
+
+.args
+t = any number.
+
+It is considered to be the tangent of an angle.
+
+.desc
+ATan( t ) is an angle which has tangent = t.
+
+It is in the range -90 to +90 degrees.
+
+
+.also
+ATan2
+
+.code
+; ATan example
+
+Const width = 640, height = 480
+
+Graphics width, height
+
+
+Local T#, AT#   ; Tan and ATan
+
+zero# = 0
+
+Print "       T      ATan( T )"
+Print "======================="
+
+; First, an extreme case...
+
+T# = 1 / zero    ; +Infinity
+AT = ATan( T ) 
+Print RSet(T, 10) + RSet( AT, 11)
+
+; Now, back to normal usage...
+
+For n = -10 To 10
+
+T = Sgn( n ) * n * n
+AT = ATan( T ) 
+Print RSet(T, 10) + RSet( AT, 11)
+
+Next
+
+; Finally, another extreme case.
+
+T# = -1 / zero    ; -Infinity
+AT = ATan( T ) 
+Print RSet(T, 10) + RSet( AT, 11)
+
+WaitKey()  :  End
+
+:ATan2# ( y#, x# )
+
+.args
+y, x are any numbers.
+
+They are interpreted as corresponding to a point ( x, y ).
+
+.desc
+ATan2 gives the angle between the positive x-axis and a vector from the point (0,0) to the point (x,y).
+
+
+One common use is in 2d graphics. Suppose you have two objects and you want to aim the first at the second.
+
+
+ATan2( y2 - y1, x2 - x1 ) gives the proper orientation for object1.
+
+You can use this angle to select an appropriately rotated image.
+
+
+Notice the reverse order, ATan2( y, x ) rather than ATan2( x, y).
+
+ATan2( y, x ) is analogous to ATan( y / x), but covers 360 degrees.
+
+
+The angle satisfies:  -180 < ATan2 <= +180
+
+.code
+; ATan2 example.
+
+; Move mouse. Escape quits.
+
+Const width = 640, height = 480
+Const radius# = .2 * height
+Const KEY_ESC = 1
+
+Graphics width, height
+SetBuffer BackBuffer( )
+Origin width / 2, height / 2
+HidePointer 
+MoveMouse .75 * width, height / 2
+
+While Not KeyDown( KEY_ESC )
+
+Cls
+
+Color 255, 255, 0
+Line 0, 0, width / 2, 0   ; positive x-axis
+
+x = MouseX() -  width / 2
+y = MouseY() - height / 2
+
+Oval x - 3, y - 3, 7, 7, True
+Line 0, 0, x, y
+
+Text .35 * width, -80, "x = " + x
+Text .35 * width, -60, "y = " + y
+
+Text .35 * width - 96, -40, "ATan2( y, x ) = " + ATan2( y, x )
+
+Flip
+
+Wend
+
+End
+
+:Exp# ( x# )
+
+.args
+x = any number.
+
+.desc
+This is e^x where e = 2.71828...
+
+
+For the curious, e is defined by the infinite sum:
+
+
+2 + 1/(2) + 1/(2*3) + 1/(2*3*4) + 1/(2*3*4*5) + ...
+
+
+.also
+Log
+
+.code
+; Exp example
+
+; Exp(x) is the same as e^x.
+
+; Actually, due to the approximate nature of floating point arithmetic
+; these will not be exactly equal. But in the following example
+; the difference is so small you can't see it.
+
+e# = 2.71828182845905  ; over-specified, might help and can't hurt.
+
+x# = .125  ; = 1/8
+
+Print "   x        Exp(x)       e^x  "
+Print "=======   =========   ========="
+
+For k = 1 To 7
+
+Write " " + LSet( x , 7 )
+Write RSet( Exp( x ), 10 )
+Print RSet( e^x , 12 ) 
+x = 2 * x
+
+Next
+
+WaitKey() : End
+
+:Log# ( x# )
+
+.args
+x = any positive number.
+
+.desc
+Natural logarithm of x. This is the inverse of Exp( ).
+
+
+y = Log( x ) means y satifies x = Exp( y ).
+
+
+The base of the natural logarithm is e = Exp(1) = 2.71828...
+
+.also
+Exp
+
+.code
+; Log example
+
+; NaN means "Not a Number", the numerical result is invalid.
+
+; NOTE: All logarithm functions are related. For example, there is no
+;       Log8 function in Blitz, but we can easily make one.
+
+HidePointer
+
+Print "Log8( -1 ) = " + Log8( -1 )
+Print "Log8( 0  ) = " + Log8( 0 )
+Print
+
+; ... and now some well behaved numbers...
+
+x# = 1.0 / 4096.0   ; small positive number
+
+For n = 1 To 15
+
+Print "Log8( " + LSet( x, 13 ) + " ) = " + Log8( x )
+x = 8 * x
+
+Next
+
+WaitKey()  :  End
+
+
+Function Log8# ( x# )
+
+Return Log( x ) / Log( 8 )
+
+End Function
+
+:Log# ( x# )
+
+.args
+x = any positive number.
+
+.desc
+Common logarithm of x. This is the inverse of raising 10 to a power.
+
+
+y = Log10( x ) means y satifies x = 10 ^ y.
+
+.code
+; Log10 example
+
+; NaN means "Not a Number", the numerical result is invalid.
+
+HidePointer
+
+; First, what happens with non-positive numbers...
+
+Print "Log10( -1 ) = " + Log10( -1 )
+Print "Log10( 0  ) = " + Log10( 0 )
+Print
+
+; ... and now some well behaved numbers...
+
+x# = 1.0 / 4096.0   ; small positive number
+
+For n = 1 To 15
+
+Print "Log10( " + LSet( x, 13 ) + " ) = " + Log10( x )
+x = 8 * x
+
+Next
+
+WaitKey()  :  End
+
+:Xor
+
+.args
+None.
+
+.desc
+Often used for lightweight (meaning worthless ;) encryption, this will take  two values and perform an exclusive OR with each bit following the basic rules  of XOR. The result can be XORed with one of the original numbers to reveal the  other number. See the example for more.
+
+.also
+And; Or; Not
+
+.code
+num=%11110000111100001111000011110000 ; Define a bit pattern which is easy  to recognize
+
+bitmask=Rnd(-2147483648,2147483647) ; Define a RANDOM Xor 32bit wide bitmask
+
+; This line prints the binary and decimal numbers before the Xor
+Print "Binary number is: "+Bin$(num)+" ("+num+")"
+
+; This line prints the binary and decimal numbers of the Xor bitmask
+Print "Xor bitmask is: "+Bin$(bitmask)+" ("+bitmask+")"
+
+Print "------------------------------------------------------------------"
+
+; This line Xor's the number with the bitmask
+xres=num Xor bitmask
+
+; This line prints the binary and decimal numbers after the Xor
+Print "Xor result is: "+Bin$(xres)+" ("+xres+")"
+Print "------------------------------------------------------------------"
+
+; This line Xor's the Xor result with the bitmask again
+xres=xres Xor bitmask
+; This line prints the binary and decimal numbers after the second Xor. NOTE:  This number is identical to the original number
+Print "Result Xor'ed again: "+Bin$(xres)+" ("+xres+")"
+
+WaitMouse ; Wait for the mouse before ending.
+
+:Shl repetitions
+
+.args
+repetitions = number of shifts to make left
+
+.desc
+This performs a left binary shift on the value the specified number of times.  This basically is a faster method of multiplying the value exponentially. By  shifting left once, you are multiplying the value by 2. By shifting left twice,  you multiple by 4, etc.
+
+
+The usefulness of this command is basically faster math execution.
+
+.code
+; shl, shr, sar examples
+
+value = 100
+
+; multiple x 2
+Print "Shift 1 bit left; Value = " + value Shl 1
+; multiple x 4
+Print "Shift 2 bits left; Value = " + value Shl 2
+; multiple x 16
+Print "Shift 4 bits left; Value = " + value Shl 4
+; divide by 2
+Print "Shift 1 bit right; Value = " + value Shr 1
+; divide by 4
+Print "Shift 2 bits right; Value = " + value Shr 2
+; divide by 16
+Print "Shift 4 bits right; Value = " + value Shr 4
+
+Print "Shift by SAR 4 times = " + value Sar 4
+
+WaitKey()
+
+
+:Shr repetitions
+
+.args
+repetitions = number of shifts to make right
+
+.desc
+This performs a left binary shift on the value the specified number of times.  This basically is a faster method of dividing the value exponentially. By shifting  right once, you are dividing the value by 2. By shifting right twice, you divide  by 4, etc.
+
+
+The usefulness of this command is basically faster math execution.
+
+.code
+; shl, shr, sar examples
+
+value = 100
+
+; multiple x 2
+Print "Shift 1 bit left; Value = " + value Shl 1
+; multiple x 4
+Print "Shift 2 bits left; Value = " + value Shl 2
+; multiple x 16
+Print "Shift 4 bits left; Value = " + value Shl 4
+; divide by 2
+Print "Shift 1 bit right; Value = " + value Shr 1
+; divide by 4
+Print "Shift 2 bits right; Value = " + value Shr 2
+; divide by 16
+Print "Shift 4 bits right; Value = " + value Shr 4
+
+Print "Shift by SAR 4 times = " + value Sar 4
+
+WaitKey()
+
+
+:Sar repetitions
+
+.args
+repetitions = number of shifts to make right
+
+.desc
+This performs a right binary shift on the value the specified number of times.  This basically is a faster method of dividing the value exponentially. By shifting  right once, you are dividing the value by 2. By shifting right twice, you divide  by 4, etc.
+
+
+Sar command varies from Shr whereas it fills blank bits  shifted with copies of the sign bit, 0 for positive numbers and 1 for negative. 
+
+The usefulness of this command is basically faster math execution.
+
+.also
+Shl;Shr
+
+.code
+; shl, shr, sar examples
+
+value = 100
+
+; multiple x 2
+Print "Shift 1 bit left; Value = " + value Shl 1
+; multiple x 4
+Print "Shift 2 bits left; Value = " + value Shl 2
+; multiple x 16
+Print "Shift 4 bits left; Value = " + value Shl 4
+; divide by 2
+Print "Shift 1 bit right; Value = " + value Shr 1
+; divide by 4
+Print "Shift 2 bits right; Value = " + value Shr 2
+; divide by 16
+Print "Shift 4 bits right; Value = " + value Shr 4
+
+Print "Shift by SAR 4 times = " + value Sar 4
+
+WaitKey()
+
+:Rnd (start#,end#)
+
+.args
+start# = Lowest value to generate
+end# = Highest value to generate
+
+.desc
+This returns either a floating point or integer number of a random value  falling between the start and end number. It returns an integer if assiged to  an integer variable, and it returns a floating point value if assiged to a floating  number variable. The start and end values are inclusive. Be sure to use the SeedRnd command to avoid generating the same random  numbers every time the program is run.
+
+.code
+y=Rnd(0,10) ; Set y to a random integer between 0 and 10
+y#=Rnd(0,5) ; Set y floating value between 0.000000 and 5.000000
+
+:Rand ([low value],high value)
+
+.args
+low value = optional - defaults to 1; lowest number to generate
+high value = highest number to generate 
+
+.desc
+Unlike the RND command, this command actually returns  only integer values. The low value defaults to 1 if no value is specified. The  high value is the highest number that can be randomly generated.
+
+
+If you need to generate floating point random numbers, use  Rnd. 
+
+.code
+; Rand example
+
+; Set the randomizer seed for more true random numbers
+SeedRnd (MilliSecs())
+
+; Generate random numbers between 1 and 100
+For t = 1 To 20
+Print Rand(1,100)
+Next
+
+
+:SeedRnd seed
+
+.args
+seed = valid integer number
+
+.desc
+Computer random number generators are not truly random. They generate numbers  based on a seed value (an integer number). If you 'seed' the random number generator  with the same seed, it will always generate the same set of numbers. Use this  command to ensure you get a good set of numbers. Usually you set the seed value  to a timer or system clock value to ensure that each time the program is run,  a new value is seeded. Look at the example for normal usage of this command.
+
+.code
+SeedRnd Millisecs() ; Seed the randomizer with the current system time in  milliseconds.
+
+:RndSeed ()
+
+.args
+
+
+.desc
+Returns the current random number seed value.
+
+
+This allows you to 'catch' the state of the random generator, usually for the purpose of restoring it later.
+
+.code
+;'randomize' the random number generator!
+SeedRnd MilliSecs()
+For k=1 To 12345
+Rnd(1)
+Next
+
+;capture random number generator state
+state=RndSeed()
+
+;generate a bunch of numbers:
+Print "First set:"
+For k=1 To 5
+Print Rnd(1)
+Next
+
+;restore random nummber generator state
+SeedRnd state
+
+;generate another bunch:
+Print "Second set (same as the first set...):"
+For k=1 To 5
+Print Rnd(1)
+Next
+

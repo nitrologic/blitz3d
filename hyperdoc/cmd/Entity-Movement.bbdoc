@@ -1,0 +1,426 @@
+:ScaleEntity entity,x_scale#,y_scale#,z_scalel#,[,global]
+
+.args
+entity - name of the entity to be scaled
+x_scale# - x size of entity
+y_scale# - y size of entity
+z_scale# - z size of entity
+global (optional) -
+
+.desc
+Scales an entity so that it is of an absolute size.
+
+Scale values of 1,1,1 are the default size when creating/loading entities.
+
+Scale values of 2,2,2 will double the size of an entity.
+
+Scale values of 0,0,0 will make an entity disappear.
+
+Scale values of less than 0,0,0 will invert an entity and make it bigger.
+
+.also
+ScaleMesh;FitMesh
+
+.code
+; ScaleEntity Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+; Set scale values so that cone is default size to begin with
+x_scale#=1
+y_scale#=1
+z_scale#=1
+
+While Not KeyDown( 1 )
+
+; Change scale values depending on the key pressed
+If KeyDown( 203 )=True Then x_scale#=x_scale#-0.1
+If KeyDown( 205 )=True Then x_scale#=x_scale#+0.1
+If KeyDown( 208 )=True Then y_scale#=y_scale#-0.1
+If KeyDown( 200 )=True Then y_scale#=y_scale#+0.1
+If KeyDown( 44 )=True Then z_scale#=z_scale#-0.1
+If KeyDown( 30 )=True Then z_scale#=z_scale#+0.1
+
+; Scale cone using scale values
+ScaleEntity cone,x_scale#,y_scale#,z_scale#
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to scale cone"
+Text 0,20,"X Scale: "+x_scale#
+Text 0,40,"Y Scale: "+y_scale#
+Text 0,60,"Z Scale: "+z_scale#
+
+Flip
+
+Wend
+
+End
+
+:PositionEntity entity,x#,y#,z#,[,global]
+
+.args
+entity - name of entity to be positioned
+x# - x co-ordinate that entity will be positioned at
+y# - y co-ordinate that entity will be positioned at
+z# - z co-ordinate that entity will be positioned at
+global (optional) - true if the position should be relative to 0,0,0 rather than a parent entity's position. False by default.
+
+.desc
+Positions an entity at an absolute position in 3D space.
+
+Entities are positioned using an x,y,z coordinate system. x, y and z each have their own axis, and each axis has its own set of values. By specifying a value for each axis, you can position an entity anywhere in 3D space. 0,0,0 is the centre of 3D space, and if the camera is pointing in the default positive z direction, then positioning an entity with a z value of above 0 will make it appear in front of the camera, whereas a negative z value would see it disappear behind the camera. Changing the x value would see it moving sideways, and changing the y value would see it moving up/down.
+
+Of course, the direction in which entities appear to move is relative to the position and orientation of the camera.
+
+.also
+MoveEntity;TranslateEntity;PositionMesh
+
+.code
+; PositionEntity Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+
+; Set position values so that cone is positioned in front of camera, so we  can see it to begin with
+x#=0
+y#=0
+z#=10
+
+While Not KeyDown( 1 )
+
+; Change position values depending on key pressed
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+; Position cone using position values
+PositionEntity cone,x#,y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to change cone position"
+Text 0,20,"X Position: "+x#
+Text 0,40,"Y Position: "+y# 
+Text 0,60,"Z Position: "+z#
+
+Flip
+
+Wend
+
+End
+
+:MoveEntity entity,x#,y#,z#
+
+.args
+entity - name of entity to be moved
+x# - x amount that entity will be moved by
+y# - y amount that entity will be moved by
+z# - z amount that entity will be moved by
+
+.desc
+Moves an entity relative to its current position and orientation.
+
+What this means is that an entity will move in whatever direction it is facing. So for example if you have an game character is upright when first loaded into Blitz3D and it remains upright (i.e. turns left or right only), then moving it by a z amount will always see it move forward or backward, moving it by a y amount will always see it move up or down, and moving it by an x amount will always see it strafe.
+
+.also
+TranslateEntity;PositionEntity;PositionMesh
+
+.code
+; MoveEntity Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+
+; Move cone in front of camera, so we can see it to begin with
+MoveEntity cone,0,0,10 
+
+While Not KeyDown( 1 )
+
+; Reset movement values - otherwise, the cone will not stop!
+x#=0
+y#=0
+z#=0
+
+; Change rotation values depending on the key pressed
+If KeyDown( 203 )=True Then x#=-0.1
+If KeyDown( 205 )=True Then x#=0.1
+If KeyDown( 208 )=True Then y#=-0.1
+If KeyDown( 200 )=True Then y#=0.1
+If KeyDown( 44 )=True Then z#=-0.1
+If KeyDown( 30 )=True Then z#=0.1
+
+; Move cone using movement values
+MoveEntity cone,x#,y#,z#
+
+; If spacebar pressed then rotate cone by random amount
+If KeyHit( 57 )=True Then RotateEntity cone,Rnd( 0,360 ),Rnd( 0,360 ),Rnd(  0,360 )
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to move cone, spacebar to rotate cone by random  amount"
+Text 0,20,"X Movement: "+x#
+Text 0,40,"Y Movement: "+y# 
+Text 0,60,"Z Movement: "+z#
+
+Flip
+
+Wend
+
+End
+
+:TranslateEntity entity,x#,y#,z#,[,global]
+
+.args
+entity - name of entity to be translated
+x# - x amount that entity will be translated by
+y# - y amount that entity will be translated by
+z# - z amount that entity will be translated by
+global (optional) -
+
+.desc
+Translates an entity relative to its current position and not its  orientation.
+
+What this means is that an entity will move in a certain direction despite where it may be facing. Imagine that you have a game character that you want to make jump in the air at the same time as doing a triple somersault. Translating the character by a positive y amount will mean the character will always travel directly up in their air, regardless of where it may be facing due to the somersault action.
+
+.also
+MoveEntity;PositionEntity;PositionMesh
+
+.code
+; TranslateEntity Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+
+; Rotate cone by random amount to demonstrate that TranslateEntity is  independent of entity orientation
+RotateEntity cone,Rnd( 0,360 ),Rnd( 0,360 ),Rnd( 0,360 )
+
+; Translate cone in front of camera, so we can see it to begin with
+TranslateEntity cone,0,0,10
+
+While Not KeyDown( 1 )
+
+; Reset translation values - otherwise, the cone will not stop!
+x#=0
+y#=0
+z#=0
+
+; Change translation values depending on the key pressed
+If KeyDown( 203 )=True Then x#=-0.1
+If KeyDown( 205 )=True Then x#=0.1
+If KeyDown( 208 )=True Then y#=-0.1
+If KeyDown( 200 )=True Then y#=0.1
+If KeyDown( 44 )=True Then z#=-0.1
+If KeyDown( 30 )=True Then z#=0.1
+
+; Translate sphere using translation values
+TranslateEntity cone,x#,y#,z#
+
+; If spacebar pressed then rotate cone by random amount
+If KeyHit( 57 )=True Then RotateEntity cone,Rnd( 0,360 ),Rnd( 0,360 ),Rnd(  0,360 )
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to translate cone, spacebar to rotate cone by  random amount"
+Text 0,20,"X Translation: "+x#
+Text 0,40,"Y Translation: "+y# 
+Text 0,60,"Z Translation: "+z#
+
+Flip
+
+Wend
+
+End
+
+:RotateEntity entity,pitch#,yaw#,roll#,[,global]
+
+.args
+entity - name of the entity to be rotated
+pitch# - angle in degrees of pitch rotation
+yaw# - angle in degrees of yaw rotation
+roll# - angle in degrees of roll rotation
+global (optional) - true if the angle rotated should be relative to 0,0,0 rather than a parent entity's orientation. False by default.
+
+.desc
+Rotates an entity so that it is at an absolute orientation.
+
+Pitch is the same as the x angle of an entity, and is equivalent to tilting forward/backwards.
+
+Yaw is the same as the y angle of an entity, and is equivalent to turning left/right.
+
+Roll is the same as the z angle of an entity, and is equivalent to tilting left/right.
+
+.also
+TurnEntity;RotateMesh
+
+.code
+; RotateEntity Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+
+; Change rotation values depending on the key pressed
+If KeyDown( 208 )=True Then pitch#=pitch#-1
+If KeyDown( 200 )=True Then pitch#=pitch#+1
+If KeyDown( 203 )=True Then yaw#=yaw#-1
+If KeyDown( 205 )=True Then yaw#=yaw#+1
+If KeyDown( 45 )=True Then roll#=roll#-1
+If KeyDown( 44 )=True Then roll#=roll#+1
+
+; Rotate cone using rotation values
+RotateEntity cone,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Use cursor/Z/X keys to change cone rotation"
+Text 0,20,"Pitch: "+pitch#
+Text 0,40,"Yaw : "+yaw# 
+Text 0,60,"Roll : "+roll#
+
+Flip
+
+Wend
+
+End
+
+:TurnEntity entity,pitch#,yaw#,roll#,[,global]
+
+.args
+entity - name of entity to be rotated
+pitch# - angle in degrees that entity will be pitched
+yaw# - angle in degrees that entity will be yawed
+roll# - angle in degrees that entity will be rolled
+global (optional) -
+
+.desc
+Turns an entity relative to its current orientation.
+
+Pitch is the same as the x angle of an entity, and is equivalent to tilting forward/backwards.
+
+Yaw is the same as the y angle of an entity, and is equivalent to turning left/right.
+
+Roll is the same as the z angle of an entity, and is equivalent to tilting left/right.
+
+.also
+RotateEntity;RotateMesh
+
+.code
+; TurnEntity Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+
+; Reset turn values - otherwise, the cone will not stop turning!
+pitch#=0
+yaw#=0
+roll#=0
+
+; Change movement values depending on the key pressed
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+; Move sphere using movement values
+TurnEntity cone,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Use cursor/Z/X keys to turn cone"
+Text 0,20,"Pitch: "+pitch#
+Text 0,40,"Yaw: "+yaw# 
+Text 0,60,"Roll: "+roll#
+
+Flip
+
+Wend
+
+End
+
+:PointEntity entity,target[,roll#]
+
+.args
+entity - entity handle
+target - target entity handle
+roll# (optional) - roll angle of entity
+
+.desc
+Points one entity at another.
+
+The optional roll parameter allows you to  specify a roll angle as pointing an entity only sets pitch and yaw angles. 
+
+If you wish for an entity to point at a certain position rather than another  entity, simply create a pivot entity at your desired position, point the entity  at this and then free the pivot. 
+
+.code
+None.
+
+:AlignToVector entity,vector_x#,vector_y#,vector_z#,axis[,rate#]
+
+.args
+entity - entity handle
+vector_x# - vector x
+vector_y# - vector y
+vector_z# - vector z
+
+axis - axis of entity that will be aligned to vector
+1: x-axis
+2: y-axis
+3: z-axis
+
+rate# (optional) - rate at which entity is aligned from current  orientation to vector orientation. Should be in the range 0 to 1, 0 for smooth  transition and 1 for 'snap' transition. Defaults to 1. 
+
+.desc
+Aligns an entity axis to a vector.
+
+.code
+None.
+

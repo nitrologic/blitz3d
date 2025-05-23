@@ -1,0 +1,19 @@
+You can add comments to your programs using the \verb|;| character. Everything following the \verb|;| until the end of the line will be ignored.
+
+This is useful for commenting your code - so you can always look through and follow each line in a logical manner. 
+
+The following code shows comments in use:
+
+.code
+;this code adds up all the numbers from 1 to 100 and displays the result
+;
+;initialize sum to 0
+sum=0
+;loop from 1 to 100
+For k=1 To 100
+   ;update sum
+   sum=sum+k
+Next
+;show result
+Print sum
+.endcode

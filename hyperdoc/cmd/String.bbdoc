@@ -1,0 +1,247 @@
+:Str (variable/value)
+
+.args
+variable/value = numeric value or variable
+
+.desc
+Use this command to transform an numeric value to a string value for use  with string commands. Blitz prints numeric values just fine, but should you  want to do functions like LEFT$, you'll need to convert  your numeric variable to a string variable. Note: during the conversion, all  6 decimal places will be represented on floating point number conversions.
+
+
+If you wish to convert from a string to a number, there is no equivalent Val command.  Instead, simply assign the string variable into a numeric variable, and Blitz will implicitly convert it.
+
+.code
+; STR example
+
+num#=2.5
+mynum$=str num#
+
+Print mynum$
+
+:Left$ (string$, length)
+
+.args
+string$ = any valid string variable
+length = a valid integer value up to the length of the string.
+
+.desc
+Use this command to get a certain number of the leftmost letters of a string.  You will use this to truncate strings to make them fit somewhere, or to control  the number of characters input.
+
+.code
+name$="Shane Monroe"
+Print "The left 3 letters of your name are: " + Left$(name$,3)
+
+
+:Right$ (string$, length)
+
+.args
+string$ = any valid string variable
+length = the number of characters on the right to return 
+
+.desc
+You can retrieve a certain number of characters from the rightmost side  of a string.
+
+.code
+name$="Bill Wallace"
+Print "The last 4 letters of your name are: " + Right$(name$,4)
+
+
+:Mid$ (string$, offset, characters)
+
+.args
+string$ = any valid string
+offset = location within the string to start reading
+characters = how many characters to read frm the offset point
+
+.desc
+Use this command to grab a set of characters from within a string. You can  choose WHERE to start in the string, and how many characters to pick. You'll  probably use this to 'decode' or 'walk through' a string to get each character  out of it for conversion or validation.
+
+.code
+name$="Shane Monroe"
+For T = 1 To Len(name$)
+Print Mid$(name$,t,1)
+Next
+
+:Replace$ (string$, find$, replace$)
+
+.args
+string$ = any valid string variable
+find$ = any valid string
+replace$ = any valid string 
+
+.desc
+This command will allow you to replace characters within a string with another.  Use this to strip or convert letters out of your strings (like removing spaces  or turning them into underscores). Pretty straight forward.
+
+.code
+name$="Bill Wallace"
+Print "Your name before replacing: " + name$
+Print "Your name with L changed to B: " + Replace$(name$,"l","b")
+
+
+:Instr (string1$, string2$, offset)
+
+.args
+string1$ = the string you wish to search
+string2$ = the string to find
+offset = valid integer starting position to being search (optional) 
+
+.desc
+This command will allow you to search for an occurance of a string within  another string. The command returns the location (number of characters from  the left) of the string you are looking for. Command returns a Zero if no matches  are found.
+
+.code
+name$="Shane R. Monroe"
+location = Instr( name$,"R.",1)
+Print "Your string contains 'R.' at position number " + location + "!"
+
+
+:Upper$ (string$)
+
+.args
+string$ = any valid string or string variable
+
+.desc
+This command takes the given string and converts it entirely to upper case.
+
+.code
+name$="Shane R. Monroe"
+print "Your name all in upper case is: " + upper$(name$)
+
+
+:Lower$ (string$)
+
+.args
+string$ = any valid string variable
+
+.desc
+This will take a string and convert it all to lower case letters. Pretty  straight forward.
+
+.code
+name$="ShAnE MoNrOe"
+Print "The original name is: " + name$
+Print "In lower case it is: " + Lower$(name$)
+
+
+:Trim$( string$ )
+
+.args
+string$ - any valid string
+
+.desc
+This function removes leading and trailing spaces from the specified string.
+
+.code
+Graphics 640,480,0,2
+
+a$ = "  Weeeeee  "
+
+Text 0,0,a$
+Text 0,20,Trim$(a$)
+
+WaitKey()
+
+:LSet$ (string$, length)
+
+.args
+string$ = any valid string or string variable
+length = how long you want the new string to be (including padding) 
+
+.desc
+If you have a string that is say, 10 letters long, but you want to make  it a full 25 letters, padding the rest of the string with spaces, this command  will do so, leaving the original string value left justified.
+
+.code
+name$="Shane R. Monroe"
+Print "New Padded Name: '" + LSet$(name$,40) + "'"
+
+
+:RSet$ (string$, length)
+
+.args
+string$ = any valid string or string variable
+length = how long you want the new string to be (including padding) 
+
+.desc
+If you have a string that is say, 10 letters long, but you want to make  it a full 25 letters, padding the rest of the string with spaces, this command  will do so, leaving the original string value right justified. You could use  this to pad your high score names to make sure all are the same width in characters.
+
+.code
+name$="Shane R. Monroe"
+Print "New Padded Name: '" + RSet$(name$,40) + "'"
+
+
+:Chr$ (integer)
+
+.args
+integer = valid ASCII code integer value
+
+.desc
+Use this command to convert a known ASCII code (for example 65) to its character  string equivelant (i.e. the letter "A").
+
+.code
+Print " The character for ASCII value 65 is: " + Chr$(65)
+
+
+:Asc (string$)
+
+.args
+string$ = any valid string variable (only the first character's ASCII value  will be returned).
+
+.desc
+This will return the ASCII value of the first letter of a string.
+
+.code
+a$=Input$("Enter a letter:")
+Print "The ASCII value of the letter is:" + Asc(a$)
+
+
+:Len (string$)
+
+.args
+string$ = any valid string variable
+
+.desc
+This will let you determine the length (number of letters, spaces, characters,  numbers, etc) inside a string. You can use this to ensure the player enters  the right number of letters (like 3 letters for a high score table). Quite useful  for 'string parsing' with other commands.
+
+.code
+name$="Shane Monroe"
+Print "There are " + Len(name$) + " characters in your name!"
+
+
+:Hex$ (integer)
+
+.args
+integer = any valid integer or integer variable
+
+.desc
+Converts integer values into hexidecimal values. If you don't know what  hex is, you don't need to know this command :)
+
+.code
+intValue="64738"
+Print "The hexidecimal value of "+intValue+" is: " + hex$(intValue)
+
+
+:Bin$ (integer)
+
+.args
+integer = any valid integer or integer variable
+
+.desc
+Converts integer values into binary values. If you don't know what binary  is, you don't need to know this command :)
+
+.code
+intValue="64738"
+Print "The binary value of "+intValue+" is: " + bin$(intValue)
+
+
+:String$ (string$, integer)
+
+.args
+string$ = any valid string or string variable
+integer = the number of times to repeat the string 
+
+.desc
+This makes a string filled with the specified occurances of the designated  string. In other words, you could use this command to write the same string  over and over again.
+
+.code
+name$="Shane"
+' Write the name string 10 times
+Print String$(name$,10)
+
+

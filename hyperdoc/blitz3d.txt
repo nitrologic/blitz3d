@@ -1,0 +1,5099 @@
+:::3D World Commands
+
+
+::3D Graphics Displays
+
+:Graphics3D width,height[,depth[,mode]]
+
+.args
+width - width of screen resolution
+height - height of screen resolution
+depth - optional colour depth for fullscreen modes
+mode - display mode of window created
+
+.desc
+The @Graphics3D command resizes the graphics display to the 
+specified size in pixels and with the specified display 
+properties including color depth and fullscreen options.
+
+This command is the same as the @Graphics command with the
+additional feature that 3D programming is supported following
+a succesful call to the @Graphics3D command.
+
+A simple "Graphics 640,480" creates a window on the desktop
+ready for 3D program development. Once your program is
+running and @debug mode has been disabled, the same command 
+opens a fullscreen display with standard VGA resolution
+of 640 pixels wide by 480 pixels high.
+
+The #depth parameter is optional, the default value of 0
+specifies that Blitz3D select the most appropriate color
+depth.
+
+The #mode parameter may be any of the following values:
+
+.table
+Mode,Description
+0,Default selects FixedWindow in Debug mode or FullScreen in Release
+1,FullScreen acheives optimal performance by owning the display
+2,FixedWindow opens a fixed size window placed on the desktop
+3,ScaledWindow opens a user sizable window with graphics scaled to fit 
+
+Before using @Graphics3D the specified resolution or support
+for 3D in Windows should be confirmed with the use of the
+@GfxMode3DExists or @Windowed3D functions respectively.
+
+.also
+GfxMode3DExists;Windowed3D;EndGraphics;Graphics
+
+
+:Dither enable
+
+.args
+enable - True to enable dithering
+
+.desc
+Enables or disables hardware dithering.
+
+Only displays configured to use 16 bit color depth benefit from
+dithering which attempts to reduce the course shading that lower
+color resolutions often suffer.
+
+The default is True.
+
+
+:WBuffer enable
+
+.args
+enable - True to enable w-buffered rendering
+
+.desc
+Enables or disables w-buffering.
+
+Often, 16 bit color depths on common graphics cards will result
+in less accurate 16 bit depth buffers being used by the 3D
+hardware.
+
+W buffering is an alternative to Z buffering that is useful
+for increasing depth sorting accuracy with such displays
+where the accuracy of sorting distance pixels is reduced
+in favour of closer pixels.
+
+The term z-fighting is often used to describe the effect
+of rendering two polygons that intersect each other.
+
+Defaults to True for 16 bit color mode.
+
+
+:AntiAlias enable
+
+.args
+enable - True to enable fullscreen antialiasing
+
+.desc
+Enables or disables fullscreen antialiasing.
+
+Fullscreen antialiasing is a technique used to smooth out the entire screen,
+so that jagged lines are made less noticeable.
+
+Any AntiAlias setting should be made optional to the user as it may have
+a serious impact on the performance of your software on their system.
+
+Default is False.
+
+
+:Wireframe enable
+
+.args
+enable - True to enable wireframe rendering
+
+.desc
+Enables or disables wireframe rendering.
+
+Enabling the wire frame rendering will cause @RenderWorld to output
+only outlines of the polygons that make up the scene.
+
+Default is False.
+
+
+:HWMultiTex enable
+
+.args
+enable - True to enable hardware multitexturing
+
+.desc
+Enables or disables hardware multitexturing.
+
+Hardware multitexturing is the process of rendering 
+multitple textures on a single surface using the 
+display harware's multiple pixel pipes if available.
+
+Providing the user of your software the option to 
+disable hardware multitexturing in favour of the
+slower multipass mode may allow them to avoid
+certain rendering bugs that exist in older graphics
+card drivers.
+
+Default is true.
+
+
+
+::3D World Commands
+
+
+:RenderWorld [tween#]
+
+.args
+tween# - optional value to render between updates
+
+.desc
+All visible entities in the World are rendered on each
+enabled camera to the @BackBuffer of the current
+@Graphics3D display device.
+
+The area of the @Graphics3D display each camera renders
+to is specified with the @CameraViewport command.
+
+A camera will not render if its @CameraProjMode has
+been set to 0 or it has not been hidden due to a call
+to the @HideEntity command.
+
+A tween value of 0 will render all entities in the same
+state they were when @CaptureWorld was last called and 
+a tween value of 1.0 will render all entities in their
+current state.
+
+The use of tweening allows you to render more than one 
+frame per game logic update, while still keeping the 
+display smooth. See @CaptureWorld for more information
+regarding the use of tweening in Blitz3D.
+
+Render tweening is an advanced technique, and it is not 
+necessary for normal use. See the castle demo  included in
+the mak (nickname of Mark Sibly, author of Blitz3D) directory 
+of the Blitz3D samples section for a demonstration of render 
+tweening.
+
+.also
+Graphics3D,CaptureWorld;CameraViewport;CameraProjMode;TrisRendered
+
+
+:UpdateWorld [anim_speed#]
+
+.args
+anim_speed# - a master control for animation speed. Defaults to 1.
+
+.desc
+Updates all animation in the world and updates all entity positions
+based on recent movements and the collision controls in place.
+
+The optional #anim_speed parameter allows control of the animation
+speed of all  entities at once. A value of 1 will animate entities
+at their usual animation  speed, a value of 2 will animate entities
+at double their animation speed etc.
+
+See the chapter on @Collisions for more details on how entity
+movement and collisions work in Blitz3D.
+
+.also
+Animate,Collisions
+
+
+:CaptureWorld
+
+.desc
+Creates a snapshot of the world including the position,
+rotation, scale and alpha of all entities in the world.
+
+The @RenderWorld command is capable of rendering frames 
+between the world as captured by @CaptureWorld and
+the world in its current state by using the optional
+#tween parameter.
+
+Often a game is designed to update it's controls and
+physics at a low frequency such as 10 times per second
+in order to reduce network and processor requirements.
+
+Calling @CaptureWorld after such a game update allows 
+the display loop to fill the gaps between game updates
+with a smooth transition of frames rendered at various 
+periods between the time of the last @CpatureWorld and 
+the time of the most recent @UpdateWorld.
+
+.also
+RenderWorld
+
+
+:ClearWorld [entities][,brushes][,textures]
+
+.args
+entities - @True to free all entities, @False not to. Defaults to true.
+brushes  - @True to free all brushes, @False not to. Defaults to true.
+textures - @True to free all textures, @False not to. Defaults to  true.
+
+.desc
+Clears all entities, brushes and / or textures from system memory.
+
+As soon as a resource is freed due to a call to @ClearWorld its 
+handle must never be used again. 
+
+Trying to do so  will cause the fatal "Entity Does Not Exist"
+or similar runtime error.
+
+This command is useful for when a game level has finished and you 
+wish to load a different level with new entities, brushes and 
+textures. 
+
+.also
+FreeEntity;FreeBrush;FreeTexture
+
+
+:TrisRendered ()
+
+.desc
+Returns the number of triangles rendered during the most recent 
+@RenderWorld.
+
+The triangle count of a scene is an important resource and errors 
+in such things as a 3D file's level of detail can slow down
+even the fastest computer. 
+
+Always make sure the models you are loading are built for 
+game use and not movie production, the later a likely cause 
+of poorly performing programs.
+
+.also
+RenderWorld
+
+
+
+::Cameras
+
+
+:CreateCamera ( [parent] )
+
+.args
+parent - parent entity of camera
+
+.desc
+Returns the handle of a newly created camera entity.
+
+@RenderWorld uses the camera entities in the world
+to render to the display. At least one camera is
+required for @RenderWorld to draw anything to the 
+display.
+
+@CameraViewport may be used to modify the region of
+the display onto which the camera renders. The default
+viewport of a new camera is a region that covers
+the entire display.
+
+Multiple cameras may be used for split screen,
+overlay and picture in picture style effects.
+
+The @EntityOrder command can be used to control 
+the order in which multiple cameras are rendered,
+see also CameraClsMode and CameraViewport which
+are 2 other commands useful when setting up a 
+multi-camera enviroment.
+
+The optional #parent parameter attaches the new camera
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+RenderWorld;CameraViewPort
+
+
+:CameraViewport camera,x,y,width,height
+
+.args
+camera - camera handle
+x - x coordinate of top left hand corner of viewport
+y - y coordinate of top left hand corner of viewport
+width - width of viewport
+height - height of viewport
+
+.desc
+Sets the camera viewport position and size.
+
+The camera viewport is the  area of the 2D screen that the
+3D graphics as viewed by the camera are displayed in. 
+
+Setting the camera viewport allows you to achieve 
+spilt-screen and  rear-view mirror effects.
+
+.also
+CreateCamera,EntityOrder
+
+
+:CameraClsMode camera,cls_color,cls_zbuffer
+
+.args
+camera - camera handle
+cls_color - @False to disable clearing of color buffer at rendertime
+cls_zbuffer - @False to disable clearing of depth buffer at rendertime
+
+.desc
+Sets camera clear mode.
+
+By default each camera contributing a view to the
+@RenderWorld command will clear both the color and
+depth buffers before rendering every entity in view.
+A False argument for either the cls_color or 
+cls_zbuffer parameters modifies the specified
+camera's behavior in this respect.
+
+Overlay cameras often disable the automatic clearing
+of the color buffer so that the scene rendered already
+by the main camera appears behind the overlay viewport.
+
+The advanced technique of multiple pass rendering
+where layers such as shadows and haze are rendered
+using multiple calls to @RenderWorld before a single
+@Flip often require cameras where both color
+and depth buffer clearing is disabled.
+
+.also
+RenderWorld;CameraClsColor
+
+
+:CameraClsColor camera,red,green,blue
+
+.args
+camera - camera handle
+red - red value of camera background color
+green - green value of camera background color
+blue - blue value of camera background color
+
+.desc
+Sets camera background color.
+
+Defaults to 0,0,0 (black).
+
+See the @Color command for more information on combining
+red, green and blue values to define colors.
+
+.also
+Color;ClsColor
+
+
+:CameraRange camera,near#,far#
+
+.args
+camera - camera handle
+near - distance in front of camera that 3D objects start being drawn
+far - distance in front of camera that 3D object stop being drawn
+
+.desc
+Sets camera range.
+
+Defaults to 1,1000.
+
+The distance parameters used in @CameraRange define two planes.
+
+The near plane will clip any objects that come to close to the
+camera while the far plane will ensure the camera does not render
+objects that are too far away (a common cause of slowdown
+in games).
+
+@Fog can be used to soften the transition when objects approach
+a @CameraRange's #far distance.
+
+The distance between #near and #far also affects the precision
+of the depth buffer which is used to determine which pixels from
+which polygon are drawn when they overlap or even intersect. See
+the @WBuffer command for more information on ways to improve
+depth buffer performance.
+
+.also
+CameraFogRange
+
+
+:CameraZoom camera,zoom#
+
+.args
+camera - camera handle
+zoom# - zoom factor of camera
+
+.desc
+Sets zoom factor for a camera. Defaults to 1.0.
+
+Values between 0.01 and 1.0 causes objects to look 
+smaller. Zoom values larger than 1.0 cause objects 
+to appear larger.
+
+.also
+CameraProjMode
+
+
+:CameraProjMode camera,mode
+
+.args
+camera - camera handle
+mode - projection mode
+
+.desc
+Sets the camera projection mode.
+
+.table
+Mode,Description
+0,No projection - disables camera (faster than HideEntity)
+1,Perspective projection (default)
+2,Orthographic projection
+
+Standard perspective projection uses a zoom variable to make
+objects further away from the camera appear smaller.
+
+In contrast, orthographic projection involves a camera with
+inifinite zoom where the disatance from camera does not affect
+the size an object is viewed. Orthographic projection is 
+also known as isometric projection.
+
+The @CameraZoom of an orthorgaphic camera instead affects
+the scale of graphics rendered with orthographic projection.
+
+.note
+Unfortunately Blitz3D @Terrains are not compatible with
+orthographics projection due to the real time level of 
+detail algorithm used.
+
+
+
+:CameraFogMode camera,mode
+
+.args
+camera - camera handle 
+mode - camera mode
+
+.desc
+Sets the camera fog mode.
+
+.table
+Mode,Description
+0,No fog (default)
+1,Linear fog
+
+This will enable/disable fogging, a technique  used to gradually fade
+out graphics the further they are away from the camera.  This can be used
+to avoid 'pop-up', the moment at which 3D objects suddenly appear on the
+horizon which itself is controlled by the #far parameter of the
+@CameraRange command.
+
+The default fog colour is black and the default fog range
+is 1-1000. Change these values with the @CameraFogColor
+and @CameraFogRange commands respectively. 
+
+Each camera can have its own fog mode, for multiple on-screen
+fog effects.
+
+.also
+CameraFogColor;CameraFogRange;CameraRange
+
+
+:CameraFogColor camera,red,green,blue
+
+.args
+camera - camera handle
+red - red value of value
+green - green value of fog
+blue - blue value of fog
+
+.desc
+Sets camera fog color.
+
+See the @Color command for more information about
+combining red, green and blue values to define
+colors in Blitz3D.
+
+.also
+CameraFogMode;CameraFogRange
+
+
+:CameraFogRange camera,near#,far#
+
+.args
+camera - camera handle
+near# - distance in front of camera that fog starts
+far# - distance in front of camera that fog ends
+
+.desc
+Sets camera fog range.
+
+The #near parameter specifies at what distance in front of the 
+camera specified that the fogging effect will start.
+
+The #far parameter specifies at what distance in front of the 
+camera that the fogging effect will end. All pixels rendered
+beyond this point will be completely faded to the fog color.
+
+.also
+CameraFogColor
+
+
+:CameraProject camera,x#,y#,z#
+
+.args
+camera - camera handle
+x# - world coordinate x
+y# - world coordinate y
+z# - world coordinate z
+
+.desc
+Projects the world coordinate x,y,z on to the 2D screen.
+
+Use the @ProjectedX, @ProjectedY and @ProjectedZ functions
+to determine the pixel location on the display and its
+distance from the camera.
+
+.also
+ProjectedX;ProjectedY;ProjectedZ
+
+
+:ProjectedX# ()
+
+.desc
+Returns the viewport x coordinate of the most recently 
+executed @CameraProject command.
+
+.also
+CameraProject
+
+
+:ProjectedY# ()
+
+.desc
+Returns the viewport y coordinate of the most recently
+executed @CameraProject command.
+
+.also
+CameraProject
+
+
+:ProjectedZ# ()
+
+.desc
+Returns the viewport z coordinate of the most recently
+executed CameraProject.
+
+.also
+CameraProject
+
+
+:EntityInView ( entity,camera )
+
+.args
+entity - entity handle
+camera - camera handle
+
+.desc
+Returns true if the specified entity is visible to the specified camera.
+
+If the entity is a mesh, its bounding box will be checked for visibility. 
+
+For all other types of entities, only their centre position will be checked.
+
+
+
+::Lights
+
+
+:AmbientLight red#,green#,blue#
+
+.args
+red# - red ambient light value
+green# - green ambient light value
+blue# - blue ambient light value
+
+.desc
+Sets the ambient light colour.
+
+Ambient light is added to all surfaces during a @RenderWorld.
+
+Ambient light has no position or direction and hence does not
+contribute to the shading of surfaces just their overall brightness.
+
+See @CreateLight for how to add lights that provide 3D shading.
+
+The red, green and blue values should be in the range 0..255.
+
+See the @Color command for more information about combining
+red, green and blue values to describe specific colors.
+
+The default ambient light colour is 127,127,127.
+
+.also
+CreateLight
+
+
+:CreateLight ( [light_type][,parent] )
+
+.args
+light_type - type of light
+parent - parent entity of light
+
+.desc
+Creates a light emitting entity.
+
+By creating a light with the @CreateLight function
+surfaces in range of the light have additional
+light added to their color based on the angle the
+surface is to the light and the diffuse and specular
+properties of the surface.
+
+The optional #light_type parameter allows you to specify
+from one of the following light types:
+
+.table
+Type,Name,Description
+1,Directional,Infinite range with no position.
+2,Point,Specific range and position.
+3,Spot,Specfic range position and angle.
+
+Point lights radiate light evenly from a single point
+while spot lights create a cone of light emitting
+from a single point aligned to the light entities 
+current orientation.
+
+A directional light is useful for emulating light
+sources like the sun where it is so distant and has
+such a large range it is simpler to reference only 
+the angle of it's shine.
+
+The optional #parent parameter attaches the new light
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+Typically an outdoor daytime scene will require a single 
+directional light entity set to an appropriate angle and 
+brightness, see @RotateEntity and @EntityLight for more
+information. Adjustments to @AmbientLight are helpful 
+for replcating the effect the entire sky is having on 
+the amount of light in the world.
+
+For nighttime and indoor scenes, a combination of point
+and spot light entities can be controlled in each room
+for dramatic shading and mood. 
+
+See @BrushShininess and @EntityShininess for more 
+information about the use of specular lighting.
+
+.hint
+For performance purposes lights point and spot
+lights should be positioned so that their effective
+range does not overlap more than 8 other point
+and spot lights minus any directional lights.
+
+Unlike point and spot lights directional lights 
+have infinite range and so their position is ignored
+and they are always included in the lighting 
+calulations during @RenderWorld.
+
+.also
+LightRange;LightColor;LightConeAngles;AmbientLight
+
+
+:LightRange light,range#
+
+.args
+light - point or spot light entity
+range# - range of light
+
+.desc
+Sets a light's maximum effective distance.
+
+The default range of a light is 1000.0.
+
+.also
+CreateLight;LightColor;LightConeAngles
+
+
+:LightColor light,red#,green#,blue#
+
+.args
+light - light handle
+red - red value of light
+green - green value of light
+blue - blue value of light
+
+.desc
+Sets the color and brightness of a light.
+
+See the @Color command for more information on combining
+red, green and blue values to define colors.
+
+Values of 255,255,255 sets a light to emit bright white light.
+
+A value of black or 0,0,0 effectively disables a light.
+
+Values of less than 0 can be used to remove light from a
+scene. This is  known as 'negative lighting', and is useful 
+for shadow effects.
+
+.also
+CreateLight;LightRange;LightConeAngles
+
+
+:LightConeAngles light,inner_angle#,outer_angle#
+
+.args
+light - light handle
+inner_angle# - inner angle of cone in degrees
+outer_angle# - outer angle of cone in degrees
+
+.desc
+Sets the 'cone' angle for a SpotLight.
+
+The default light cone angles setting is 0,90.
+
+.also
+CreateLight;LightRange;LightColor
+
+
+
+::Primitives
+
+
+:CreatePivot ( [parent] )
+
+.args
+parent - optional #parent entity of new pivot
+
+.desc
+Creates a pivot entity.
+
+Pivots have position, scale and orientation but no geometry 
+and so are always invisible themselves.
+
+Pivots make useful parent entities where they can be used
+to control the visibility, position and orientation of 
+their children.
+
+Pivots are also used for the bones when loading animated
+b3d files with the @LoadAnimMesh command.
+
+The optional #parent parameter attaches the new pivot
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+EntityParent;LoadAnimMesh
+
+
+:CreateCube ( [parent] )
+
+.args
+parent - optional #parent entity of a new cube
+
+.desc
+Creates a geometric cube, a mesh the shape of a 
+square box.
+
+The new cube extends from  -1,-1,-1 to +1,+1,+1.
+
+Creation of cubes, cylinders and cones are great 
+for placeholders during initial program development
+when a game's art resources may only be in their
+planning stages.
+
+The optional #parent parameter attaches the new cube
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.hint
+Parenting a semitransparent cube to an object to
+visually represent it's @EntityBox collision settings
+is often useful when fine tuning object collisions.
+
+.also
+ScaleMesh;CreateSphere;CreateCylinder;CreateCone
+
+
+:CreateSphere ( [segments][,parent] )
+
+.args
+segments - sphere detail. Defaults to 8.
+parent - parent entity of new sphere
+
+.desc
+Creates a geometric sphere, a mesh the shape of a round ball.
+
+The sphere will be centred  at 0,0,0 and will have a radius of 1. 
+
+The optional segements value affects how many triangles are used
+in the resulting mesh:
+.table
+Value,Triangles,Comment
+8,224,Bare minimum amount of polygons for a sphere
+16,960,Smooth looking sphere at medium-high distances
+32,3968,Smooth sphere at close distances
+
+The optional #parent parameter attaches the new sphere
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+ScaleMesh;CreateCube;CreateCylinder;CreateCone
+
+
+:CreateCylinder ( [segments][,solid][,parent] )
+
+.args
+segments - cylinder detail. Defaults to 8.
+solid - @True for a cylinder @False for a tube. Defaults to @True.
+parent - parent entity of cylinder
+
+.desc
+Creates a mesh entity the shape of a cylinder with optional ends.
+
+The cylinder will  be centred at 0,0,0 and will have a radius of 1. 
+
+The segments value must be in the range 3-100 inclusive and results
+in cylinders with the following triangle counts:
+
+.table
+Value,Triangles,Comment
+3,8,A prism
+8,28,Bare minimum amount of polygons for a cylinder
+16,60,Smooth cylinder at medium-high distances
+32,124,Smooth cylinder at close distances 
+
+The optional #parent parameter attaches the new cylinder
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+ScaleMesh;CreateCube;CreateSphere;CreateCone
+
+
+:CreateCone ( [segments][,solid][,parent] )
+
+.args
+segments - cone detail. Defaults to 8.
+solid - @True for a cone with a base @False for a cone without a base. Defaults to true.
+parent - parent entity of cone
+
+.desc
+Creates a mesh entity the shape of a cone with optional base.
+
+The cone will be centred  at 0,0,0 and the base of the cone will have a 
+radius of 1. 
+
+The segments value has a range 3-100 inclusive and results
+in cones with the following triangle counts:
+
+.table
+Value,Triangles,Description
+4,6,A pyramid
+8,14,Bare minimum amount of polygons for a cone
+16,30,Smooth cone at medium-high distances
+32,62,Smooth cone at close distances 
+
+The optional #parent parameter attaches the new cone
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+CreateCube, CreateSphere, CreateCylinder.
+
+
+:CreatePlane ( [divisions][,parent] )
+
+.args
+division - sub divisions of plane in the range 1-16. The default value is 1.
+parent - parent entity of plane
+
+.desc
+Creates a geometric plane, a flat surface with zero height that extends 
+inifinitely in the x and z axis.
+
+The optional #divisions parameter determines how many sub divisions of 
+polygons the viewable area of the plane will be rendered with which
+is important when their are point and spot lights contributing to the
+lighting of a plane's surface.
+
+Due to it's inifinite nature a plane is not a mesh based entity
+so unlike @CreateCube, @CreateSphere, @CreateCylinder and
+@CreateCone, mesh based commands must not be used on planes.
+
+The optional #parent parameter attaches the new plane
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+CreateMirror
+
+
+:CreateMirror ( [parent] )
+
+.args
+parent - parent entity of mirror
+
+.desc
+Creates a mirror entity which is a plane with a surface that reflects all
+visible geometry when rendered.
+
+The optional #parent parameter attaches the new mirror
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+See @CreatePlane for more information about the size and shape of a
+mirror's geometry.
+
+.also
+CreatePlane
+
+
+:CopyEntity ( entity[,parent] )
+
+.args
+entity - Entity to duplicate
+parent - Entity that will act as parent to the copy.
+
+.desc
+Returns a duplicate or clone of the specified entity.
+
+Surfaces of mesh based entities are not duplicated but
+shared with the clone returned by @CopyEntity.
+
+The optional #parent parameter attaches the new clone
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+EntityParent
+
+
+::Textures
+
+
+:LoadTexture ( file$[,flags] )
+
+.args
+file$ - filename of image file to be used as texture
+flags - optional texture flags
+
+.desc
+Load a texture from an image file and returns the texture's handle.
+
+Supported file formats include BMP, PNG, TGA and JPG.
+
+Only PNG and TGA support an alpha channel which provides per pixel
+transparency information.
+
+See @CreateTexture for more detailed descriptions of the texture flags and
+the @TextureFilter command for an alternative method of setting the texture
+flags of a loaded texture based on the texture file's name.
+
+.also
+LoadAnimTexture;CreateTexture;TextureFilter;FreeTexture
+
+
+:LoadAnimTexture ( file$,flags,frame_width,frame_height,first_frame,frame_count )
+
+.args
+file$ - name of image file with animation frames laid out in left-right, top-to-bottom order
+flags - optional texture flags
+frame_width - width of each animation frame in pixels
+frame_height - height of each animation frame in pixels
+first_frame - the first frame to be used as an animation frame
+frame_count - the amount of frames to be used
+
+.desc
+Loads an animated texture from an image file and returns the 
+texture's handle.
+
+Supported file formats include BMP, PNG, TGA and JPG.
+
+Only PNG and TGA support an alpha channel which provides per pixel
+transparency information.
+
+See @CreateTexture for more detailed descriptions of the texture flags and
+the @TextureFilter command for an alternative method of setting the texture
+flags of a loaded texture based on the texture file's name.
+
+The frame_width, frame_height, first_frame and frame_count
+parameters determine how Blitz will separate the image file into individual
+animation frames.
+
+The frames must be drawn in similar sized rectangles
+arranged from left to right, top to bottom on the
+image source.
+
+.also
+LoadTexture;CreateTexture;TextureFilter;FreeTexture
+
+
+:CreateTexture ( width,height[,flags][,frames] )
+
+.args
+width - width of texture
+height - height of texture
+flags - combination of texture flags listed
+frames - no of frames texture will have. Defaults to 1.
+
+.desc
+Creates a texture and returns its handle.
+
+Width and height are the pixel dimensions of the texture. 
+
+Note that the size of the actual texture created may be
+different from the width and height requested due to the
+limitations of various designs of 3D hardware.
+
+The optional #flags parameter allows you to apply
+certain effects to the texture:
+.table
+Flag,Description
+1,Color (default)
+2,Alpha
+4,Masked
+8,Mipmapped
+16,Clamp U
+32,Clamp V
+64,Spherical reflection map
+128,Cubic environment map
+256,Store texture in vram
+512,Force the use of high color textures
+
+Flags can be added to combine two or more effects, e.g. 3 (1+2) = texture
+with colour and alpha maps.
+
+Color - colour map, what you see is what you get.
+
+Alpha - alpha channel. If an image contains an alpha map, this will be used to
+make certain areas of the texture transparent. Otherwise, the colour map 
+will  be used as an alpha map. With alpha maps, the dark areas always 
+equal high-transparency,  light areas equal low-transparency.
+
+Masked - all areas of a texture coloured Black (0,0,0) will be treated
+as 100% transparent.
+
+Mipmapped - low detail versions of the texture are generated for use
+at various distances resulting in both smoother filtering and higher
+performance rendering.
+
+Clamp U - Disables texture wrapping / repeating in the horizontal axis.
+
+Clamp V - Disables texture wrapping / repeating in the vertical axis.
+
+Spherical environment map - a form of environment mapping. This works by 
+taking a single image, and then applying it to a 3D mesh in such a way 
+that the image appears to be reflected. When used with a texture that 
+contains light sources, it can give some meshes such as a teapot a 
+shiny appearance.
+
+Cubic environment map - a form of environment mapping. Cube mapping is 
+similar to spherical mapping, except it uses six images each representing 
+a particular 'face' of an imaginary cube, to give the appearance of an 
+image that perfectly reflects its surroundings. 
+
+When creating cubic environment maps with the CreateTexture command,
+cubemap textures must be square 'power of 2' sizes. See the @SetCubeFace 
+command for information on how to then draw to the cubemap.
+
+When loading cubic environments maps into Blitz using LoadTexture, all 
+six images relating to the six faces of the cube must be contained within 
+the one texture, and be laid out in a horizontal strip in the following 
+order - left, forward, right, backward, up, down.
+
+The images comprising the cubemap must all be power of two sizes.
+
+Please note that not some older graphics cards do not support cubic mapping.
+
+In order to find out if a user's graphics card can support it, use 
+@GfxDriverCaps3D .
+
+See @SetCubeFace and @SetCubeMode for more information about using cube 
+mapping in Blitz3D.
+
+Store texture in vram - In some circumstances, this makes for much faster 
+dynamic textures - ie. when using CopyRect between two textures. When 
+drawing to cube maps in real-time, it is preferable to use this flag.
+
+Force the use of high color textures in low bit depth graphics modes.
+This is useful for when you are in 16-bit color mode, and wish to 
+create/load textures with the alpha flag - it should give better results. 
+
+Once you have created a texture, use SetBuffer TextureBuffer to draw to it.
+
+However, to display 2D graphics on a texture, it is usually quicker to draw 
+to an image and then copy it to the texturebuffer, and to display 3D 
+graphics on a texture, your only option is to copy from the backbuffer to 
+the texturebuffer.
+
+.also
+LoadTexture;LoadAnimTexture
+
+
+:FreeTexture texture
+
+.args
+texture - texture handle
+
+.desc
+Frees a texture's resources from memory.
+
+Freeing a texture means you will not be able to use it again; however, entities 
+already textured with it will not lose the texture.
+
+
+:TextureBlend texture,blend
+
+.args
+texture - texture handle.
+blend - blend mode of texture.
+
+.desc
+Sets the blending mode for a texture.
+
+The texture blend mode determines how the texture will blend with the texture 
+or polygon which is 'below' it.
+
+Texture 0 will blend with the polygons of the entity it is applied to.
+
+Texture 1 will blend with texture 0.
+
+Texture 2 will blend with texture 1.
+
+And so on.
+
+.table
+Mode,Description
+0,Do not blend
+1,No blend or Alpha (alpha when texture loaded with alpha flag - not recommended  for multitexturing - see below)
+2,Multiply (default)
+3,Add
+4,Dot3
+5,Multiply x 2
+
+Texture blending in Blitz effectively takes the highest order
+texture (the one with the highest index) and it blends with the texture
+below it, then that result to the texture directly below again, and so on
+until texture 0 which is blended with the polygons of the entity it is applied
+to and thus the world, depending on the @EntityBlend of the object.
+
+Each of the blend modes are identical to their @EntityBlend counterparts.
+
+In the case of multitexturing (more than one texture applied to an entity),
+it is not recommended you blend textures that have been loaded with the
+alpha flag, as this can cause unpredictable results on a variety of different
+graphics cards. 
+
+Use @EntityTexture to set the index number of a texture.
+
+.also
+EntityBlend;EntityTexture
+
+
+:TextureCoords texture,coords
+
+.args
+texture - name of texture
+coords - coordinate set (0 or 1)
+
+.desc
+Sets the texture coordinate mode for a texture.
+
+This determines where the UV values used to look up a texture come from.
+
+.table
+Coords,Description
+0,UV coordinates are from first UV set in vertices (default)
+1,UV coordinates are from second UV set in vertices
+
+
+:ScaleTexture texture,u_scale#,v_scale#
+
+.args
+texture - name of texture
+u_scale# - u scale
+v_scale# - v scale
+
+.desc
+Scales a texture by an absolute amount.
+
+Effective immediately on all instances of the texture being used.
+
+
+:PositionTexture texture,u_position#,v_position#
+
+.args
+texture - texture handle
+u_position# - u position of texture
+v_position# - v position of texture
+
+.desc
+Positions a texture at an absolute position.
+
+Positioning a texture is useful for performing scrolling texture effects,
+such as for water etc.
+
+
+:RotateTexture texture,angle#
+
+.args
+texture - texture handle
+angle# - absolute angle of texture rotation
+
+.desc
+Rotates a texture.
+
+This will have an immediate effect on all instances of the texture being used. 
+
+Rotating a texture is useful for performing swirling texture effects, such as
+for smoke etc.
+
+
+:TextureWidth (texture )
+
+.args
+texture - texture handle
+
+.desc
+Returns the width of a texture in pixels.
+
+
+:TextureHeight ( texture )
+
+.args
+texture - texture handle
+
+.desc
+Returns the height of a texture in pixels.
+
+
+:TextureBuffer ( texture[,frame] )
+
+.args
+texture - texture handle
+frame - optional texture frame
+
+.desc
+Returns the handle of a texture's drawing buffer.
+
+This can be used with @SetBuffer to perform 2D drawing operations to
+the texture, although it's usually faster to draw to an image, and 
+then copy the  image buffer across to the texture buffer using @CopyRect.
+
+You cannot render 3D to a texture buffer as @RenderWorld only works with
+a graphic display's back buffer. To display 3D graphics on a texture, use
+@CopyRect to copy the contents of the back buffer to a texture buffer
+after the call to @RenderWorld
+
+
+:TextureName$ ( texture )
+
+.args
+texture - a valid texture handle
+
+.desc
+Returns a texture's absolute filename.
+
+To find out just the name of the texture, you will need to strip
+the path information from the string returned by @TextureName.
+
+.also
+GetBrushTexture
+
+
+:GetBrushTexture ( brush [,index=0] )
+
+.args
+brush - brush handle
+index - optional index of texture applied to brush, from 0..7. Defaults to 0.
+
+.desc
+Returns the texture that is applied to the specified brush.
+
+The optional #index parameter allows you to specify which particular 
+texture you'd like returning, if there are more than one textures 
+applied to a brush.
+
+You should release the texture returned by GetBrushTexture after use 
+to prevent leaks! Use @FreeTexture to do this.
+
+To find out the name of the texture, use @TextureName.
+
+.also
+TextureName;FreeTexture;GetEntityBrush;GetSurfaceBrush
+
+
+:TextureFilter match_text$,flags
+
+.args
+match_text$ - text that, if found in texture filename, will activate certain filters
+flags - filter texture flags
+
+.desc
+Adds a texture filter.
+
+Any texture files subsequently loaded with @LoadTexture, @LoadAnimTexture or
+as the result of @LoadMesh or @LoadAnimMesh that contain the text match_text$
+in their filename will inherit the specified properties:
+
+.table
+Flag,Description 
+1,Color
+2,Alpha 
+4,Masked 
+8,Mipmapped 
+16,Clamp U 
+32,Clamp V 
+64,Spherical environment map 
+128,Cubic environment mapping
+256,Store texture in vram 
+512,Force the use of high color textures
+
+See @CreateTexture for more information on texture flags.
+
+By default, the following texture filter is used: 
+
+TextureFilter "",1+8 
+
+This means that all loaded textures will have color and be mipmapped by default.
+
+.also
+LoadTexture;LoadAnimTexture;LoadMesh;LoadAnimMesh;ClearTextureFilters
+
+
+:ClearTextureFilters
+
+.desc
+Clears the current texture filter list.
+
+.also
+TextureFilter;LoadTexture
+
+
+:SetCubeFace texture,face
+
+.args
+texture - a cubemap type texture
+face - face of cube to select 0..5
+
+.desc
+Selects a cube face for direct rendering to a texture.
+
+.table
+Face,Description
+0,left (negative X) face
+1,forward (positive Z) face - this is the default.
+2,right (positive X) face
+3,backward (negative Z) face
+4,up (positive Y) face
+5,down (negative Y) face
+
+This command should only be used when you wish to draw directly to a
+cubemap texture in real-time.
+
+Otherwise, just loading a pre-rendered cubemap with a flag of 128 will suffice.
+
+To understand how this command works exactly it is important to recognise
+that Blitz treats cubemap textures slightly differently to how it treats
+other textures. Here's how it works...
+
+A cubemap texture in Blitz actually consists of six images, each of which 
+must be square 'power' of two size - e.g. 32, 64, 128 etc. Each corresponds
+to a particular cube face. These images are stored internally by Blitz, and
+the texture handle that is returned by LoadTexture/CreateTexture when 
+specifying the cubemap flag, only provides access to one of these six 
+images at once (by default the first one, or '0' face).
+
+This is why, when loading a cubemap texture into Blitz using
+LoadTexture, all the six cubemap images must be laid out in a specific order
+(0-5, as described above), in a horizontal strip. Then Blitz takes this
+texture and internally converts it into six separate images.
+
+So seeing as the texture handle returned by @CreateTexture / @LoadTexture 
+only provides access to one of these images at once (no. 1 by default), 
+how do we get access to the other five images? This is where @SetCubeFace 
+comes in. 
+
+It will tell Blitz that whenever you next draw to a cubemap texture, to draw
+to the particular image representing the face you have specified with the
+#face parameter.
+
+Now you have the ability to draw to a cubemap in real-time.
+
+To give you some idea of how this works in code, here's a function that
+updates a cubemap in real-time. It works by rendering six different views
+and copying them to the cubemap texture buffer, using @SetCubeFace to specify
+which particular cubemap image should be drawn to.
+
+All rendering to a texture buffer affects the currently
+selected face. Do not change the selected cube face while a buffer is locked.
+
+Finally, you may wish to combine the vram 256 flag with the cubic mapping
+flag when drawing to cubemap textures for faster access.
+
+.also
+CreateTexture;LoadTexture;SetCubeMode
+
+
+:SetCubeMode texture,mode
+
+.args
+texture - a valid texture handle
+mode - the rendering mode of the cubemap texture:
+
+.desc
+Set the rendering mode of a cubemap texture.
+
+.table
+Mode,Description
+1,Specular (default) 
+2,Diffuse
+3,Refraction
+
+The available rendering modes are as follows:
+
+Specular (default) - use this to give your cubemapped 
+objects a shiny effect.
+
+Diffuse - use this to give your cubemapped objects a 
+non-shiny, realistic lighting effect.
+
+Refraction - Good for 'cloak'-style effects.
+
+.also
+CreateTexture;LoadTexture;SetCubeFace
+
+
+::Brushes
+
+
+:CreateBrush ( [red,green,blue] )
+
+.args
+red - brush red value
+green - brush green value
+blue - brush blue value
+
+.desc
+Creates a brush with an optional color that can be used with the
+@PaintEntity and @PaintSurface commands.
+
+See the @Color command for more information on combining
+red, green and blue values to define colors. The brush will
+default to White if no color is specified.
+
+A brush is a collection of properties including color, alpha,
+shininess, textures, blend mode and rendering effects.
+
+All the properties of a brush are assigned to an entity or
+particular surface with the @PaintEntity and @PaintSurface
+commands.
+
+.also
+LoadBrush.
+
+
+:LoadBrush ( texture_file$[,flags][,u_scale][,v_scale]
+
+.args
+texture_file$ - filename of texture
+flags - optional texture flags
+u_scale - optional texture horizontal scale
+v_scale - optional texture vertical scale
+
+.desc
+Creates a brush and loads and assigns a single texture to it with the
+specified texture properties.
+
+See the @CreateTexture command for a discussion of the various texture
+flags and their effects and the @TextureScale command for more information
+on texture scales.
+
+.also
+CreateBrush;CreateTexture
+
+
+:FreeBrush brush
+
+.args
+brush - brush handle
+
+.desc
+Frees up a brush.
+
+.also
+FreeTexture;FreeEntity;ClearWorld
+
+
+:BrushColor brush,red,green,blue
+
+.args
+brush - brush handle
+red - red value of brush
+green - green value of brush
+blue - blue value of brush
+
+.desc
+Modifies the colour of a brush.
+
+See the @Color command for more information on combining
+red, green and blue values to define colors.
+
+Please note that if @EntityFX or @BrushFX flag 2 is being used,
+brush colour will have no effect and vertex colours will be used
+instead.
+
+.also
+EntityColor
+
+
+:BrushAlpha brush,alpha#
+
+.args
+brush - brush handle
+alpha# - alpha level of brush
+
+.desc
+Sets the alpha level of a brush.
+
+The alpha# value should be in the range 0.0 to 1.0.
+
+The default brush alpha setting is 1.0. 
+
+The alpha level is how transparent an entity is.
+
+A value of 1 will mean the  entity is non-transparent, i.e. opaque.
+
+A value of 0 will mean the entity is  completely transparent, i.e. invisible.
+
+Values between 0 and 1 will cause varying amount of transparency
+accordingly, useful for imitating the look of objects such as glass 
+and ice. 
+
+A @BrushAlpha value of 0 is especially useful as Blitz3D will
+not render surfaces painted with such a brush, but will still
+involve the entities in collision tests.
+
+.also
+EntityAlpha
+
+
+:BrushBlend brush,blend
+
+.args
+brush - brush handle
+blend - blendmode
+
+.desc
+Sets the blending mode for a brush.
+
+.table
+Mode,Description
+1,alpha (default)
+2,multiply
+3,add
+
+.also
+EntityBlend
+
+
+:BrushFX brush,fx
+
+.args
+brush - brush handle
+fx - effects flags
+
+.desc
+Sets miscellaneous effects for a brush.
+
+Flags can be added
+to combine  two or more effects. For example, specifying a flag of 3 (1+2)
+will result in  a full-bright and vertex-coloured brush.
+
+.table
+Effect,Description
+0,Nothing (default)
+1,FullBright
+2,Use vertex colors instead of brush color
+4,FlatShaded
+8,Disable fog
+16,Disable backface culling
+
+See the @EntityFX command for details on the meaning of each flag.
+
+.also
+EntityFX
+
+
+:BrushShininess brush,shininess#
+
+.args
+brush - brush handle
+shininess# - shininess of brush
+
+.desc
+Sets the specular shininess of a brush.
+
+The shininess# value should be  in the range 0-1. The default shininess 
+setting is 0. 
+
+Shininess is how much brighter certain areas of an object will appear to
+be when a light is shone directly at them. 
+
+Setting a shininess value of 1 for a medium to high poly sphere, combined
+with the creation of a light shining in the direction of it, will give it
+the appearance of a shiny snooker ball.
+
+.also
+EntityShininess
+
+
+:BrushTexture brush,texture[,frame][,index]
+
+.args
+brush - brush handle
+texture - texture handle
+frame - texture frame. Defaults to 0.
+index - brush texture layer. Defaults to 0.
+
+.desc
+Assigns a texture to a brush.
+
+The optional #frame parameter specifies which  animation
+frame, if any exist, should be assigned to the brush. 
+
+The optional #index parameter specifies the texture layer 
+that the texture should  be assigned to.
+
+Brushes have up to eight texture layers, 0-7 inclusive.
+
+.also
+EntityTexture
+
+
+:GetEntityBrush(entity)
+
+.args
+entity - entity handle
+
+.desc
+Returns a new brush with the same properties as is currently
+applied to the specified entity.
+
+See the @GetSurfaceBrush function for capturing the properties
+of a particualar entities surface.
+
+Use the @FreeBrush command when the newly created brush is no
+longer needed.
+
+See the @GetBrushTexture and @TextureName functions for
+retrieving details of the brushes texture properties.
+
+.also
+GetSurfaceBrush;FreeBrush;GetBrushTexture;TextureName
+
+
+:GetSurfaceBrush(surface)
+
+.args
+surface - surface handle
+
+.desc
+Returns a new brush with the same properties as is currently
+applied to the specified surface.
+
+See the @GetEntityBrush command for capturing entitities default 
+surface properties.
+
+Use the @FreeBrush command when the newly created brush is no
+longer needed.
+
+See the @GetBrushTexture and @TextureName functions for
+retrieving details of the brushes texture properties.
+
+.also
+GetEntityBrush;FreeBrush;GetSurface;GetBrushTexture;TextureName
+
+
+
+::3D Graphics Modes and Drivers
+
+
+:CountGfxModes3D()
+
+.desc
+Returns the number of 3D compatible modes available on the selected 3D 
+graphics card, and configures the table of information returned by 
+@GfxModeWidth, @GfxModeHeight and @GfxModeDepth functions.
+
+Shares Use instead of CountGfxModes()
+
+.also
+GfxModeWidth;GfxModeHeight;GfxModeDepth;Graphics3D;SetGfxDriver;CountGfxModes
+
+
+:GfxMode3D(mode)
+
+.args
+mode - graphics mode number from 1 .. CountGfxModes ()
+
+.desc
+Returns True if the specified graphics mode is 3D-capable.
+
+This function has been superceeded by the use of @CountGfxModes3D()
+which removes any non3D capable modes from the available
+mode list.
+
+.also
+CountGfxModes3D
+
+
+:Windowed3D ()
+
+.desc
+Returns @True if the current 3D driver is capable of supporting 
+@Graphics3D in windowed disply mode.
+
+This function should be used before calling @Graphics3D involving
+a windowed display.
+
+Older generation graphics cards may only support 3D "in a window" 
+if the Desktop is set to a specific color depth if at all.
+
+.also
+Graphics3D;GfxMode3DExists;GfxDriver3D
+
+
+:GfxMode3DExists ( width, height, depth )
+
+.args
+width - width of screen resolution
+height - height of screen resolution
+depth - colour depth of screen. 0 for don't care
+
+.desc
+Returns @True if current driver can display 3D graphics at
+the specified resolution.
+
+Use the @GfxMode3DExists command to avoid a possible "Unable
+to set Graphics mode" runtime error when calling @Graphics3D
+which occurs if the user's computer is unable to support 3D
+graphics displays at the specified resolution.
+
+See @CountGfxModes3D for an altaerative method of ensuring
+the 3D driver supports certain resolution requirements.
+
+.also
+Graphics3D;Windowed3D;GfxDriver3D
+
+
+:GfxDriver3D(driver)
+
+.args
+driver - display driver number to check, from 1 to CountGfxDrivers ()
+
+.desc
+Returns True if the specified graphics driver is 3D-capable.
+
+The graphics driver usually corresponds to the number of monitors
+connected to the user's system.
+
+If GfxDriver3D returns False the specifed driver will be unable
+to support any 3D modes and should not be selected with the
+@SetGfxDriver command.
+
+See @CountGfxDrivers for more information on multiple monitor systems.
+
+.also
+CountGfxDrivers;SetGfxDriver;GfxDriverCaps3D
+
+
+:GfxDriverCaps3D()
+
+.desc
+Returns the 'caps level' of the current graphics driver. Values are:
+
+.table
+Level,Description
+100,Card supports all 'standard' Blitz3D operations.
+110,Card supports all standard ops plus cubic environment mapping.
+
+.hint
+The program must already have configured the 3D display by 
+successfully calling @Graphics3D before calling this function.
+
+.also
+CreateTexture;Graphics3D
+
+
+:HWTexUnits()
+
+.desc
+Returns the number of hardware texturing units available.
+
+The result of @HWTexUnits is only of interest as a basic
+performance indicator of the current graphics driver as
+Blitz3D uses multipass rendering techniques when hardware
+texturing units are not available.
+
+See the @BrushTexture command for more information about
+working with multitextured surfaces.
+
+.also
+BrushTexture
+
+
+::3D Maths
+
+:VectorYaw# ( x#,y#,z# )
+
+.args
+x# - x vector length
+y# - y vector length
+z# - z vector length
+
+.desc
+Returns the yaw value of a vector.
+
+Yaw is a common name for rotation around the Y axis or in this
+instance the compass heading in degrees if z is north and x is west.
+
+.also
+VectorPitch;EntityYaw
+
+
+:VectorPitch# ( x#,y#,z# )
+
+.args
+x# - x vector length
+y# - y vector length
+z# - z vector length
+
+.desc
+Returns the pitch value of a vector.
+
+Pitch is a common name for rotation around the X axis or in this
+instance the angle the vector is raised if y is up and the distance 
+x,z is forwards.
+
+.also
+VectorYaw;EntityPitch
+
+
+:TFormPoint x#, y#, z#, source_entity, dest_entity
+
+.args
+x# - x coordinate of a point in 3d space
+y# - y coordinate of a point in 3d space
+z# - z coordinate of a point in 3d space
+source_entity - handle of source entity, or 0 for 3d world 
+dest_entity - handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems. After using TFormPoint the new
+
+coordinates can be read with TFormedX(), TFormedY() and TFormedZ(). 
+
+See EntityX() for details about local coordinates. 
+
+Consider a sphere built with CreateSphere().
+The 'north pole' is at (0,1,0).
+
+At first, local and global coordinates
+are the same. As the sphere is moved, 
+
+turned and scaled the global coordinates
+of the point change.
+
+
+But it is always at (0,1,0) in the sphere's local
+space.
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormVector;TFormNormal
+
+
+:TFormVector x#, y#, z#, source_entity, dest_entity
+
+.args
+x# = x component of a vector in 3d space
+y# = y component of a vector in 3d space
+z# = z component of a vector in 3d space
+source_entity = handle of source entity, or 0 for 3d world
+dest_entity = handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems. After using TFormVector
+the new
+
+components can be read with TFormedX(), TFormedY() and TFormedZ().
+
+See EntityX() for details about local coordinates.
+
+Similar
+to TFormPoint, but operates on a vector. A vector can be thought of
+
+as
+'displacement relative to current location'.
+
+
+For example, vector (1,2,3)
+means one step to the right, two steps up 
+
+and three steps forward. 
+
+
+This is analogous to PositionEntity and MoveEntity:
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormPoint;TFormNormal
+
+
+:TFormNormal x#, y#, z#, source_entity, dest_entity
+
+.args
+x# = x component of a vector in 3d space
+y# = y component of a vector in 3d space
+z# = z component of a vector in 3d space
+source_entity = handle of source entity, or 0 for 3d world
+dest_entity = handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems.
+After using TFormNormal the new
+
+components can be read with TFormedX(),
+TFormedY() and TFormedZ().
+
+
+This is exactly the same as TFormVector
+but with one added feature.
+
+After the transformation the new vector is
+'normalized', meaning it
+
+is scaled to have length 1.
+
+
+For example,
+suppose the result of TFormVector is (1,2,2).
+
+This vector has length
+Sqr( 1*1 + 2*2 + 2*2 ) = Sqr( 9 ) = 3.
+
+
+This means TFormNormal would
+produce ( 1/3, 2/3, 2/3 ).
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormPoint;TFormVector
+
+:TFormedX()
+
+
+.desc
+Returns the X component of the last TFormPoint, TFormVector or TFormNormal
+ operation.
+
+
+See those commands for examples.
+
+.also
+TFormedY;TFormedZ;TFormPoint;TFormVector;TFormNormal
+
+
+:TFormedY()
+
+
+.desc
+Returns the Y component
+of the last TFormPoint, TFormVector or TFormNormal  operation.
+
+
+See
+those commands for examples.
+
+.also
+TFormedX;TFormedZ;TFormPoint;TFormVector;TFormNormal
+
+
+:TFormedZ()
+
+
+.desc
+Returns the Z component
+of the last TFormPoint,  TFormVector or TFormNormal operation. 
+
+
+See
+those commands for examples.
+
+.also
+TFormedX;TFormedY;TFormPoint;TFormVector;TFormNormal
+
+
+
+:::3D Entity Commands
+
+
+::Position
+
+
+:PositionEntity entity,x#,y#,z#,[,global]
+
+.args
+entity - name of entity to be positioned
+x# - x co-ordinate that entity will be positioned at
+y# - y co-ordinate that entity will be positioned at
+z# - z co-ordinate that entity will be positioned at
+global - @False for parent space @True for global space
+
+.desc
+Position an entity at the position defined by the 3D
+coordinate (x,y,z) either relative to it's parent 
+position and orientation or optionally in world
+coordinates.
+
+In Blitz3D an entity typically faces towards the +z axis,
+the y axis is the height of the entity and it's left / 
+right position is the x axis.
+
+In particular all entities including cameras are created
+facing the z axis oriented so y is up.
+
+To move an entity a relative amount rather than
+position it at an absolute position see the @MoveEntity
+and @TranslateEntity commands.
+
+See the @UpdateWorld command for details regarding
+the effect of any collisions that may occur due to
+the requested repositioning.
+
+.also
+EntityX;MoveEntity;TranslateEntity;UpdateWorld
+
+
+:MoveEntity entity,x#,y#,z#
+
+.args
+entity - name of entity to be moved
+x# - x amount that entity will be moved by
+y# - y amount that entity will be moved by
+z# - z amount that entity will be moved by
+
+.desc
+Moves an entity relative to its current position and orientation.
+
+Typically the x,y,z values for a 'Z facing model' are:
+
+.table
+Axis,Direction
+X,Right Left
+Y,Up Down
+Z,Forward Backwards 
+
+For movement that ignores the entities orientation see the
+@TranslateEntity command.
+
+To position an entity at an absolute location in parent
+or world space see the @PositionEntity command.
+
+See the @UpdateWorld command for details regarding
+the effect of any collisions that may occur due to
+the requested repositioning.
+
+.also
+EntityX;TranslateEntity;PositionEntity;UpdateWorld
+
+
+:TranslateEntity entity,x#,y#,z#
+
+.args
+entity - name of entity to be translated
+x# - x amount that entity will be translated by
+y# - y amount that entity will be translated by
+z# - z amount that entity will be translated by
+
+.desc
+Translates an entity relative to its current position 
+in the global direction specified.
+
+@TranslateEntity is an alternative to @MoveEntity
+when an entity must be moved in a global direction
+such as straight down for gravity.
+
+Unlike @MoveEntity an entities orientation is ignored
+in the resulting calculation.
+
+To move an entity with coordinates that represent
+a vector relative to its own orientation use the
+@MoveEntity command.
+
+See the @UpdateWorld command for details regarding
+the effect of any collisions that may occur due to
+the requested repositioning.
+
+.also
+MoveEntity;PositionEntity;PositionMesh;UpdateWorld
+
+
+:EntityX# ( entity[,global] )
+
+.args
+entity - entity handle
+global - @True to return global coordinate @False to return local coordinate
+
+.desc
+Returns the X component of the entities current position
+in local or optionally global space.
+
+The X axis is tradionally the left to right axis in Blitz3D
+space when facing towards Z either from the parents point
+of view or optionally from the center of the world.
+
+.also
+EntityY;EntityZ
+
+
+:EntityY# ( entity[,global] )
+
+.args
+entity = handle of Loaded or Created Entity
+global = @True to return global coordinate @False to return local coordinate
+
+.desc
+Returns the Y component of the entities current position
+in local or optionally global space.
+
+The Y axis is tradionally the down to up axis in Blitz3D
+space when facing towards Z either from the parents point
+of view or optionally from the center of the world.
+
+.also
+EntityX;EntityZ
+
+
+:EntityZ# ( entity[,global] )
+
+.args
+entity = handle of Loaded or Created Entity
+global = @True to return global coordinate @False to return local coordinate
+
+.desc
+Returns the Z component of the entities current position
+in local or optionally global space.
+
+The Z axis is tradionally the from behind to infront axis 
+in Blitz3D space from the parents current point of view 
+or optionally from the center of the world.
+
+.also
+EntityX;EntityY
+
+
+::Rotation
+
+:RotateEntity entity,pitch#,yaw#,roll#,[,global]
+
+.args
+entity - name of the entity to be rotated
+pitch# - angle in degrees of rotation around x
+yaw# - angle in degrees of rotation around y
+roll# - angle in degrees of rotation around z
+global - @True to rotate in world space @False for parent space
+
+.desc
+Rotates an entity to the specified world orientation or 
+optionally one relative to its parent's orientation.
+
+.table
+Name,Rotation Axis,Description
+Pitch,Around x axis,Equivalent to tilting forward/backwards
+Yaw,Around y axis, Equivalent to turning left/right
+Roll,Around z axis, Equivalent to tilting left/right
+
+See the @TurnEntity command for rotating entities starting
+from their current position.
+.also
+TurnEntity;RotateMesh
+
+
+:TurnEntity entity,pitch#,yaw#,roll#,[,global]
+
+.args
+entity - name of entity to be rotated
+pitch# - angle in degrees that entity will be pitched
+yaw# - angle in degrees that entity will be yawed
+roll# - angle in degrees that entity will be rolled
+global - @True to rotate in world space @False for parent space
+
+.desc
+Turns an entity relative to its current rotatation.
+
+.table
+Name,Rotation Axis,Description
+Pitch,Around x axis,Equivalent to tilting forward/backwards
+Yaw,Around y axis, Equivalent to turning left/right
+Roll,Around z axis, Equivalent to tilting left/right
+
+Unlike @RotateEntity the #pitch, #yaw and #roll rotations are applied
+to the object starting from its current rotation.
+
+.also
+RotateEntity;PointEntity
+
+
+:PointEntity entity,target[,roll#]
+
+.args
+entity - entity handle
+target - target entity handle
+roll# - roll angle of entity
+
+.desc
+Points one entity at another by adjusting its pitch
+and yaw rotations.
+
+The optional #roll parameter allows you to specify a 
+rotation around the z axis to complete the rotation.
+
+Use the @AlignToVector command for aiming an entity
+(typically its z axis) using a specified alignment 
+vector and smoothing rate.
+
+.hint
+Invisible pivot entities make useful targets for pointing
+an entity towards any arbitrary direction.
+
+.also
+AlignToVector
+
+
+:AlignToVector entity,vector_x#,vector_y#,vector_z#,axis[,rate#]
+
+.args
+entity - entity handle
+vector_x# - vector x
+vector_y# - vector y
+vector_z# - vector z
+axis - axis of entity that will be aligned to vector
+rate# - rate at which entity is aligned from current orientation to vector orientation.
+
+.desc
+Aligns an entity axis to a vector.
+
+Rate should be in the range 0 to 1, 0.1 for smooth transition and 1.0 for 'snap' 
+transition. Defaults to 1.0. 
+
+.table
+Axis,Description
+1,X axis
+2,Y axis
+3,Z axis
+
+The @AlignToVector command offers an advanced alternative to the
+@RotateEntity, @TurnEntity and @PointEntity commands. @AlignToVector
+provides a method of steering entities by turning them so a
+specified axis aligns to a precalculated directions in an optionally
+smooth manner.
+
+.also
+RotateEntity,TurnEntity,PointEntity
+
+
+:EntityRoll# ( entity[,global] )
+
+.args
+entity - name of entity that will have roll angle returned
+global - true if the roll angle returned should be relative to 0 rather than a parent entities  roll angle. False by default.
+
+.desc
+Returns the roll angle of an entity.
+
+The roll angle is also the z angle
+of an entity.
+
+
+:EntityYaw# ( entity[,global] )
+
+.args
+entity - name of entity that will have yaw angle returned
+global - true if the yaw angle returned should be relative to 0 rather than a parent entities yaw angle. False by default.
+
+.desc
+Returns the yaw angle of an entity.
+
+The yaw angle is also the y angle of an entity.
+
+
+:EntityPitch# ( entity[,global] )
+
+.args
+entity - name of entity that will have pitch angle returned
+global - true if the pitch angle returned should be relative to 0 rather than a parent entities pitch angle. False by default.
+
+.desc
+Returns the pitch angle of an entity.
+
+The pitch angle is also the x angle of an entity.
+
+
+:GetMatElement# ( entity,row,column )
+
+.args
+entity - entity handle
+row - matrix row index
+column - matrix column index
+
+.desc
+Returns the value of an element from within an entities transformation
+matrix.
+
+The transformation matrix is what is used by Blitz internally
+to position, scale and rotate entities.
+
+GetMatElement is intended for
+use by advanced users only.
+
+
+::Scale
+
+:ScaleEntity entity,x_scale#,y_scale#,z_scalel#,[,global]
+
+.args
+entity - name of the entity to be scaled
+x_scale# - x scalar value
+y_scale# - y scalar value
+z_scale# - z scalar value
+global - True means relative to world not parent's scale
+
+.desc
+Scales the size of an entity a scalar amount in each axis.
+
+The values 1,1,1 are the default scale of a newly created
+entity which has no affect on the entity size.
+
+A scalar values of 2 will double the size of an entity in the
+specified axis, 0.5 will halve the size.
+
+Negative scalar values invert that entities axis and may
+result in reversed facing surfaces. 
+
+A global value of False is default and multiplies the specified
+scale with the entity parent's scale. A global value of @True
+ignores the scale of the parent.
+
+.hint
+A scale value of 0,0,0 should be avoided as it can produce
+dramatic performance problems on some computers due to the
+infinite nature of the surface normals it produces.
+
+.also
+ScaleMesh;FitMesh
+
+
+
+::Hierachy
+
+
+:EntityParent entity,parent[,global]
+
+.args
+entity - entity handle
+parent - parent entity handle
+global - true for the child entity to retain its global position  and orientation. Defaults to true.
+
+.desc
+Attaches an entity to a parent.
+
+Parent may be 0, in which case the entity  will have no parent. 
+
+
+:GetParent ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns an entities parent.
+
+:CountChildren ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the number of children of an entity.
+
+
+:GetChild (entity,index)
+
+.args
+entity - entity handle
+index - index of child entity. Should be in the range 1...CountChildren(  entity ) inclusive.
+
+.desc
+Returns a
+child of an entity.
+
+
+:FindChild ( entity,child_name$ )
+
+.args
+entity - entity handle
+child_name$ - child name to find within entity
+
+.desc
+Returns the first child of the specified entity with name
+matching child_name$.
+
+
+::Visibility
+
+:ShowEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Shows an entity. Very
+much the opposite of HideEntity.
+
+Once an entity has been hidden using
+HideEntity,  use show entity to make it visible and involved in collisions
+again.  Note that ShowEntity has no effect if the enitities parent object
+is hidden.
+
+Entities are shown by default after creating/loading them,
+so you should  only need to use ShowEntity after using HideEntity. 
+
+ShowEntity affects the specified entity only - child entities are not affected.
+
+
+:HideEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Hides an entity, so that it is no longer visible, and is no longer
+involved  in collisions.
+
+The main purpose of hide entity is to allow
+you to create entities  at the beginning of a program, hide them, then copy
+them and show as necessary  in the main game. This is more efficient than
+creating entities mid-game. 
+
+If you wish to hide an entity so that it
+is no longer visible but still involved  in collisions, then use EntityAlpha
+0 instead.  This will make an entity completely transparent. 
+
+HideEntity
+affects the specified entity and all of its child entities, if  any exist.
+
+
+:EntityAutoFade entity,near#,far#
+
+.args
+entity - entity handle
+near# - distance from camera when entity begins to fade
+far# - distance from camera entity becomes completely invisible
+
+.desc
+Enables auto fading for an entity.
+
+@EntityAutoFade causes an entities alpha level to be adjusted at
+distances between near and far to create a 'fade-in' effect.
+
+.also
+EntityAlpha
+
+
+:EntityOrder entity,order
+
+.args
+entity - entity handle
+order - order that entity will be drawn in
+
+.desc
+Sets the drawing order for
+an entity.
+
+An order value of 0 will mean the  entity is drawn normally.
+A value greater than 0 will mean that entity is drawn  first, behind everything
+else. A value less than 0 will mean the entity is drawn  last, in front
+of everything else. 
+
+Setting an entities order to non-0 also disables
+z-buffering for the entity,  so should be only used for simple, convex entities
+like skyboxes, sprites etc. 
+
+EntityOrder affects the specified entity
+but none of its child entities,  if any exist. 
+
+
+:FreeEntity EntityHandle
+
+.args
+EntityHandle - valid entity handle
+
+.desc
+FreeEntity will free up the internal resources associated
+with a particular entity and remove it from the scene.
+
+Handle must be valid entity hanlde such as returned by 
+function such as CreateCube(), CreateLight(), LoadMesh() etc.
+
+This command will also free all children entities parented 
+to the entity.
+
+See the @ClearWorld command for freeing all entities with
+a single call.
+
+.hint
+Any references to the entity or it's children become
+invalid after a call to @FreeEntity so care should be
+taken as any subsquent use of a handle to a freed 
+entity will cause a runtime error.
+
+.also
+FreeTetuxe;FreeBrush;ClearWorld
+
+
+
+::Painting
+
+
+:EntityColor entity,red,green,blue
+
+.args
+entity - entity handle
+red# - red value of entity
+green# - green value of entity
+blue# - blue value of entity
+
+.desc
+Sets the color of an entity.
+
+See the @Color command for more information on combining
+red, green and blue values to define colors.
+
+.hint
+Both @EntityColor and @PaintEntity reset the color of all
+surfaces when used with a mesh type entity containing
+multiple surfaces. The @PaintSurface command can be
+used to color individual surfaces of a mesh.
+
+.also
+PaintEntity;PaintSurface;EntityAlpha
+
+
+:EntityAlpha entity,alpha#
+
+.args
+entity - entity handle
+alpha# - alpha level of entity
+
+.desc
+Sets the alpha or transparency level of an entity.
+
+The #alpha value should be between 0.0 and 1.0 which
+correspond to the range from totally transaperent 
+(effectively invisible) to totally opaque:
+
+.table
+alpha#,effect
+0.0,invisible
+0.25,very transparent
+0.50,semi transparent
+0.75,very solid
+1.00,completely opaque
+
+Unlike @HideEntity an entity made invisible with
+an #alpha of 0.0 still participates in any collisions.
+
+The default #alpha level of an entity is 1.0.
+
+Use the @BrushAlpha and @PaintSurface commands for
+affecting transparency on a surface by surface basis.
+
+.also
+EntityAutoFade;BrushAlpha;PaintEntity;PaintSurface;
+
+
+
+:EntityShininess entity,shininess#
+
+.args
+entity - entity handle
+shininess# - shininess of entity
+
+.desc
+Sets the specular shininess of an entity.
+
+The shininess# value should be a floting point number in the 
+range 0.0-1.0. The default shininess setting is 0.0. 
+
+Shininess is the extra brightness that appears on a surface
+when it is oriented to reflect light directly towards the 
+camera.
+
+A low #shininess produces a dull non reflective surface while
+a high #shininess approaching 1.0 will make a surface appear
+polished and shiny.
+
+Use the @BrushShininess and @PaintSurface commands for
+affecting shininess on a surface by surface basis.
+
+.also
+BrushShininess
+
+
+:EntityTexture entity,texture[,frame][,index]
+
+.args
+entity - entity handle
+texture - texture handle
+frame - frame of texture. Defaults to 0.
+index - index number of texture. Should be in the range to 0-7. Defaults  to 0.
+
+.desc
+Applies a texture to an entity.
+
+The optional #frame parameter specifies  which texture
+animation frame should be used as the texture. 
+
+The #index parameter specifies an optional texturing channel
+when using multitexturing. See the @TextureBlend command for
+more details on mixing multiple textures on the same surface.
+
+Texturing requires the use of a valid texture returned by
+the @CreateTexture or @LoadTexture functions and a mesh based
+entity with texturing coordinates assigned to it's vertices.
+
+.hint
+Primitives created with @CreateCube, @CreatePlane, 
+@CreateSphere etc. contain texturing information known
+as UV coordinates. Howeever model files and surfaces 
+created programatically may be missing this information
+and will consequently fail to display textures correctly
+on their surfaces.
+
+.also
+LoadTexture;BrushTexture;VertexTexCoords
+
+
+:EntityBlend entity,blend
+
+.args
+entity - entity handle
+blend - blend mode of the entity.
+
+.desc
+Sets the blending mode of an entity.
+
+A blending mode determines the way in which the color and 
+alpha (RGBA) on an entities surface (source) is combined 
+with the color of the background (destination) during rendering.
+
+To calculate the color of a pixel being rendered, the texture 
+color for the surface and its alpha component are multiplied by 
+the surfaces color and alpha components.
+
+The resulting color and alpha values are then blended with the
+background - the color already rendered to the display by more 
+distant entities or if none the current @CameraClsColor.
+
+The possible blend modes are:
+.table
+Blend,Name,Description,Use
+1,Alpha,Combines #alpha amount of src with 1-#alpha of dest,most things
+2,Multiply,Blends src color with dest,lightmaps
+3,Add,Adds src color to dest,explosions lasers etc.
+
+Alpha - blends the pixels according to the Alpha value. This is 
+roughly done to the formula:
+
+Rr = ( An * Rn ) + ( ( 1.0 - An ) * Ro )
+
+Gr = ( An * Gn ) + ( ( 1.0 - An ) * Go )
+
+Br = ( An * Bn ) + ( ( 1.0 - An ) * Bo )
+
+Where R = Red, G = Green, B = Blue, n = new pixel colour values, 
+r = resultant colour values, o = old pixel colour values.
+
+Alpha blending is the default blending mode and is used
+with most world objects.
+
+Multiply - darkens the underlying pixels. If you think of each RGB value as 
+being on a scale from 0% to 100%, where 0 = 0% and 255 = 100%, the multiply 
+blend mode will multiply the red, green and blue values individually together 
+in order to get the new RGB value, roughly according to:
+
+Rr = ( ( Rn / 255.0 ) * ( Ro / 255.0 ) ) * 255.0
+
+Gr = ( ( Gn / 255.0 ) * ( Go / 255.0 ) ) * 255.0
+
+Br = ( ( Bn / 255.0 ) * ( Bo / 255.0 ) ) * 255.0
+
+The alpha value has no effect with multiplicative blending.
+
+Blending a RGB value of 255, 255, 255 will make no difference, while an 
+RGB value of 128, 128, 128 will darken the pixels by a factor of 2 and an 
+RGB value of 0, 0, 0 will completely blacken out the resultant pixels.
+
+An RGB value of 0, 255, 255 will remove the red component of the underlying 
+pixel while leaving the other color values untouched.
+
+Multiply blending is most often used for lightmaps, shadows or anything else 
+that needs to 'darken' the resultant pixels.
+
+Add - additive blending will add the new color values to the old, roughly
+according to:
+
+Rr = ( Rn * An ) + Ro
+
+Gr = ( Gn * An ) + Go
+
+Br = ( Bn * An ) + Bo
+
+The resultant RGB values are clipped out at 255, meaning
+that multiple additive effects can quickly cause visible 
+banding from smooth gradients.
+
+Additive blending is extremely useful for effects such as
+laser shots and fire.
+
+.also
+BrushBlend;TextureBlend;EntityAlpha
+
+
+:EntityFX entity,fx
+
+.args
+entity - entity handle
+fx - fx flags
+
+.desc
+Sets miscellaneous effects for an entity.
+
+.table
+Flag,Description
+0,No fx (default)
+1,FullBright
+2,EnableVertexColors
+4,FlatShaded
+8,DisableFog
+16,DoubleSided
+32,EnableVertexAlpha
+
+Flags can be added to combine two or more effects.
+
+For example, specifying a flag of 3 (1+2) will result in both
+FullBright and EnableVertexColor effects to be enabled for all
+the surfaces of the specified entity.
+
+See @BrushFX and @PaintSurface for details on controlling 
+FX on a surface by surface basis.
+
+
+FullBright - disables standard diffuse and specular lighting
+caclulations during rendering so surface appears at 100%
+brightness.
+
+EnableVertexColors - vertex color information is used
+instead of surface colors when using vertex lighting 
+techniques.
+
+FlatShaded - uses lighting information from first vertex of
+each triangle instead of interpolating between all three as
+per default smooth shading.
+
+DisableFog - disables fogging calulations.
+
+DoubleSided- disables the back face culling method making
+both front facing and back facing sides of a surfaces 
+visible.
+
+EnableVertexAlpha - ensures surfaces is treated as transparent
+by rendering pipeline.
+
+.also
+BrushFX;VertexColor
+
+
+:PaintEntity entity,brush
+
+.args
+entity - entity handle
+brush - brush handle
+
+.desc
+Paints an entity with a brush.
+
+@PaintEntity applies all the surface rendering properties 
+including color, alpha, texture, fx and blending modes
+to the entity specified.
+
+See the @CreateBrush function for details about creating 
+a brush.
+
+Use the @PaintMesh command to set all the surface properties
+of a mesh entity and @PaintSurface for modifying rendering
+attributes on a particular surface.
+
+.also
+CreateBrush;LoadBrush;PaintMesh;PaintSurface
+
+
+
+
+::Collisions
+
+
+:Collisions src_type,dest_type,method,response
+
+.args
+src_type - entity type to be checked for collisions.
+dest_type - entity type to be collided with.
+method - collision detection method.
+response - what the source entity does when a collision occurs.
+
+.desc
+Configures method and response for collisions between two
+entities of the specified collision types.
+
+The #method parameter can be one of the following:
+
+.table
+Method,Description
+1,Ellipsoid-to-ellipsoid collisions
+2,Ellipsoid-to-polygon collisions
+3,Ellipsoid-to-box collisions
+
+The #response parameter can be one of the following:
+
+.table
+Response,Name,Description
+1,Stop,source entity halts at point of collision
+2,Slide1,slide source entity along the collision plane
+3,Slide2,same as slide1 but y component ignored
+
+After calling @UpdateWorld the @CountCollisions
+command can be used to detect collisions incurred
+by each entity and information about each of those
+collisions is returned by functions such as
+@EntityCollided, @CollisionX, @CollisionNX etc.
+
+.hint
+A series of calls to the @Collisions command is usually
+only required during a game's initialization and not
+every game loop as @Collisions settings remain effective 
+until a call to @ClearCollisions or a call to @Collisions
+with matching #source and #target entity types overwrites
+the existing method and reponse settings.
+
+.also
+EntityBox;EntityRadius;Collision;EntityType;ResetEntity
+
+
+:ClearCollisions
+
+.desc
+Clears the internal collision behavior table.
+
+Whenever a @Collisions command is used to enable collisions 
+between two different entity types, an entry is added to
+an internal collision behavior table used by the @UpdateWorld
+command.
+
+@ClearCollisions clears the internal collision behavior
+table and has no affect on current entity collision state.
+
+.also
+Collisions;UpdateWorld;ResetEntity
+
+
+:EntityType entity,collision_type[,recursive]
+
+.args
+entity - entity handle
+collision_type - collision type of entity. Must be in the range 0-999.
+recursive - true to apply collision type to entities children. Defaults to false.
+
+.desc
+Sets the collision type for an entity.
+
+A collision_type value of 0 indicates that no collision checking will 
+occur with that entity.
+
+A collision value of 1-999 enables collision checking for the specified 
+entity and optionally all it's children.
+
+The @UpdateWorld command uses the currently active @Collisions rules
+to perform various collision responses for the overlapping of entities
+that have a corresponding @EntityType.
+
+.also
+Collisions;GetEntityType;EntityBox;EntityRadius
+
+
+:GetEntityType ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the collision type of an entity as set by the EntityType
+command.
+
+.also
+EntityType;EntityBox;EntityRadius;Collisions;ResetEntity
+
+
+:ResetEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Resets the collision state of an entity.
+
+.also
+EntityBox;EntityRadius;Collision;EntityType;GetEntityType
+
+
+:EntityRadius entity,x_radius#[,y_radius#]
+
+.args
+entity - entity handle
+x_radius# - x radius of entities collision ellipsoid
+y_radius# - y radius of entities collision ellipsoid
+
+.desc
+Sets the radius of an entities collision sphere or if a 
+#y_radius is specified the dimenstions of a collision
+ellipsoid.
+
+An entity radius should be set for all entities
+involved in ellipsoidal collisions.
+
+All entity types used as source entities in the 
+@Collisions table (as collisions are always 
+ellipsoid-to-something), and any destination entity
+types specified in method 1 type @Collisions
+entries (ellipsoid-to-ellipsoid collisions)
+require an @EntityRadius.
+
+.also
+EntityBox;Collisions;EntityType
+
+
+:EntityBox entity,x#,y#,z#,width#,height#,depth#
+
+.args
+entity - entity handle#
+x# - x position of entities collision box
+y# - y position of entities collision box
+z# - z position of entities collision box
+width# - width of entities collision box
+height# - height of entities collision box
+depth# - depth of entities collision box
+
+.desc
+Sets the dimensions of an entities collision box.
+
+Any entity types featured as the destination of 
+type 3 @Collisions (ellipsoid to box) require 
+an @EntityBox to define their collision space.
+
+.also
+EntityRadius;Collisions;EntityType
+
+
+:EntityCollided ( entity,type )
+
+.args
+entity - entity handle
+type - type of entity
+
+.desc
+Returns the handle of the entity of the specified type 
+that collided with the specified entity.
+
+Usually the @CountCollisions function is used after an
+@UpdateWorld with each collision being processed individually
+with the collision specific @CollisionX, @CollisionY, @CollisionZ,
+@CollisionNX, @CollisionNY, @CollisionNZ, @CountCollisions,
+@EntityCollided, @CollisionTime, @CollisionEntity, @CollisionSurface
+and @CollisionTriangle functions.
+
+@EntityCollided provides a simple alternative in situations
+where a simple True or False collision result is required
+in regards to the specified entity type.
+
+.also
+CountCollisions;
+
+
+:CountCollisions ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns how many collisions an entity was involved in during
+the last UpdateWorld.
+
+The @CountCollisions function returns the maximum index value
+that should be used when fetching collision specific data 
+such as returned by the @CollisionX, @CollisionY, @CollisionZ,
+@CollisionNX, @CollisionNY, @CollisionNZ, @CountCollisions,
+@EntityCollided, @CollisionTime, @CollisionEntity, @CollisionSurface
+and @CollisionTriangle functions.
+
+.also
+UpdateWorld;CollisionX;CollisionNX;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionX# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world x coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionY# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world y coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionZ# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the world z coordinate of a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionNX# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the x component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions(  entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionNY# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the y component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionNZ# ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the z component of the normal of a particular collision.
+
+Index  should be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionTime ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the time at which the specified collision occured.
+
+Index should be in the range 1...CountCollisions( entity ) inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionEntity ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the other entity involved in a particular collision.
+
+Index should  be in the range 1...CountCollisions( entity  ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionSurface ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the handle of the surface belonging to the specified entity that 
+was closest to the point of a particular collision.
+
+Index should be in  the range 1...CountCollisions( entity ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+:CollisionTriangle ( entity,index )
+
+.args
+entity - entity handle
+index - index of collision
+
+.desc
+Returns the index number of the triangle belonging to the specified entity
+that was closest to the point of a particular collision.
+
+Index should be in the range 1...CountCollisions( entity ), inclusive.
+
+.also
+CollisionX;CollisionY;CollisionZ;CollisionNX;CollisionNY;CollisionNZ;CountCollisions;EntityCollided;CollisionTime;CollisionEntity;CollisionSurface;CollisionTriangle
+
+
+
+::Picking
+
+
+:EntityPickMode entity,pick_geometry[,obscurer]
+
+.args
+entity - entity handle
+pick_geometry - type of geometry used for picking
+obscurer - False to make entity transparent 
+
+.desc
+Sets the pick mode for an entity.
+
+The obscurer option if @True specifies the entity 'obscures' other 
+entities during an EntityVisible call. Defaults to True.
+
+.table
+mode,description
+0,Unpickable (default)
+1,Sphere (EntityRadius is used)
+2,Polygon
+3,Box (EntityBox is used)
+
+The optional #obscurer parameter is used with EntityVisible to determine 
+just what can get in the way of the line-of-sight between 2 entities.
+
+This allows some entities to be pickable using the other pick commands, 
+but to be ignored (i.e. 'transparent') when using EntityVisible.
+
+.hint
+A valid mesh entity is required for Polygon type picking.
+Use Sphere or Box type picking for all other entity classes
+including sprites, terrains, pivots etc.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+
+:LinePick ( x#,y#,z#,dx#,dy#,dz#[,radius#] )
+
+.args
+x# - x coordinate of start of line pick
+y# - y coordinate of start of line pick
+z# - z coordinate of start of line pick
+dx# - distance x of line pick
+dy# - distance y of line pick
+dz# - distance z of line pick
+radius - radius of line pick
+
+.desc
+Returns the first pickable entity along the line defined
+by the end coordinates (x,y,z) and (x+dx,y+dy,z+dz).
+
+Use the @EntityPickMode command to make an entity
+pickable.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+
+:EntityPick ( entity,range# )
+
+.args
+entity - entity handle
+range# - range of pick area around entity
+
+.desc
+Returns the nearest pickable entity 'infront' of the 
+specified entity.
+
+The scale of the #range parameter is affected by the 
+scale of the entity and affects the maximum distance
+of the pick.
+
+Use the @EntityPickMode command to make an entity
+pickable.
+
+.also
+EntityPickMode;LinePick;CameraPick;EntityPickMode
+
+
+:CameraPick ( camera,viewport_x#,viewport_y# )
+
+.args
+camera - camera handle
+viewport_x# - 2D viewport coordinate
+viewport_z# - 2D viewport coordinate
+
+.desc
+Returns the nearest pickable entity occupying the specified 
+viewport coordinates or 0 if none.
+
+Use the @EntityPickMode command to make an entity
+pickable.
+
+The @CameraPick function is a useful way for detecting
+the entity being drawn at the specified screen location
+in particular when that location is the point at
+@MouseX,@MouseY.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode;EntityInView
+
+:PickedX# ( )
+
+.desc
+Returns the world X coordinate at which the most recently 
+picked entity was picked.
+
+The coordinate ( @PickedX(), @PickedY(), @PickedZ() ) is
+the exact point in world space at which the current 
+@PickedEntity() was picked with either the @CameraPick, 
+@EntityPick or @LinePick functions.
+
+.also
+PickedY, PickedZ. 
+
+
+:PickedY# ( )
+
+.desc
+Returns the world Y coordinate at which the most recently 
+picked entity was picked.
+
+The coordinate ( @PickedX(), @PickedY(), @PickedZ() ) is
+the exact point in world space at which the current 
+@PickedEntity() was picked with either the @CameraPick, 
+@EntityPick or @LinePick functions.
+
+.also
+PickedX, PickedZ. 
+
+
+:PickedZ# ( )
+
+.desc
+Returns the world Z coordinate at which the most recently 
+picked entity was picked.
+
+The coordinate ( @PickedX(), @PickedY(), @PickedZ() ) is
+the exact point in world space at which the current 
+@PickedEntity() was picked with either the @CameraPick, 
+@EntityPick or @LinePick functions.
+
+.also
+PickedX, PickedY. 
+
+
+:PickedNX ( )
+
+.desc
+Returns the X component of the normal at which the most recently 
+picked entity was picked.
+
+.also
+PickedNY;PickedNZ
+
+
+:PickedNY ( )
+
+.desc
+Returns the Y component of the normal at which the most recently 
+picked entity was picked.
+
+.also
+PickedNX;PickedNZ
+
+
+:PickedNZ ( )
+
+.desc
+Returns the Z component of the normal at which the most recently 
+picked entity was picked.
+
+.also
+PickedNX;PickedNY
+
+
+:PickedTime ( )
+
+.desc
+Returns the time taken to calculate the most recently executed
+Pick command.
+
+
+:PickedEntity ( )
+
+.desc
+Returns the entity 'picked' by the most recently executed
+Pick command.
+
+Returns 0 if no entity was picked.
+
+
+:PickedSurface ( )
+
+.desc
+Returns the handle of the surface that was 'picked' by the
+most recently executed Pick command.
+
+
+:PickedTriangle ( )
+
+
+.desc
+Returns the index number of the triangle that was 'picked'
+by the most recently  executed Pick command.
+
+
+::Meshes
+
+
+:LoadMesh ( filename$, [parent] )
+
+.args
+filename$ - name of the file containing the model to load
+parent - optional #parent entity 
+
+.desc
+Returns a new mesh entity loaded from a .X, .3DS or .B3D file.
+
+Any hierarchy and animation information is ignored.
+
+Use the @LoadAnimMesh function to load both mesh, hierarchy 
+and animation information.
+
+The optional #parent parameter attaches the new mesh
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+The .b3d file format is the native file format of Blitz3D
+and supoports features such as multitexturing, weighted 
+bone skinning and hierachial animation.
+
+See @The b3d File Format chapter for more information.
+
+.also
+LoadAnimMesh,LoaderMatrix
+
+
+:LoadAnimMesh( filename$, [parent] )
+
+.args
+filename$ - name of the file containing the model to load. 
+parent - optional entity to act as parent to the loaded mesh.
+
+.desc
+Returns the root of an entity hierachy loaded from the specified file.
+
+Unlike @LoadMesh, @LoadAnimMesh may result in the creation of many
+mesh and pivot entities depending on what it finds in the specified
+file.
+
+The optional #parent parameter attaches the new entity hierachy 
+to a parent entity. See the @EntityParent command for more 
+details on the effects of entity parenting. 
+
+See the @Animate command for activating any animation that may
+be included in the file.
+
+Locate child entities within an entity hierarchy by using the 
+@FindChild() and @GetChild functions.
+
+See @The .b3d file format for more information on Blitz3D's
+native file format and it's support for multitexturing, weighted 
+bone skinning and hierachial animation.
+
+.also
+LoadMesh,LoaderMatrix,Animate,FindChild,GetChild
+
+
+:LoaderMatrix file_extension$,xx#,xy#,xz#,yx#,yy#,yz#,zx#,zy#,zz#
+
+.args
+file extension$ - file extension of 3d file
+xx# - 1.1 element of 3x3 matrix
+xy# - 2.1 element of 3x3 matrix
+xz# - 3.1 element of 3x3 matrix
+yx# - 1.2 element of 3x3 matrix
+yy# - 2.2 element of 3x3 matrix
+yz# - 3.2 element of 3x3 matrix
+zx# - 1.3 element of 3x3 matrix
+zy# - 2.3 element of 3x3 matrix
+zz# - 3.3 element of 3x3 matrix
+
+.desc
+
+Sets a transformation matrix to be applied to specified file
+types when loaded.
+
+When geometric models loaded from file with the @LoadMesh
+and @LoadAnimMesh functions have been created in a different 
+coordinate system a @LoaderMatrix transformation can be 
+used to correct the geometry at the time of loading.
+
+By default, the following loader matrices are used: 
+
+LoaderMatrix "x",1,0,0,0,1,0,0,0,1 ; no change in coord system
+
+LoaderMatrix "3ds",1,0,0,0,0,1,0,1,0 ; swap y/z axis' 
+
+You can use LoaderMatrix to flip meshes/animations if necessary,
+eg: 
+
+LoaderMatrix "x",-1,0,0,0,1,0,0,0,1  ; flip x-cords for ".x" files
+
+LoaderMatrix "3ds",-1,0,0,0,0,-1,0,1,0  ; swap y/z, negate x/z for ".3ds" files 
+
+.also
+LoadMesh,LoadAnimMesh
+
+
+:CopyMesh ( mesh[,parent] )
+
+.args
+mesh - handle of mesh to be copied
+parent - handle of entity to be made parent of mesh
+
+.desc
+Creates a copy of a mesh entity and returns the newly-created mesh's
+handle.
+
+The optional #parent parameter attaches the new copy 
+to a parent entity. See the @EntityParent command for more 
+details on the effects of entity parenting. 
+
+The difference between @CopyMesh and @CopyEntity is that 
+@CopyMesh makes a copy of all the surfaces whereas 
+the result of a @CopyEntity shares any surfaces with it's
+template.
+
+A mesh copy can also be created using a combination of the
+@CreateMesh and @AddMesh commands.
+
+.also
+CopyEntity;CreateMesh;AddMesh
+
+
+:CreateMesh ( [parent] )
+
+.args
+parent - optional #parent entity for new mesh
+
+.desc
+Create a 'blank' mesh entity and returns its handle.
+
+When a mesh is first created it has no surfaces, vertices or 
+triangles associated with it.
+
+To add geometry to a mesh, use the @AddMesh command to copy
+surfaces from other meshes or new surfaces can be added with the
+@CreateSurface() function with vertices and triangles being
+added to that surface using the @AddVertex and @AddTriangle 
+commands.
+
+The optional #parent parameter attaches the new mesh
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+AddMesh,CreateSurface;AddVertex;AddTriangle
+
+
+:AddMesh source_mesh,dest_mesh
+
+.args
+source_mesh - source mesh handle
+dest_mesh - destination mesh handle
+
+.desc
+Adds copies of all source_mesh's surfaces to the dest_mesh entities 
+surface list.
+
+.also
+CreateMesh
+
+
+:FlipMesh mesh
+
+.args
+mesh - mesh handle
+
+.desc
+Flips all the triangles in a mesh.
+
+@FlipMesh reverses the order of vertices for each triangle effectively
+making it face the opposite direction.
+
+Triangles that all face the wrong way is a common error when loading
+external meshes and the @FlipMesh command is a useful correction
+if an alternative @LoaderMatrix solution can not be found.
+
+@FlipMesh is also useful for turning primitives created by @CreateSphere,
+@CreateCylinder and @CreateCone inside out.
+
+See the @EntityFX command for treating the triangles of a mesh as double
+sided instead.
+
+.also
+LoaderMatrix;EntityFX;BrushFX
+
+
+:PaintMesh mesh,brush
+
+.args
+mesh - mesh handle
+brush - brush handle
+
+.desc
+Paints a mesh with a brush.
+
+Color, texture, shininess, fx and blend mode properties are copied from
+the brush to each of the entities surfaces.
+
+See the @CreateBrush() function for more information about setting up a
+brush with which to paint entities and individual surfaces.
+
+.also
+CreateBrush,PaintEntity,PaintSurface
+
+
+:LightMesh mesh,red#,green#,blue#[,range#][,light_x#][,light_y#][,light_z#]
+
+.args
+mesh - mesh handle
+red# - mesh red value
+green# - mesh green value
+blue# - mesh blue value
+range# - optional light range 
+light_x# - optional light x position
+light_y# - optional light y position 
+light_z# - optional light z position
+
+.desc
+Adds the affect of a specified directional light to the color
+of all vertices.
+
+See the @EntityFX command for selecting EnableVertexColors which must
+be active for the results of LightMesh to be visible.
+
+Because @LightMesh is an additive operation and vertex colors default
+to white, negative white can be applied initially to reset all vertex
+colors to black:
+
+LightMesh ent,-255,-255,-255
+
+.also
+EntityFX;BrushFX
+
+
+:FitMesh mesh,x#,y#,z#,width#,height#,depth#[,uniform]
+
+.args
+mesh - mesh handle
+x# - x position of mesh
+y# - y position ofmesh
+z# - z position of mesh
+width# - width of mesh 
+height# - height of mesh
+depth# - depth of mesh
+uniform - optional, True to scale all axis the same amount
+
+.desc
+Scales and translates all vertices of a mesh so that the mesh 
+occupies the specified box.
+
+The #uniform parameter defaults to false.
+
+A #uniform fit will scale the size of the mesh evenly in
+each axis until the mesh fits in the dimensions specified
+retaining the mesh's original aspect ratio.
+
+.also
+ScaleMesh;ScaleEntity
+
+
+:ScaleMesh mesh,x_scale#,y_scale#,z_scale#
+
+.args
+mesh - mesh handle
+x_scale# - x scale of mesh
+y_scale# - y scale of mesh
+z_scale# - z scale of mesh
+
+.desc
+Scales all vertices of a mesh by the specified scaling factors.
+
+.also
+FitMesh;ScaleEntity
+
+
+:RotateMesh mesh,pitch#,yaw#,roll#
+
+.args
+mesh - mesh handle
+pitch# - pitch of mesh
+yaw# - yaw of mesh
+roll# - roll of mesh
+
+.desc
+Rotates all vertices of a mesh by the specified rotation.
+
+Rotation is in degrees where 360` is a complete rotation
+and the axis of each rotation is as follows:
+
+.table
+name,rotation axis,description
+Pitch,around x axis,equivalent to tilting forward/backwards.
+Yaw,around y axis, equivalent to turning left/right.
+Roll,around z axis, equivalent to tilting left/right.
+
+.also
+RotateEntity;TurnEntity
+
+
+:PositionMesh mesh,x#,y#,z#
+
+.args
+mesh - mesh handle
+x# - x direction
+y# - y direction
+z# - z direction
+
+.desc
+Translates the position of all mesh vertices using the 
+specified direction vector.
+
+.also
+PositionEntity;MoveEntity;TranslateEntity
+
+
+:UpdateNormals mesh
+
+.args
+mesh - mesh handle
+
+.desc
+Recalculates all normals in a mesh.
+
+This is necessary for correct lighting if you have
+not set surface normals using the @VertexNormals commands
+or a mesh has been loaded from a model file with
+bad or missing verticy normal data.
+
+.also
+
+
+
+:MeshesIntersect (mesh_a,mesh_b )
+
+.args
+mesh_a - mesh_a handle
+mesh_b - mesh_b handle
+
+.desc
+Returns true if the specified meshes are currently
+intersecting.
+
+This  is a fairly slow routine - use with discretion...
+
+This command is  currently the only  polygon->polygon collision checking
+routine available in Blitz3D.
+
+
+:MeshWidth# (mesh)
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the width of a mesh. This is calculated by the actual vertex
+positions and so the scale of the entity (set by ScaleEntity) will not have
+an effect on the resultant width. Mesh operations, on the other hand, will
+effect the result.
+
+.also
+MeshHeight;MeshDepth
+
+
+:MeshHeight# (mesh )
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the height of a mesh.
+This is calculated by the actual vertex positions and so the scale of the
+entity (set by ScaleEntity) will not have an effect on the resultant height.
+Mesh operations, on the other hand, will effect the result.
+
+.also
+MeshWidth;MeshDepth
+
+
+:MeshDepth# (mesh)
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the depth of a mesh. This is calculated by the actual vertex positions
+and so the scale of the entity (set by ScaleEntity) will not have an effect
+on the resultant depth. Mesh operations, on the other hand, will effect
+the result.
+
+.also
+MeshWidth;MeshHeight
+
+
+:CountSurfaces ( mesh )
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the number of surfaces
+in a mesh.
+
+Surfaces are sections of mesh.  A mesh may contain only one
+section, or very many. 
+
+.also
+GetSurface.
+
+
+:GetSurface ( mesh, index )
+
+.args
+mesh - mesh handle
+index - index of surface
+
+.desc
+Returns the handle of the surface attached to the specified mesh
+and with  the specified index number.
+
+Index should be in the range 1...CountSurfaces(
+ mesh ), inclusive. 
+
+You need to 'get a surface', i.e. get its handle,
+in order to be able to  then use that particular surface with other commands.
+
+.also
+CountSurfaces;FindSurface
+
+
+::Surfaces
+
+
+:CreateSurface ( mesh[,brush] )
+
+.args
+mesh - mesh handle
+brush - optional brush handle
+
+.desc
+Creates a surface attached to a mesh and returns
+the surface's handle.
+
+Surfaces are sections of mesh which are then used
+to attach triangles to. You  must have at least one surface per mesh in
+order to create a visible mesh, however  you can use as many as you like.
+Splitting a mesh up into lots of sections allows  you to affect those sections
+individually, which can be a lot more useful than  if all the surfaces are
+combined into just one.
+
+
+:PaintSurface surface,brush
+
+.args
+surface - surface handle
+brush - brush handle
+
+.desc
+Paints a surface with a brush.
+
+This has the effect of instantly
+altering  the visible appearance of that particular surface, i.e. section
+of mesh, assuming  the brush's properties are different to what was applied
+to the surface before. 
+
+.also
+PaintEntity, PaintMesh. 
+
+
+:ClearSurface surface,[clear_verts,clear_triangles]
+
+.args
+surface - surface handle
+clear_verts - @True to remove all vertices from the specified surface
+clear_triangles - @True to remove all triangles from the specified surface
+
+.desc
+Removes all vertices and / or triangles from a surface.
+
+The two optional parameters #clear_verts and #clear_triangles default
+to @True.
+
+.also
+AddVertex;AddTriangle
+
+
+:FindSurface ( mesh,brush )
+
+.args
+mesh - mesh handle
+brush - brush handle
+
+.desc
+Attempts to find a surface attached to the specified mesh and created with
+the specified brush. Returns the surface handle if found or 0 if not.
+
+.also
+CountSurfaces;GetSurface
+
+
+:AddVertex ( surface,x#,y#,z#[,u#][,v#][,w#] )
+
+.args
+surface - surface handle
+x# - x coordinate of vertex
+y# - y coordinate of vertex
+z# - z coordinate of vertex
+u# - u texture coordinate of vertex
+v# - v texture coordinate of vertex
+w# - w texture coordinate of vertex
+
+.desc
+Returns the index of a new vertex added to the specified surface.
+
+The #x, #y and #z parameters are the geometric coordinates of the new 
+vertex, and #u, #v, and #w are texture mapping coordinates.
+
+By creating three vertex on a specific surface, their three index values can 
+then be used with @AddTriangle to create a simple triangle mesh.
+
+The same vertex can be used as the corner of multiple triangles which is
+useful when creating surfaces with smooth edges.
+
+Multiple vertex in the same position are often required when the
+two sides of a sharp edge have different surface normals or there is
+a seem in the texture coordinates. Such situations require unique 
+vertex per face such as the cube created CreateCube which has 24 vertex 
+not 8 in its single surface.
+
+See the @VertexTexCoords command for more details on the optional u,v,w
+texture coordinates. The #u, #v and #w parameters, if specified, effect 
+both texture coordinate sets (0 and 1).
+
+When adding a vertex its default color is 255,255,255,255.
+
+.also
+AddTriangle;VertexCoords;
+
+
+:AddTriangle ( surface,v0,v1,v2 )
+
+.args
+surface - surface handle
+v0 - index number of first vertex of triangle
+v1 - index number of second vertex of triangle
+v2 - index number of third vertex of triangle
+
+.desc
+Returns the index of a new triangle added to the specified surface.
+
+The three vertex indexes define the points in clockwise order of 
+a single sided triangle that is added to the surface specified.
+
+The #v0, #v1 and #v2 parameters are the index numbers of vertices added
+to the same surface using the AddVertex function. 
+
+.hint
+A special DoubleSided effect can be enabled for a surface that
+will treat each triangle in a surface as having two sides, see
+@EntityFX and @BrushFX for more information.
+
+.also
+AddVertex;EntityFX
+
+
+:VertexCoords surface,index,x#,y#,z#
+
+.args
+surface - surface handle
+index - index of vertex
+x# - x position of vertex
+y# - y position of vertex
+z# - z position of vertex
+
+.desc
+Sets the geometric coordinates of an existing vertex.
+
+My changing the position of individual vertex in a mesh dynamic
+'mesh deforming' effects and high performance 'particle systems'
+can be programmed in Blitz3D.
+
+See the @VertexNormal or @UpdateNormals commands for correcting
+lighting errors that may be introduced when deforming mesh.
+
+.also
+VertexNormal;VertexColor
+
+
+:VertexNormal surface,index,nx#,ny#,nz#
+
+.args
+surface - surface handle
+index - index of vertex
+nx# - normal x of vertex
+ny# - normal y of vertex
+nz# - normal z of vertex
+
+.desc
+Sets the normal of an existing vertex.
+
+Depending on the suface properties and the type of active 
+lights in the world vertex normals can play a big part in 
+rendering correctly shaded surfaces.
+
+A vertex normal should point directly away from any
+triangle faces the vertex has been used to construct.
+
+.also
+AddVertex;AddTriangle;EntityFX;EntityShininess
+
+
+:VertexColor surface,index,red#,green#,blue#[,alpha#]
+
+.args
+surface - surface handle
+index - index of vertex
+red# - red value of vertex
+green# - green value of vertex
+blue# - blue value of vertex
+alpha# - optional alpha transparency of vertex (0.0 to 1.0 - default: 1.0)
+
+.desc
+Sets the color of an existing vertex.
+
+.hint
+If you want to set the alpha individually for vertices using the 
+#alpha parameter then you need to use EntityFX flags: 32 (to force 
+alpha-blending) and 2 (to switch to vertex colors).
+
+.also
+EntityFX;VertexAlpha;VertexRed;VertexGreen;VertexBlue
+
+
+:VertexTexCoords surface,index,u#,v#[,w#][,coord_set]
+
+.args
+surface - surface handle
+index - index of vertex
+u# - u# coordinate of vertex
+v# - v# coordinate of vertex
+w# - w# coordinate of vertex
+coord_set - co_oord set. Should be set to 0 or 1.
+
+.desc
+Sets the texture coordinates of an existing vertex.
+
+Texture coordinates determine how any active texturing for a
+surface will be positioned on triangles by changing the
+texture location used at each vertex corner.
+
+This works on the following basis: 
+
+The top left of an image has the uv coordinates 0,0. 
+
+The top right has coordinates 1,0.
+
+The bottom right is 1,1.
+
+The bottom left 0,1. 
+
+Thus, uv coordinates for a vertex correspond to a point in the 
+image. For example, coordinates 0.9,0.1 would be near the upper 
+right corner of the image. 
+
+.also
+AddVertex
+
+
+:CountVertices ( surface )
+
+.args
+surface - surface handle
+
+.desc
+Returns the number of vertices in a surface.
+
+.also
+AddVertex;GetSurface;FindSurface
+
+
+:CountTriangles ( surface )
+
+.args
+surface - surface handle
+
+.desc
+Returns the number of triangles in a surface.
+
+.also
+AddTriangle;GetSurface;FindSurface
+
+
+:VertexX# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the x coordinate of a vertex.
+
+
+:VertexY# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the y coordinate of a vertex.
+
+
+:VertexZ ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the z coordinate of a vertex.
+
+
+:VertexNX# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the x component of a vertices normal.
+
+
+:VertexNY# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the y component of a vertices normal.
+
+
+:VertexNZ# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the z component of a vertices normal.
+
+
+:VertexRed# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the red component of a vertices color.
+
+
+:VertexGreen# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the green component of a vertices color.
+
+
+:VertexBlue# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the blue component of a vertices color.
+
+
+:VertexAlpha# ( surface,index )
+
+.args
+surface - surface handle 
+index - index of vertex
+
+.desc
+Returns the alpha component of a vertices color, set using
+@VertexColor.
+
+.also
+VertexRed;VertexGreen;VertexBlue;VertexColor
+
+
+:VertexU# ( surface,index [,coord_set] )
+
+.args
+surface - surface handle
+index - index of vertex
+coord_set - optional UV mapping coordinate set. Should be set to 0 or 1.
+
+.desc
+Returns the texture u coordinate of a vertex.
+
+.also
+VertexV, VertexTexCoords
+
+
+:VertexV# ( surface,index [,coord_set] )
+
+.args
+surface - surface handle
+index - index of vertex 
+coord_set - optional UV mapping coordinate set. Should be set to 0 or 1.
+
+.desc
+Returns the texture v coordinate of a vertex.
+
+.also
+VertexU, VertexTexCoords
+
+
+:VertexW# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the texture w coordinate of a vertex.
+
+
+:TriangleVertex ( surface,triangle_index,corner )
+
+.args
+surface - surface handle 
+triangle_index - triangle index 
+corner - corner of triangle. Should be 0, 1 or 2.
+
+.desc
+Returns the vertex of a triangle corner.
+
+
+::Properties
+
+
+:EntityClass$( entity )
+
+.args
+entity - a valid entity handle
+
+.desc
+Returns a string containing the class of the specified entity.
+
+Possible return values are "Pivot", "Light","Camera", "Mirror", "Listener",
+"Sprite", "Terrain", "Plane", "Mesh", "MD2" and "BSP".
+
+Note that @EntityClass function will fail if a valid entity handle is not 
+supplied and will not just return an empty string.
+
+
+:EntityName$ ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the name of an entity.
+
+An entities name may be set when it was loaded from a model file
+or from the use of the @NameEntity command.
+
+.also
+NameEntity;LoadMesh;LoadAnimMesh
+
+
+:NameEntity entity,name$
+
+.args
+entity - entity handle
+name$ - name of entity
+
+.desc
+Sets an entities name.
+
+.also
+EntityName
+
+
+
+::Comparisons
+
+
+:EntityVisible ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns @True if src_entity and dest_entity can 'see' each other.
+
+
+:EntityDistance# ( src_entity,dest_entity)
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the distance between src_entity and dest_entity.
+
+
+:DeltaYaw# ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the yaw angle, that src_entity should be rotated by in order 
+to face dest_entity.
+
+This command can be used to be point one entity at another, rotating on
+the y axis only.
+
+.also
+DeltaPitch
+
+
+:DeltaPitch# ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the pitch angle, that src_entity should be rotated by in order 
+to face dest_entity.
+
+This command can be used to be point one entity at another, rotating on
+the x axis only.
+
+.also
+DeltaYaw
+
+
+
+::Animation
+
+
+:Animate entity[,mode][,speed#][,sequence][,transition#]
+
+.args
+entity - entity handle
+mode - mode of animation.
+speed# - speed of animation. Defaults to 1.
+sequence - specifies which sequence of animation frames to play.  Defaults to 0.
+transition# - used to tween between an entities current position rotation and the first frame of animation. Defaults to 0.
+
+.desc
+Animates an entity.
+
+The mode specified can be one of the following values:
+
+.table
+Mode,Descriptiopn
+0,Stop animation
+1,Loop animation (default)
+2,Ping-pong animation
+3,One-shot animation
+
+A #speed of greater than 1.0 will cause the animation to replay
+quicker, less than 1.0 slower. A negative speed will play the 
+animation backwards.
+
+Animation sequences are numbered 0,1,2...etc. Initially, an entity 
+loaded with @LoadAnimMesh will have a single animation sequence.
+
+More sequences can be added using either @ExtractAnimSeq, 
+@LoadAnimSeq or @AddAnimSeq.
+
+The optional #transition parameter can be set to 0 to cause an instant 
+'leap' to the first frame,  while values greater than 0 will cause a 
+smoother transition to occur.
+
+.also
+LoadAnimMesh;ExtractAnimSeq;LoadAnimSeq;AddAnimSeq
+
+
+:ExtractAnimSeq( entity,first_frame,last_frame[,anim_seq] )
+
+.args
+entity - entity handle
+first_frame - first frame of anim sequence to extract
+last_frame - last frame of anim sequence to extract
+anim_seq - anim sequence to extract from. This is usually 0, and  as such defaults to 0.
+
+.desc
+This command allows you to convert an animation with an MD2-style series  of
+anim sequences into a pure Blitz anim sequence, and play it back as such
+using Animate.
+
+
+:AddAnimSeq ( entity,length)
+
+.args
+entity - entity handle
+length - number of frames to be added
+
+.desc
+Creates an animation sequence for an entity.
+
+This must be done before any animation keys set by @SetAnimKey can be 
+used in  an actual animation however this is optional.
+
+You may use it to "bake" the frames you have added previously
+using SetAnimKey.
+
+Returns the animation sequence number added.
+
+.also
+SetAnimKey
+
+
+:SetAnimKey entity,frame[,pos_key][,rot_key][,scale_key]
+
+.args
+entity - entity handle
+frame - frame of animation to be used as anim key
+pos_key - true to include entity position information when setting  key. Defaults to true.
+rot_key - true to include entity rotation information when setting  key. Defaults to true. 
+scale_key - true to include entity scale information when setting  key. Defaults to true.
+
+.desc
+Sets an animation key for the specified entity at the specified frame.
+
+The entity must have a valid animation sequence to work with.
+
+This is most useful when you've got a character, or a complete set of 
+complicated moves to perform, and you want to perform them en-masse.
+
+.also
+AddAnimSeq
+
+
+:LoadAnimSeq ( entity,filename$ )
+
+.args
+entity - entity handle 
+filename$ - filename of animated 3D object
+
+.desc
+Appends an animation sequence from a file to an entity.
+
+Returns the animation sequence number added.
+
+.also
+LoadAnimMesh
+
+
+:SetAnimTime entity,time#[,anim_seq]
+
+.args
+entity - a valid entity handle. 
+time# - a floating point time value.
+anim_seq - an optional animation sequence number.
+
+.desc
+SetAnimTime allows you to manually animate entities.
+
+
+:AnimSeq ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the specified entities current animation sequence.
+
+
+:AnimLength ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the length of the specified entities current animation sequence.
+
+
+:AnimTime# ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the current animation time of an entity.
+
+
+:Animating ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns true if the specified entity is currently animating.
+
+
+
+::Terrains
+
+
+:CreateTerrain ( grid_size [,parent] )
+
+.args
+grid_size - no of grid squares along each side of terrain
+parent - optional #parent entity of terrain
+
+.desc
+Creates a terrain entity and returns its handle.
+
+The terrain extends from 0,0,0 to grid_size,1,grid_size. 
+
+The grid_size, no of grid squares along each side of terrain, and must 
+be a  power of 2 value, e.g. 32, 64, 128, 256, 512, 1024.
+
+A terrain is a special type of polygon object that uses real-time level of
+detail (LOD) to display landscapes which should theoretically consist of 
+over a million polygons with only a few thousand.
+
+The way it does this is by constantly rearranging a certain amount of
+polygons to display high levels of detail close to the viewer and low
+levels further away. 
+
+This constant rearrangement of polygons is occasionally noticeable 
+however,  and is a well-known side-effect of all LOD landscapes.
+
+This 'pop-in' effect  can be reduced in lots of ways though, as the 
+other terrain help files will  go on to explain. 
+
+The optional #parent parameter attaches the new terrain
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+LoadTerrain. 
+
+
+:LoadTerrain ( file$ [,parent] )
+
+.args
+file$ - filename of image file to be used as height map
+parent - parent entity of terrain
+
+.desc
+Loads a terrain from an image file and returns the terrain's handle.
+
+The image's red channel is used to determine heights. Terrain is 
+initially the same width and depth as the image, and 1 unit high. 
+
+Tips on generating nice terrain -
+
+* Smooth or blur the height map
+
+* Reduce the y scale of the terrain
+
+* Increase the x/z scale of the terrain
+
+* Reduce the camera range 
+
+When texturing an entity, a texture with a scale of 1,1,1
+(default) will  be the same size as one of the terrain's grid squares. A
+texture that is scaled  to the same size as the size of the bitmap used
+to load it or the no. of grid  square used to create it, will be the same
+size as the terrain. 
+
+A heightmaps dimensions (width and height) must be the same and must be a 
+power of 2, e.g. 32, 64, 128, 256, 512, 1024. 
+
+The optional #parent parameter attaches the new terrain
+to a parent entity. See the @EntityParent command for 
+more details on the effects of entity parenting. 
+
+.also
+CreateTerrain
+
+
+:TerrainDetail terrain,detail_level[,vertex_morph]
+
+.args
+terrain - terrain handle
+detail_level - detail level of terrain
+vertex_morph - True to enable vertex morphing of terrain. Defaults to False.
+
+.desc
+Sets the detail level for a terrain. This is the number
+of triangles used  to represent the terrain. A typical value is 2000.
+
+The optional #vertex_morph  parameter specifies whether to enable vertex
+morphing. It is recommended you  set this to True, as it will reduce the
+visibility of LOD 'pop-in'. 
+
+
+:TerrainShading terrain,enable
+
+.args
+terrain - terrain handle
+enable - True to enable terrain shading, False to to disable it. The default  mode is False.
+
+.desc
+Enables or disables terrain shading.
+
+Shaded terrains are a little slower  than non-shaded terrains, and in
+some instances can increase the visibility  of LOD 'pop-in'. However, the
+option is there to have shaded terrains if you  wish to do so. 
+
+
+:ModifyTerrain terrain,grid_x,grid_z,height#[,realtime]
+
+.args
+terrain - terrain handle
+grid_x - grid x coordinate of terrain
+grid_y - grid y coordinate of terrain
+height# - height of point on terrain. Should be in the range 0-1. 
+realtime- True to modify terrain immediately. False to modify terrain when RenderWorld in next called. Defaults to False.
+
+.desc
+Sets the height of a point on a terrain.
+
+
+:TerrainSize ( terrain )
+
+.args
+terrain - terrain handle
+
+.desc
+Returns the grid size used to create a terrain.
+
+
+:TerrainHeight# ( terrain,grid_x,grid_z )
+
+.args
+terrain - terrain handle
+grid_x - grid x coordinate of terrain
+grid_z - grid z coordinate of terrain
+
+.desc
+Returns the height of the terrain at terrain grid coordinates x,z.
+
+The value returned is in the range 0 to 1.
+
+.also
+TerrainY
+
+
+:TerrainX# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated x coordinate on a terrain.
+
+.also
+TerrainY;TerrainZ
+
+
+:TerrainY# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated y coordinate on a terrain.
+
+Gets the ground's  height, basically. 
+
+.also
+TerrainX;TerrainZ;TerrainHeight
+
+
+:TerrainZ# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated z coordinate on a terrain.
+
+.also
+TerrainX;TerrainY
+
+
+::Sprites
+
+:CreateSprite ( [parent] )
+
+.args
+parent - optional #parent entity of sprite
+
+.desc
+Creates a sprite entity and returns its handle.
+
+Sprites are 2D rectangles that can be oriented automatically
+towards the current rendering camera.
+
+Sprites are created at position (0,0,0) and extend from 
+(-1,-1,0) to (+1,+1,0) billboard style.
+
+The orientation used to render a sprite unlike other entities
+is goverened by a combination of the sprite entities own position
+and orientation, the rendering camera's orientation and the 
+@SpriteViewMode.
+
+The default viewmode of a sprite means it is always turned
+to face the camera. See the @SpriteViewMode command for more
+information.
+
+The optional #parent parameter attaches the new Sprite entity to a 
+specified parent entity. See the @EntityParent command for more 
+information on entity hierachy.
+
+Unlike many Blitz3D primitives Sprites are not mesh based
+and must not have mesh based commands used on them. 
+
+.also
+LoadSprite;RotateSprite;ScaleSprite;HandleSprite;SpriteViewMode;PositionEntity;MoveEntity;TranslateEntity;EntityAlpha;FreeEntity
+
+
+:LoadSprite ( tex_file$[,tex_flag][,parent] )
+
+.args
+text_file$ - filename of image file to be used as sprite
+tex_flag - optional texture flag
+parent - optional #parent of entity
+
+.desc
+Creates a sprite entity, and assigns a texture to it.
+
+.table
+textureflag,description
+1,Color
+2,Alpha
+4,Masked
+8,Mipmapped
+16,Clamp U
+32,Clamp V
+64,Spherical reflection map
+
+See the @CreateTexture command for a detailed description
+of the texture flags.
+
+The optional #parent parameter attaches the new Sprite entity to a 
+specified parent entity. See the @EntityParent command for more 
+information on entity hierachy.
+
+.also
+LoadSprite;RotateSprite;ScaleSprite;HandleSprite;SpriteViewMode;PositionEntity;MoveEntity;TranslateEntity;EntityAlpha;FreeEntity
+
+
+:SpriteViewMode sprite,view_mode
+
+.args
+sprite - spritehandle
+view_mode - view_mode of sprite
+
+.desc
+Sets the view mode of a sprite.
+
+The view mode determines how at rendertime a sprite alters its 
+orientation in respect to the camera:
+
+.table
+Mode,Description
+1,Turn about X and Y axis to face camera
+2,Do not modify orientation at render time.
+3,Turn about X and Y axis to face camera and align Z axis with camera
+4,Turn about Y axis to face camera
+
+This allows the sprite to in  some instances give the impression
+that it is more than two dimensional. 
+
+In technical terms, the four sprite modes perform the following 
+changes: 
+
+Mode 1 - Sprite changes its pitch and yaw values to face camera, 
+but doesn't roll, good for most smoke and particle effects.
+
+Mode 2 - Sprite does not change either its pitch, yaw or roll 
+values, good for generic flat rectangular entities such as fences.
+
+Mode 3 - Sprite changes its yaw and pitch to face camera, and 
+changes its roll value to match cameras, useful for overlays.
+
+Mode 4 - Sprite changes its yaw to face camera, pitch and roll
+are unmodified. Useful for trees and other upstanding scenery.
+
+.hint
+The @EntityFX flag 16 can be used to make a Sprite double sided
+and hence visible from both sides. This applies to Mode 2 Sprites 
+in particular.
+
+.also
+CreateSprite; LoadSprite
+
+
+:RotateSprite sprite,angle#
+
+.args
+sprite - sprite handle 
+angle# - absolute angle of sprite rotation
+
+.desc
+Rotates a sprite.
+
+.also
+CreateSprite;LoadSprite
+
+
+:ScaleSprite sprite,x_scale#,y_scale#
+
+.args
+sprite - sprite handle
+x_scale# - x scale of sprite
+y scale# - y scale of sprite
+
+.desc
+Scales a sprite.
+
+.also
+LoadSprite;CreateSprite
+
+
+:HandleSprite sprite,x_handle#,y_handle#
+
+.args
+sprite - sprite handle.
+
+.desc
+Sets a sprite handle. Defaults to 0,0.
+
+Not to be confused with HandleSprite - ie. the handle  used to position
+the sprite, rather than the sprite's actual handle
+
+A sprite extends from -1,-1 to +1,+1.
+
+.also
+LoadSprite;CreateSprite
+
+
+
+::MD2 Animations
+
+
+:LoadMD2 ( md2_file$ [,parent] )
+
+.args
+md2_file$ - filename of md2
+parent - parent entity of md2
+
+.desc
+Loads an MD2 entity and returns its handle.
+
+The MD2 model format uses a highly efficient vertex animation
+technology that is not compatible with the standard Blitz3D
+animation system but instead requires use of the specific MD2 
+animation commands.
+
+The optional #parent parameter attaches the new MD2 entity to a 
+specified parent entity. See the @EntityParent command for more 
+information on entity hierachy.
+
+.hint
+An MD2 texture has to be loaded and applied separately, otherwise the md2 
+will appear untextured. 
+
+.also
+AnimateMD2;MD2AnimTime;MD2AnimLength;MD2AnimTime;MD2Animating
+
+
+:AnimateMD2 md2[,mode][,speed#][,first_frame][,last_frame][,transition#]
+
+.args
+md2 - md2 handle
+mode - mode of animation
+speed# - speed of animation. Defaults to  1.
+first_frame - first frame of animation. Defaults to 1.
+last_frame# - last frame of animation. Defaults to last frame of  all md2 animations.
+transition# - smoothness of transition between last frame shown of  previous animation and first frame of next animation. Defaults to 0.
+
+.desc
+Animates an md2 entity.
+
+.table
+Mode,Description
+0,Stop animation
+1,Loop animation (default)
+2,PingPong animation
+3,OneShot animation
+
+The MD2 will actually move from one frame to the next when UpdateWorld is called. 
+
+.also
+MD2Animating
+
+
+:MD2AnimTime ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns the animation time of an md2 model.
+
+The animation time is the exact moment that the MD2 is at with
+regards its frames of animation.
+
+For example, if the MD2 entity is currently animating between
+the third and fourth frames, then MD2AnimTime will return a 
+number somewhere between 3 and 4. 
+
+
+:MD2AnimLength ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns the animation length of an MD2 model in frames.
+
+The animation length is the total number of animation frames 
+loaded from the MD2 file.
+
+
+:MD2Animating ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns @True if the specified MD2 entity is currently animating,
+@False if not.
+
+.also
+AnimateMD2
+
+
+
+::BSP Map Files
+
+
+:LoadBSP( file$[,gamma_adjust#][,parent] )
+
+.args
+file$ - filename of BSP model
+gamma_adjust# - intensity of BSP lightmaps. Values
+should be in the  range 0-1. Defaults to 0.
+parent - parent entity of BSP
+
+.desc
+Loads a BSP model and returns its handle.
+
+A BSP model is a standard Blitz3D entity. Use the standard entity commands to
+scale, rotate and position the BSP, and the standard collision commands to 
+setup collisions with the BSP.
+
+BSP models are not lit by either @AmbientLight or any directional
+lights. This allows you to setup lighting for in-game models without affecting 
+the BSP's internal lighting. BSP models ARE lit by point or spot lights.
+See the @BSPAmbientLight and @BSPLighting commands for more control
+over the lighting of BSP entities.
+
+BSP's cannot be painted, textured, colored, faded etc. in Blitz3D.
+
+Textures for the BSP model must be in the same directory as the BSP
+file itself. 
+
+Shaders are *not* supported!
+
+The optional #parent parameter attaches the new Sprite entity to a 
+specified parent entity. See the @EntityParent command for more 
+information on entity hierachy.
+
+.also
+BSPAmbientLight;BSPLighting
+
+
+:BSPAmbientLight bsp, red#, green#, blue#
+
+.args
+bsp - BSP handle
+red# - red BSP ambient light value 
+green# - green BSP ambient light value
+blue# - blue BSP ambient light value
+
+.desc
+Sets the ambient lighting colour for a BSP model.
+
+The red, green and blue values should  be in the range 0-255. The default
+BSP ambient light colour is 0,0,0.
+
+Note that BSP models  do not use the @AmbientLight setting. 
+
+This can also be used to increase the brightness of a BSP model,
+but the effect is  not as 'nice' as using the #gamma_adjust parameter of
+LoadBSP.
+
+.also
+LoadBSP;BSPLighting
+
+
+:BSPLighting bsp, use_lightmaps
+
+.args
+bsp - BSP handle
+use_lightmaps - True to use lightmaps, False for vertex lighting. The default  mode is True.
+
+.desc
+Controls whether BSP models are illuminated using lightmaps, or by 
+vertex lighting.
+
+Vertex lighting will be faster on some graphics cards, but may not look 
+as good.
+
+.also
+LoadBSP;BSPAmbientLight
+
+
+::Listeners
+
+
+:CreateListener ( parent[,rolloff_factor#][,doppler_scale#][,distance_scale#] )
+
+.args
+parent - parent entity of listener. A parent entity, typically a camera,  must be specified to 'carry' the listener around.
+rolloff_factor# - the rate at which volume diminishes with distance.  Defaults to 1.
+doppler_scale# - the severity of the doppler effect. Defaults to  1.
+distance_scale# - artificially scales distances. Defaults to 1.
+
+.desc
+Creates a listener entity and returns its handle.
+
+Currently, only a single  listener is supported.
+
+
+:Load3DSound ( file$ )
+
+.args
+file$ - filename of sound file to be loaded and used as 3D sound
+
+.desc
+Loads a sound and returns its handle for use with EmitSound.
+
+
+:EmitSound( sound,entity )
+
+.args
+sound - sound handle
+entity - entity handle
+
+.desc
+Emits a sound attached to the specified entity and returns a sound channel.
+
+The sound must have been loaded using Load3DSound for 3D effects.
+

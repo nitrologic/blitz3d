@@ -1,0 +1,1057 @@
+:Input$ (prompt$)
+
+.args
+prompt$ = any valid string (optional)
+
+.desc
+This command will retrieve a string value from the user with an optional  prompt on the screen (if not in a graphic mode) or on the current drawing buffer  being used by the program. Usually you will assign this command's value to a  string for later use.
+
+.code
+; Get the user's name and print a welcome
+
+name$=Input$("What is your name?")
+Write "Hello there, " + name$ + "!"
+
+
+:KeyDown (scancode)
+
+.args
+scancode = corresponding key scancode
+
+.desc
+This command (similar to its counterparts MouseDown  and JoyDown) is used to detect if a key is being held  down. This command returns a 0 if the key is not held down, a 1 if the key is  held down. 
+
+
+See Also: ScanCodes
+
+.code
+; KeyDown() example
+
+Print "Hold down ENTER key!"
+Delay 3000
+While Not KeyHit(1)
+If KeyDown(28) Then 
+Print "Enter is being pressed!"
+Else
+Print 
+End If
+Wend
+
+:KeyHit (scancode)
+
+.args
+scancode = the scancode for the key to test
+
+.desc
+This command returns the number of times a specified key has been hit since  the last time you called the KeyHit() command. Check the ScanCodes for a complete listing of scancodes.
+
+.code
+; KeyHit Example
+
+; Set up the timer
+current=MilliSecs()
+Print "Press ESC a bunch of times for five seconds..."
+
+; Wait 5 seconds
+While MilliSecs() < current+5000
+Wend
+
+; Print the results
+Print "Pressed ESC " + KeyHit(1) + " times."
+
+
+:GetKey()
+
+.args
+None
+
+.desc
+This command will check to see if a key has been pressed and will return  its ASCII value. Not all keys have ASCII values - if you need to trap SHIFT,  ALT, or other non-ASCII compliant key, try KeyHit or KeyDown. 
+
+.code
+; GetKey Example
+
+Print "Please press any ASCII key ..."
+
+While Not value
+value=GetKey()
+Wend 
+
+Print "You pressed key with an ASCII value of:" + value
+
+
+:WaitKey()
+
+.args
+None.
+
+.desc
+This command makes your program halt until a key is pressed on the keyboard.  Used alone, it simply halts and waits for a key press. It can also be used to  assign the pressed key's ASCII value to a variable. See example.
+
+
+In MOST CASES, you are not going to want to use this command because chances  are likely you are going to want things on the screen still happening while  awaiting the keypress. In that situation, you'll use a WHILE ... WEND awaiting  a KeyHit value - refreshing your screen each loop.
+
+.code
+; WaitKey() sample
+
+Print "Press any key to continue."
+
+key=WaitKey()
+
+Print "The ASCII code of the key you pressed was: " + key
+Print "Now press a key to quit."
+
+WaitKey()
+
+End
+
+
+:FlushKeys
+
+.args
+None.
+
+.desc
+This command 'resets' or 'empties out' the queue holding the keyboard inputs.  Can't make it much easier than that.
+
+.code
+; clear all keystrokes from the queue
+FlushKeys
+
+
+:MoveMouse x,y
+
+.args
+x = the x coordinate on the screen to move the mouse
+y = the y coordinate on the screen to move the mouse
+
+.desc
+Although the mouse isn't visible on the screen, the mouse location is still  being tracked and you can attach a graphic to it. However, there are times when  you want to put the pointer to a specific location on the screen. Use this command  to move the mouse to a designated location.
+
+.code
+Graphics 640,480
+
+SetBuffer BackBuffer()
+
+Repeat
+Cls
+
+Text 320,0,"Click to reset mouse",True
+
+Text 0,0,"Mouse X:"+MouseX()
+Text 0,10,"Mouse Y:"+MouseY()
+
+If MouseDown(1) Or MouseDown(2) Then MoveMouse 320,240
+
+Text MouseX(),MouseY(),"X",True,True
+
+Flip
+
+Until KeyHit(1)
+
+End
+
+:MouseDown (button)
+
+.args
+button = 1: Left Button, 2: Right Button, 3: Middle Button
+
+.desc
+This command (and its counterparts KeyDown and JoyDown) is used to detect if a mouse button is being  held down. You must check for each mouse button independantly with its corresponding  number (unlike KeyDown which returns WHICH key is being held down). Also see MouseHit.
+
+.code
+; MouseDown Example
+
+; Until user presses ESC, show the mouse button pressed
+While Not KeyHit(1)
+button$="No"
+If MouseDown(1) Then button$="Left"
+If MouseDown(2) Then button$="Right"
+If MouseDown(3) Then button$="Middle"
+
+Print button$ + " mouse button pressed!"
+Wend
+
+
+:MouseHit (button)
+
+.args
+button = button code (1=Left, 2=Right, 3-Middle)
+
+.desc
+This command returns the number of times a specified mouse button has been  hit since the last time you called the MouseHit() command. Also see KeyHit and JoyHit.
+
+.code
+; MouseHit Example
+
+; Set up the timer
+current=MilliSecs()
+Print "Press left mouse button a bunch of times for five seconds..."
+
+; Wait 5 seconds
+While MilliSecs() < current+5000
+Wend
+
+; Print the results
+Print "Pressed left button " + MouseHit(1) + " times."
+
+
+:GetMouse()
+
+.args
+None.
+
+.desc
+Unlike the other similar commands (MouseDown  and MouseHit), this command doesn't need to know  which button you are trying to test for. It looks for any mouse button, then  returns the number the user clicked. Since you are polling all the mouse buttons  instead of just a specific one, this may be a tad less efficient than using  MouseDown or MouseHit. Use this command in conjunction with Select/Case for maximum efficiency!
+
+.code
+; GetMouse Example
+
+While Not KeyHit(1)
+button=GetMouse()
+If button <> 0 Then
+Print "You pressed mouse button #" + button
+End If
+Wend
+
+
+:WaitMouse()
+
+.args
+None.
+
+.desc
+This command makes your program halt until a mouse button is pressed on  the mouse. Used alone, it simply halts and waits for a button press. It can  also be used to assign the pressed button's code value to a variable. See example.
+
+
+In MOST CASES, you are not going to want to use this command because chances  are likely you are going to want things on the screen still happening while  awaiting the button press. In that situation, you'll use a WHILE ... WEND awaiting  a MouseHit value - refreshing your screen each loop.
+
+.code
+; WaitMouse() sample
+
+Print "Press a mouse button to continue."
+
+button=WaitMouse()
+
+Print "The mouse button code of the button you pressed was: " + button
+Print "Now press a button to quit."
+
+WaitMouse()
+
+End
+
+
+:MouseX()
+
+.args
+None
+
+.desc
+This command returns the X location of the mouse on the screen. This position is always from the range 0 to GraphicsWidth( ) - 1. You can use this command in combination with DrawImage to make a custom mouse pointer, or to control something on the screen directly with the mouse.
+
+.also
+MouseY;MouseZ
+
+.code
+Graphics 640,480
+
+SetBuffer BackBuffer()
+
+Repeat
+Cls
+
+Text 320,0,"Click to reset mouse",True
+
+Text 0,0,"Mouse X:"+MouseX()
+Text 0,10,"Mouse Y:"+MouseY()
+
+If MouseDown(1) Or MouseDown(2) Then MoveMouse 320,240
+
+Text MouseX(),MouseY(),"X",True,True
+
+Flip
+
+Until KeyHit(1)
+
+End
+
+:MouseY()
+
+.args
+None
+
+.desc
+This command returns the Y location of the mouse on the screen. This position is always from the range 0 to GraphicsHeight( ) - 1. You can use this command in combination with DrawImage to make a custom mouse pointer, or to control something on the screen directly with the mouse.
+
+.also
+MouseX;MouseZ
+
+.code
+Graphics 640,480
+
+SetBuffer BackBuffer()
+
+Repeat
+Cls
+
+Text 320,0,"Click to reset mouse",True
+
+Text 0,0,"Mouse X:"+MouseX()
+Text 0,10,"Mouse Y:"+MouseY()
+
+If MouseDown(1) Or MouseDown(2) Then MoveMouse 320,240
+
+Text MouseX(),MouseY(),"X",True,True
+
+Flip
+
+Until KeyHit(1)
+
+End
+
+:MouseZ()
+
+.args
+None.
+
+.desc
+MouseZ returns the current position of the mouse wheel on a suitable mouse.  It starts off at zero when your program begins. The value of MouseZ increases  as you move the wheel away from you and decreases as you move it towards you.
+
+.also
+MouseX;MouseY
+
+.code
+Graphics 640, 480, 0, 2
+
+SetBuffer BackBuffer ()
+
+Repeat
+Flip:Cls
+Text 20, 20, "Mouse wheel position: " + MouseZ ()
+Until KeyHit (1)
+
+End
+
+:MouseXSpeed()
+
+.args
+None.
+
+.desc
+Often you'd like to find the difference between where the mouse WAS to where it is NOW. You can use this command and MouseXSpeed() in pairs to find out the changes in the mouse location between calls.
+
+
+You really have to use these commands TWICE to get anything out of them. Each call you make returns the difference in location since the LAST time you called it.
+
+
+In this example it's called every loop and therefore allows you to have infinite mouse movement without the screen size restrictions.
+
+.also
+MouseYSpeed
+
+.code
+Graphics 640,480
+
+SetBuffer BackBuffer()
+
+x=320
+y=240
+
+; infinite mouse movement
+
+Repeat
+Cls
+
+xs=MouseXSpeed() ; see how far the mouse has been moved
+ys=MouseYSpeed()
+MoveMouse 320,240 ;put the mouse back in the middle of the screen
+
+x=x+xs ;adjust mouse co-ords
+y=y+ys
+
+If x>GraphicsWidth()-1 Then x=x-GraphicsWidth() ;wrap screen
+If x<0 Then x=x+GraphicsWidth()
+If y<0 Then y=y+GraphicsHeight()
+If y>GraphicsHeight()-1 Then y=y-GraphicsHeight()
+
+Text x,y,"X",True,True
+
+Flip
+
+Until KeyHit(1)
+
+End
+
+:MouseYSpeed()
+
+.args
+None.
+
+.desc
+Often you'd like to find the difference between where the mouse WAS to where it is NOW. You can use this command and MouseYSpeed() in pairs to find out the changes in the mouse location between calls. 
+
+
+You really have to use these commands TWICE to get anything out of them. Each call you make returns the difference in location since the LAST time you called it. 
+
+
+In this example it's called every loop and therefore allows you to have infinite mouse movement without the screen size restrictions.
+
+.also
+MouseXSpeed
+
+.code
+Graphics 640,480
+
+SetBuffer BackBuffer()
+
+x=320
+y=240
+
+; infinite mouse movement
+
+Repeat
+Cls
+
+xs=MouseXSpeed() ; see how far the mouse has been moved
+ys=MouseYSpeed()
+MoveMouse 320,240 ;put the mouse back in the middle of the screen
+
+x=x+xs ;adjust mouse co-ords
+y=y+ys
+
+If x>GraphicsWidth()-1 Then x=x-GraphicsWidth() ;wrap screen
+If x<0 Then x=x+GraphicsWidth()
+If y<0 Then y=y+GraphicsHeight()
+If y>GraphicsHeight()-1 Then y=y-GraphicsHeight()
+
+Text x,y,"X",True,True
+
+Flip
+
+Until KeyHit(1)
+
+End
+
+:MouseZSpeed()
+
+.args
+None.
+
+.desc
+MouseZSpeed returns -1 if the mousewheel on a suitable mouse is being rolled  backwards (towards user), 0 if it is not being moved, and 1 if it is being rolled  forwards.
+
+.code
+Graphics 640, 480, 0, 2
+SetBuffer BackBuffer ()
+
+Repeat
+
+Cls
+
+Select MouseZSpeed ()
+Case -1
+result$ = "Backwards"
+Case 0
+; result$ = "No movement"
+Case 1
+result$ = "Forwards"
+End Select
+
+Text 20, 10, "NOTE: MouseZSpeed () = 0 is not listed here, to avoid confusion!"
+Text 20, 40, result$
+Flip
+
+Until KeyHit (1)
+
+End
+
+
+:FlushMouse
+
+.args
+None.
+
+.desc
+There are many times when you aren't interested in the dozens of possible  mouse button pressed the player might have made before you are checking for  one in particular. Or perhaps you want to pause the game and wait for any mouse  button to be hit, but you don't want a 'queued' button press bypassing this.  Use this command before you specifically want to poll a mouse button hit from  the user.
+
+.code
+; Flushmouse sample
+
+FlushMouse
+
+Print "Press a mouse button to exit!"
+
+WaitMouse()
+
+End
+
+
+:JoyType ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the type of joystick that is currently connected to  the computer. It returns 0 if there is none, 1 for digital, and 2 for analog.
+
+.code
+; JoyType() example
+
+; Check to see what stick is present - print the proper message
+Select JoyType()
+Case 0
+Print "Sorry, no joystick attached to system!"
+Case 1
+Print "Digital joystick is attached to system!"
+Case 2
+Print "Analog joystick is attched to system!"
+End Select
+
+; Wait for user to hit ESC
+While Not KeyHit(1)
+Wend
+
+
+:JoyDown (button,[port])
+
+.args
+button = number of joystick button to check
+port = number of joystick port to check (optional) 
+
+.desc
+This command (and its counterparts KeyDown and MouseDown) is used to detect if a joystick button  is being held down. You must check for each joystick button independantly with  its corresponding number (unlike KeyDown which returns WHICH key is being held  down). Also see JoyHit.
+
+.code
+; JoyDown Example
+
+; Until user presses ESC, show the mouse button pressed
+While Not KeyHit(1)
+button$="No"
+For t = 1 To 5
+If JoyDown(t) Then button$=Str(t)
+Print button$ + " joystick button pressed!"
+Next
+Wend
+
+
+:JoyHit (button,[port])
+
+.args
+button = number of joystick button to check
+port = number of joystick port to check (optional) 
+
+.desc
+This command returns the number of times a specified joystick button has  been hit since the last time you called the JoyHit() command. Also see KeyHit and MouseHit.
+
+.code
+; JoyHit Example
+
+; Set up the timer
+current=MilliSecs()
+Print "Press FireButton 1 a bunch of times for five seconds..."
+
+; Wait 5 seconds
+While MilliSecs() < current+5000
+Wend
+
+; Print the results
+Print "Pressed button " + JoyHit(1) + " times."
+
+
+:GetJoy ([port])
+
+.args
+port = optional joystick port to read
+
+.desc
+Unlike the other similar commands (JoyDown and JoyHit), this command doesn't need to know which button  you are trying to test for. It looks for any joystick button, then returns the  number the user pressed. Since you are polling all the buttons instead of just  a specific one, this may be a tad less efficient than using JoyDown or JoyHit.  Use this command in conjunction with Select/Case  for maximum efficiency!
+
+.code
+; GetJoy Example
+
+While Not KeyHit(1)
+button=GetJoy()
+If button <> 0 Then
+Print "You pressed joystick button #" + button
+End If
+Wend
+
+
+:WaitJoy ([port])
+
+.args
+port = joystick port to check
+
+.desc
+This command makes your program halt until a jpystick button is pressed  on the joystick. Used alone, it simply halts and waits for a button press. It  can also be used to assign the pressed button's code value to a variable. See  example.
+
+
+In MOST CASES, you are not going to want to use this command because chances  are likely you are going to want things on the screen still happening while  awaiting the button press. In that situation, you'll use a WHILE ... WEND awaiting  a JoyHit value - refreshing your screen each loop.
+
+
+As with any joystick command, you MUST have a DirectX compatible joystick plugged  in and properly configured within Windows for it to work. See your joystick  documentation for more information.
+
+.code
+; WaitJoy() sample
+
+Print "Press a joystick button to continue."
+
+button=WaitJoy()
+
+Print "The joystick button code of the button you pressed was: " + button
+Print "Now press a button to quit."
+
+WaitJoy()
+
+End
+
+
+:JoyX ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the value of the x-axis of the joystick. The range  is -1 to 1 (full left to full right). The value returned is a floating point  number. See the example.
+
+.code
+; JoyX()/JoyY() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy X Value: " + JoyX() + " - Joy Y Value:" + JoyY()
+Wend
+
+
+:JoyY ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the value of the x-axis of the joystick. The range  is -1 to 1 (full up to full down). The value returned is a floating point number.  See the example.
+
+.code
+; JoyX()/JoyY() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy X Value: " + JoyX() + " - Joy Y Value:" + JoyY()
+Wend
+
+
+:JoyZ ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the value of the x-axis of the joystick. The range  is -1 to 1 (Max to none). The value returned is a floating point number. See  the example. 
+
+As with any joystick command, you MUST have a DirectX compatible joystick plugged  in and properly configured within Windows for it to work. See your joystick  documentation for more information.
+
+.code
+; JoyZ() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy Z Value: " + JoyZ()
+Wend
+
+
+:JoyU#([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns a float value between -1 and 1 that represents the U value of a joystick's output.
+
+
+The U value of a joystick usually corresponds to a joystick's 'slider' or 'throttle' feature, although this may vary depending on the joystick, and will not be available with all joysticks.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyU Example
+; ------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyV#([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns a float value between -1 and 1 that represents the V value of a joystick's output.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyV Example
+; ------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyXDir ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the direction of the x-axis of the joystick being pressed.  The value is -1 (left) or 1 (right). The value returned is an integer number.  See the example. Perfect for digital joysticks.
+
+
+As with any joystick command, you MUST have a DirectX compatible joystick plugged  in and properly configured within Windows for it to work. See your joystick  documentation for more information.
+
+.code
+; JoyXDir() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy X Direction: " + JoyXDir()
+Wend
+
+
+:JoyYDir ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the direction of the Y-axis of the joystick being pressed.  The value is -1 (up) or 1 (down). The value returned is an integer number. See  the example. Perfect for digital joysticks.
+
+
+As with any joystick command, you MUST have a DirectX compatible joystick plugged  in and properly configured within Windows for it to work. See your joystick  documentation for more information.
+
+.code
+; JoyYDir() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy Y Direction: " + JoyYDir()
+Wend
+
+
+:JoyZDir ([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+This command returns the direction of the Z-axis of the joystick being pressed.  The value is -1 (up) or 1 (down). The value returned is an integer number. See  the example. Perfect for digital joysticks.
+
+
+As with any joystick command, you MUST have a DirectX compatible joystick plugged  in and properly configured within Windows for it to work. See your joystick  documentation for more information.
+
+.code
+; JoyZDir() example
+
+While Not KeyHit(1)
+Cls
+Text 0,0,"Joy Z Direction: " + JoyZDir()
+Wend
+
+
+:JoyUDir([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns an integer value between -1 and 1 that represents the U value of a joystick's output.
+
+
+The U value of a joystick usually corresponds to a joystick's 'slider' or 'throttle' feature, although this may vary depending on the joystick, and will not be available with all joysticks.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+JoyUDir Example
+---------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyVDir([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns an integer value between -1 and 1 that represents the V value of a joystick's output.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyVDir Example
+; ---------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyYaw#([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns the yaw value of a joystick.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyYaw Example
+; --------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyPitch#([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns the pitch value of a joystick.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyPitch Example
+; ----------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyRoll#([port])
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+Returns the roll value of a joystick.
+
+
+The roll value of a joystick usually corresponds to a joystick's 'twistable stick' or 'rudder' feature, although this may vary depending on the joystick, and will not be available with all joysticks.
+
+
+The optional port parameter allows you to select which joystick to get output from should you have multiple controllers connected to your PC.
+
+.code
+; JoyRoll Example
+; ---------------
+
+While Not KeyDown(1)
+
+; Get various joystick values
+ju#=JoyU()
+judir=JoyUDir()
+jv#=JoyV()
+jvdir=JoyVDir()
+jyaw#=JoyYaw()
+jpitch#=JoyPitch()
+jroll#=JoyRoll()
+
+; Output joystick values
+Text 0,0,"Move joystick to output values onto screen"
+Text 0,20,"JoyU(): "+ju#
+Text 0,40,"JoyUDir(): "+judir
+Text 0,60,"JoyV(): "+jv#
+Text 0,80,"JoyVDir(): "+jvdir
+Text 0,100,"JoyYaw(): "+jyaw#
+Text 0,120,"JoyPitch(): "+jpitch#
+Text 0,140,"JoyRoll(): "+jroll#
+
+Flip
+Cls
+
+Wend
+
+:JoyHat ( [port] )
+
+.args
+port (optional) - an integer value representing the port to be checked for joystick data
+
+.desc
+JoyHat returns the state of a joystick 'hat' or 'pov' (point-of-view) control.
+
+
+If the returned value is -1, the hat is currently centred.
+
+
+Otherwise, the returned value gives the direction as an angle in the range 0 to 360 relative to 'up'.
+
+.code
+While Not KeyHit(1)
+Print JoyHat()
+Wend
+End
+
+:FlushJoy
+
+.args
+None.
+
+.desc
+There are many times when you aren't interested in the dozens of possible  joystick button pressed the player might have made before you are checking for  one in particular. Or perhaps you want to pause the game and wait for any joystick  button to be hit, but you don't want a 'queued' button press bypassing this.  Use this command before you specifically want to poll a joystick button hit  from the user.
+
+.code
+; FlushJoy sample
+
+FlushJoy
+
+Print "Press a joystick button to exit!"
+
+WaitJoy()
+
+End
+
+

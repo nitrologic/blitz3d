@@ -1,0 +1,1041 @@
+:CreateMesh([parent])
+
+.args
+parent (optional) - This optional parameter allows you to specify another entity which will act as the parent to this mesh.
+
+.desc
+Create a 'blank' mesh entity and returns its handle.
+
+When a mesh is first created it has no surfaces, vertices or triangles associated with it.
+
+To add geometry to this mesh, you will need to:
+
+CreateSurface() ; To make a surface
+AddVertex ; You will need to add at least 3 to make a Triangle
+AddTriangle ; This will add a triangle by connecting the Vertices (points) you added to the mesh.
+
+.code
+; CreateMesh Example
+; ------------------
+
+; In this example, we will create a custom mesh. This custom mesh will be in the shape of a ramp.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,45,0,0
+
+; Create blank mesh
+ramp=CreateMesh()
+
+; Create blank surface which is attached to mesh (surfaces must always be attached to a mesh)
+surf=CreateSurface(ramp)
+
+; Now we have our blank mesh and surface, we can start adding vertices to it, to form the shape of our
+; ramp.
+; Vertices are invisible 'points' in a 3D object that we can attach triangles too later.
+; To create a single triangle, you need three vertices, one for each corner.
+; However, you can share vertices between triangles, so you do not always need 3 new vertices per
+; triangle.
+; In the case of our ramp mesh, we will require 6 vertices, one for each corner
+
+v0=AddVertex(surf,0,0,0) ; bottom corner 1
+v1=AddVertex(surf,0,0,1) ; bottom corner 2
+v2=AddVertex(surf,4,0,1) ; bottom corner 3
+v3=AddVertex(surf,4,0,0) ; bottom corner 4
+v4=AddVertex(surf,0,2,0) ; top corner 1
+v5=AddVertex(surf,0,2,1) ; top corner 2 
+
+; Having created our blank mesh and surface, and added our vertices to form the shape of the mesh, we
+; now need to add triangles to it in order to make it solid and visible to the user. We create
+; triangles simply by connecting vertices up, very much like a 3D dot-to-dot.
+
+; When adding triangles, we need to remember that they are only one sided, and the side they are
+; visible from is determined by the order in which we specify the vertices when using AddTriangle.
+; If the vertices, in the order that they are specified, are aligned in a clockwise fashion relative 
+; to the camera then they will appear visible, otherwise they won't. 
+; So, to make our ramp visible from the outside, we will be connecting all vertices in a clockwise
+; fashion, relative to the camera.
+
+t0=AddTriangle(surf,v0,v3,v2) ; bottom triangle 1
+t1=AddTriangle(surf,v0,v2,v1) ; bottom triangle 2
+t2=AddTriangle(surf,v0,v4,v3) ; front triangle
+t3=AddTriangle(surf,v1,v2,v5) ; back triangle
+t4=AddTriangle(surf,v0,v1,v5) ; side triangle 1
+t5=AddTriangle(surf,v0,v5,v4) ; side triangle 2
+t6=AddTriangle(surf,v2,v4,v5) ; top triangle 1
+t7=AddTriangle(surf,v2,v3,v4) ; top triangle 2
+
+; Now we will position our ramp in front of the camera so we can see it!
+PositionEntity ramp,0,-4,10
+
+; Enable wireframe mode so we can see structure of model more clearly
+WireFrame True
+
+; And a quick loop that renders the scene and displays the contents on the screen until we press esc
+While Not KeyDown(1)
+
+; Constantly turn our ramp entity to show it off a bit
+TurnEntity ramp,0,1,0
+
+RenderWorld
+Flip
+
+Wend
+
+; The end! 
+End
+
+:LoadMesh(filename$,[Parent])
+
+.args
+Filename$ - Name of the file containing the model to load.
+Parent (optional) - Specify an entity to act as a Parent to the loaded mesh.
+
+.desc
+LoadMesh, as the name suggests, Loads a mesh from an .X, .3DS or .B3D file (Usually created in advance by one of a number of 3D model creation packages) and returns the mesh handle.
+
+Any hierarchy and animation information in the file will be ignored. Use LoadAnimMesh to maintain hierarchy and  animation information.
+
+The optional parent parameter allows you to specify a parent entity for the mesh so that when the parent is moved the child mesh will move with it. However, this relationship is one way;  applying movement commands to the child will not affect the parent. 
+
+Specifying a parent entity will still result in the mesh being created at position 0,0,0 rather than at the parent entity's position. 
+
+.also
+LoadAnimMesh.
+
+.code
+; LoadMesh Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load mesh
+drum=LoadMesh("media/oil-drum/oildrum.3ds")
+
+PositionEntity drum,0,0,MeshDepth(drum)*2
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:LoadAnimMesh( Filename$, [Parent] )
+
+.args
+Filename$ - Name of the file containing the model to load. 
+Parent (optional) - Specify an entity to act as a Parent to the loaded mesh.
+
+.desc
+LoadAnimMesh, similar to LoadMesh, Loads a mesh from an .X, .3DS or .B3D file and returns a mesh handle.
+
+The difference between LoadMesh and LoadAnimMesh is that any hierarchy and animation information present in the file is retained. You can then either activate the animation by using the Animate command or find child entities within the hierarchy by using the FindChild(), GetChild() functions.
+
+The optional parent parameter allows you to specify a parent entity for the mesh so that when the parent is moved the child mesh will move with it. However, this relationship is one way;  applying movement commands to the child will not affect the parent. 
+
+Specifying a parent entity will still result in the mesh being created at position 0,0,0 rather than at the parent entity's position.
+
+.code
+; LoadAnimMesh Example
+; --------------------
+
+; In this example we will demonstrate the use of the LoadAnimMesh command.
+
+; Quite simply, we will load an anim mesh from file, animate it, and then view it.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,20,-100 ; position camera so that robot will be in view when loaded
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load anim mesh
+robot=LoadAnimMesh("media/makbot/mak_robotic.3ds")
+
+; Animate mesh - this will begin an animation sequence which is updated when UpdateWorld is called
+Animate robot,2
+
+While Not KeyDown(1)
+
+UpdateWorld ; Update anim - without this our anim mesh will freeze
+RenderWorld ; Render everything
+Flip ; Show everything
+
+Wend
+
+End
+
+:CreateCube( [parent] )
+
+.args
+parent (optional) - This allows you to set the parent entity of Cube.
+
+.desc
+Creates a cube mesh/entity and returns its handle.
+
+The cube will extend from  -1,-1,-1 to +1,+1,+1.  
+
+The optional parent parameter allow you to specify a parent entity for  the cube so that when the parent is moved the child cube will move with it.  However, this relationship is one way; applying movement commands to the  child will not affect the parent. 
+
+Specifying a parent entity will still result in the cube being created at  position 0,0,0 rather than at the parent entity's position. 
+
+Creation of cubes, cylinders and cones are a great way of getting scenes set up quickly, as they can act as placeholders for more complex pre-modeled meshes later on in program development. 
+
+.also
+CreateSphere(),  CreateCylinder(), CreateCone().
+
+.code
+; CreateCube Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create cube
+cube=CreateCube()
+
+PositionEntity cube,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:CreateSphere ( [segments][,parent] )
+
+.args
+segments (optional) - sphere detail. Defaults to 8.
+parent (optional) - parent entity of sphere
+
+.desc
+Creates a sphere mesh/entity and returns its handle.
+
+The sphere will  be centred  at 0,0,0 and will have a radius of 1. 
+
+The segments value must be in the range 2-100 inclusive, although this is  only checked in debug mode. A common mistake  is to leave debug mode off and specify the parent parameter  (usually an eight digit memory address) in the place of the segments value.  As the amount of polygons used to create a sphere is exponentially  proportional to the segments value, this will result in Blitz trying to create a sphere  with unimaginable amounts of polygons! Depending on how unlucky you are,  your computer will then crash.
+
+Example segments values:
+8: 224 polygons - bare minimum amount of polygons for a sphere
+16: 960 polygons - smooth looking sphere at medium-high distances
+32: 3968 polygons - smooth sphere at close distances
+
+The  optional parent parameter allow you to specify a parent entity for the  sphere so that when the parent is moved the child sphere will move with it.  However, this relationship is one way; applying movement commands to the  child will not affect the parent. 
+
+Specifying a parent entity will still result in the sphere being created  at position 0,0,0 rather than at the parent entity's position. 
+
+.also
+CreateCube,  CreateCylinder, CreateCone.
+
+.code
+; CreateSphere Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create sphere
+sphere=CreateSphere()
+
+PositionEntity sphere,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:CreateCylinder ( [segments][,solid][,parent] )
+
+.args
+segments (optional) - cylinder detail. Defaults to 8.
+solid (optional) - true for a cylinder, false for a tube. Defaults to true.
+parent (optional) - parent entity of cylinder
+
+.desc
+Creates a cylinder mesh/entity and returns its handle.
+
+The cylinder will  be centred at 0,0,0 and will have a radius of 1. 
+
+The segments value must be in the range 3-100 inclusive, although this is  only checked in debug mode. A common mistake is to leave debug mode off and  specify the parent parameter (usually an eight digit memory address) in the  place of the segments value. As the amount of polygons used to create a cylinder  is exponentially proportional to the segments value, this will result in Blitz  trying to create a cylinder with unimaginable amounts of polygons! Depending  on how unlucky you are, your computer may then crash. 
+
+Example segments values (solid=true):
+3: 8 polygons - a prism
+8: 28 polygons - bare minimum amount of polygons for a cylinder
+16: 60 polygons - smooth cylinder at medium-high distances
+32: 124 polygons - smooth cylinder at close distances 
+
+The optional parent parameter allow you to specify a parent entity for the  cylinder so that when the parent is moved the child cylinder will move with  it. However, this relationship is one way; applying movement commands to the  child will not affect the parent. 
+
+Specifying a parent entity will still result in the cylinder being created  at position 0,0,0 rather than at the parent entity's position. 
+
+.also
+CreateCube, CreateSphere, CreateCone.
+
+.code
+; CreateCylinder Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create cylinder
+cylinder=CreateCylinder()
+
+PositionEntity cylinder,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:CreateCone ( [segments][,solid][,parent] )
+
+.args
+segments (optional) - cone detail. Defaults to 8.
+solid (optional) - true for a cone with a base, false for a cone without a base.  Defaults to true.
+parent (optional) - parent entity of cone
+
+.desc
+Creates a cone mesh/entity and returns its handle.
+
+The cone will be centred  at 0,0,0 and the base of the cone will have a radius of 1. 
+
+The segments value must be in the range 3-100 inclusive, although this is  only checked in debug mode. A common mistake is to leave debug mode off and  specify the parent parameter (usually an eight digit memory address) in the  place of the segments value. As the amount of polygons used to create a cone  is exponentially proportional to the segments value, this will result in Blitz  trying to create a cone with unimaginable amounts of polygons! Depending on  how unlucky you are, your computer will then crash. 
+
+Example segments values (solid=true):
+4: 6 polygons - a pyramid
+8: 14 polygons - bare minimum amount of polygons for a cone
+16: 30 polygons - smooth cone at medium-high distances
+32: 62 polygons - smooth cone at close distances 
+
+The optional parent parameter allow you to specify a parent entity for the  cone so that when the parent is moved the child cone will move with it. However,  this relationship is one way; applying movement commands to the child will not  affect the parent. 
+
+Specifying a parent entity will still result in the cone being created at  position 0,0,0 rather than at the parent entity's position. 
+
+.also
+CreateCube, CreateSphere, CreateCylinder.
+
+.code
+; CreateCone Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create cone
+cone=CreateCone()
+
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:CopyMesh ( mesh[,parent] )
+
+.args
+mesh - handle of mesh to be copied
+parent (optional) - handle of entity to be made parent of mesh
+
+.desc
+Creates a copy of a mesh and returns the newly-created mesh's handle.
+
+The difference between CopyMesh and CopyEntity  is that CopyMesh performs a 'deep' copy of a mesh. 
+
+CopyMesh is identical to performing new_mesh=CreateMesh() : AddMesh mesh,new_mesh
+
+.code
+; CopyMesh Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+crate1=LoadMesh("media/wood-crate/wcrate1.3ds")
+PositionEntity crate1,-40,0,100
+
+crate2=CopyMesh(crate1)
+PositionEntity crate2,40,0,100
+
+While Not KeyDown(1)
+
+TurnEntity crate1,1,1,1
+TurnEntity crate2,1,1,-1
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:AddMesh source_mesh,dest_mesh
+
+.args
+source_mesh - source mesh handle
+dest_mesh - destination mesh handle
+
+.desc
+Adds the source mesh to the destination mesh.
+
+AddMesh works best with  meshes that have previously only had mesh commands used with them. 
+
+So if you want to manipulate a mesh before adding it to another mesh, make  sure you use ScaleMesh, PositionMesh, PaintMesh etc rather than ScaleEntity,  PositionEntity, EntityTexture etc before using AddMesh. 
+
+However, something to be aware of when using commands such as RotateMesh  is that all mesh commands work from a global origin of 0,0,0. Therefore it is  generally a good idea to scale and rotate a mesh before positioning it, otherwise  your mesh could end up in unexpected positions. Also, when using AddMesh, the  origin of the new all-in-one mesh will be set at 0,0,0. 
+
+After using AddMesh, the original source_mesh will still exist, therefore  use FreeEntity to delete it if you wish to do so.
+
+.code
+; AddMesh Example
+; ---------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,0,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create tree mesh (upper half)
+tree=CreateCone()
+green_br=CreateBrush(0,255,0)
+PaintMesh tree,green_br
+ScaleMesh tree,2,2,2
+PositionMesh tree,0,1.5,0
+
+; Create trunk mesh
+trunk=CreateCylinder()
+brown_br=CreateBrush(128,64,0)
+PaintMesh trunk,brown_br
+PositionMesh trunk,0,-1.5,0
+
+; Add trunk mesh to tree mesh, to form one whole tree
+AddMesh trunk,tree
+
+; Free trunk mesh - we don't need it anymore
+FreeEntity trunk
+
+While Not KeyDown( 1 )
+
+TurnEntity tree,1,1,1
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:FlipMesh mesh
+
+.args
+mesh - mesh handle
+
+.desc
+Flips all the triangles in a mesh.
+
+This is useful for a couple of reasons.  Firstly though, it is important to understand a little bit of the theory behind  3D graphics. A 3D triangle is represented by three points; only when these points  are presented to the viewer in a clockwise-fashion is the triangle visible.  So really, triangles only have one side. 
+
+Normally, for example in the case of a sphere, a model's triangles face the  inside of the model, so it doesn't matter that you can't see them. However,  what about if you wanted to use the sphere as a huge sky for your world, i.e.  so you only needed to see the inside? In this case you would just use FlipMesh.
+
+Another use for FlipMesh is to make objects two-sided, so you can see them from  the inside and outside if you can't already. In this case, you can copy the  original mesh using CopyEntity, specifying the  original mesh as the parent, and flip it using FlipMesh. You will now have two  meshes occupying the same space - this will make it double-sided, but beware,  it will also double the polygon count! 
+
+The above technique is worth trying when an external modelling program has  exported a model in such a way that some of the triangles appear to be missing.
+
+.code
+; FlipMesh Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+; Create sphere
+sphere=CreateSphere()
+
+; Scale sphere
+ScaleEntity sphere,100,100,100
+
+; Texture sphere with sky texture
+sky_tex=LoadTexture("media/sky.bmp")
+EntityTexture sphere,sky_tex
+
+; Flip mesh so we can see the inside of it
+FlipMesh sphere
+
+Color 0,0,0
+
+While Not KeyDown( 1 )
+RenderWorld
+Text 0,0,"You are viewing a flipped sphere mesh - makes a great sky!"
+Flip
+Wend
+
+End
+
+:PaintMesh mesh,brush
+
+.args
+mesh - mesh handle
+brush - brush handle
+
+.desc
+Paints a mesh with a brush.
+
+This has the effect of instantly altering  the visible appearance of the mesh, assuming the brush's properties are different  to what was was applied to the surface before. 
+
+The reason for using PaintMesh to apply specific properties to a mesh using  a brush rather than just using EntityTexture, EntityColor, EntityShininess etc,  is that you can pre-define one brush, and then paint meshes over and over again  using just the one command rather than lots of separate ones. 
+
+.also
+PaintEntity, PaintSurface.
+
+.code
+; PaintMesh Example
+; -----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture("media/b3dlogo.jpg")
+
+; Create brush
+brush=CreateBrush()
+
+; Apply texture to brush
+BrushTexture brush,tex
+
+; And some other effects
+BrushColor brush,0,0,255
+BrushShininess brush,1 
+
+; Paint mesh with brush
+PaintMesh cube,brush
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:LightMesh mesh,red#,green#,blue#[,range#][,light_x#][,light_y#][,light_z#]
+
+.args
+mesh - mesh handle
+red# - mesh red value
+green# - mesh green value
+blue# - mesh blue value
+range# (optional) - light range
+light_x# (optional) - light x position
+light_y# (optional) - light y position
+light_z# (optional) - light z position
+
+.desc
+Performs a 'fake' lighting operation on a mesh.
+
+You need to use EntityFX ent,2 to enable vertex colors on the target mesh before you can see any results.
+
+Since V1.83 the default vertex color for primitives is 255,255,255 and not 0,0,0, so for LightMesh to effect primitives as it did before, you will first need to reset the vertex colors to 0,0,0. You can do this using LightMesh mesh,-255,-255,-255.
+
+.code
+Graphics3D 640,480 ,16,2
+camera=CreateCamera() 
+
+ent=CreateSphere()
+EntityFX ent,2 ; enable vertex colors
+Lightmesh ent,-255,-255,-255 ; reset vertex colors from 255,255,255 (default) to 0,0,0
+LightMesh ent,255,255,0,50,-20,20,-20 ; apply fake lighting
+
+MoveEntity camera,0,2,-10 
+PointEntity camera,ent
+
+While Not KeyDown(1) 
+RenderWorld
+Flip 
+Wend
+End
+
+:FitMesh mesh,x#,y#,z#,width#,height#,depth#[,uniform]
+
+.args
+mesh - mesh handle
+x# - x position of mesh
+y# - y position of mesh
+z# - z position of mesh
+width# - width of mesh 
+height# - height of mesh
+depth# - depth of mesh
+uniform (optional) - if true, the mesh will be scaled by the same amounts in x, y and z, so will not be distorted. Defaults to false.
+
+.desc
+Scales and translates all vertices of a mesh so that the mesh occupies the specified box.
+
+Do not use a width#, height# or depth# value of 0, otherwise all mesh data will be destroyed and your mesh will not be displayed. Use a value of 0.001 instead for a flat mesh along one axis.
+
+.also
+ScaleMesh;ScaleEntity
+
+.code
+; FitMesh Example
+; ---------------
+
+; In this example we will demonstrate the use of the FitMesh command.
+
+; First we will use FitMesh on a semi-transparent blue box. This will represent the dimensions we will
+; be using with FitMesh.
+
+; Then we will use these dimensions on a red cone, so that it appears to fit inside the box when the 
+; space bar is pressed.
+
+; The first time the space bar is pressed a uniform FitMesh will be performed, which means the cone 
+; will be scaled equally along all axis so that at least one axis fits the dimensions specified.
+
+; The second time the space bar is pressed a non-unifrom FitMesh will be performed, meaning the cone 
+; will be scaled non-equally along all axes so that all axes fit the dimensions specified.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+; Create cube
+cube=CreateCube()
+
+; Set cube colour to blue
+EntityColor cube,0,0,255
+
+; Make cube semi-transparent so we will be able to see cone inside it later
+EntityAlpha cube,0.5
+
+; Use FitMesh on cube to make it a cuboid
+FitMesh cube,-1,-.5,-1,2,1,2
+
+; Position cube in front of camera so we can see it
+PositionEntity cube,0,-1,5
+
+; Create cone
+cone=CreateCone()
+
+; Set cone color to red
+EntityColor cone,255,0,0
+
+; Position cone in front of camera so we can see it 
+PositionEntity cone,0,-1,5
+
+; Set uniform value to 1 so when space is first pressed, FitMesh will be uniform
+uniform=1
+
+While Not KeyDown(1)
+
+	; If space bar pressed....
+	If KeyHit(57)=True
+	
+		; Set syntax string to show syntax useage
+		syntax$="FitMesh cone,-1,-.5,-1,2,1,2,"+uniform
+		
+		; Use FitMesh with cone, using same values as used with cube earlier. Cone should now fit in cube.
+		FitMesh cone,-1,-.5,-1,2,1,2,uniform
+		
+		; Change uniform value from 1 to 0 so when space bar is pressed again FitMesh will be non-uniform 
+		uniform=0
+
+	EndIf
+
+	RenderWorld
+
+	Text 0,0,"Press space to use uniform FitMesh with cone"
+	Text 0,20,"Press space again to use non-uniform FitMesh with cone"
+	Text 0,40,syntax$
+	
+	Flip
+
+Wend
+ 
+End
+
+:ScaleMesh mesh,x_scale#,y_scale#,z_scale#
+
+.args
+mesh - mesh handle
+x_scale# - x scale of mesh
+y_scale# - y scale of mesh
+z_scale# - z scale of mesh
+
+.desc
+Scales all vertices of a mesh by the specified scaling factors.
+
+.also
+FitMesh;ScaleEntity
+
+.code
+; ScaleMesh Example
+; -----------------
+ 
+; In this example we will demonstrate the use of the ScaleMesh command.
+
+; Unlike ScaleEntity, ScaleMesh actually modifies the actual mesh structure.
+
+; So whereas using ScaleEntity 2,2,2 would only double the size of an entity the first time it was 
+; used, ScaleMesh 2,2,2 will double the size of the mesh every time it is used.
+
+; This is because ScaleEntity scales an entity based on a fixed mesh structure, whereas ScaleMesh
+; actually modifies the mesh structure itself.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+ 
+camera=CreateCamera()
+ 
+light=CreateLight()
+ 
+; Create cube mesh
+cube=CreateCube()
+
+; Position cube in front of camera so we can see it 
+PositionEntity cube,0,0,5
+ 
+While Not KeyDown(1)
+
+	; If space bar pressed then scale cube mesh by 1%. Also set syntax$ text.
+	If KeyHit(57)=True Then ScaleMesh cube,1.01,1.01,1.01 : syntax$="ScaleMesh 1.01,1.01,1.01"
+
+	RenderWorld
+	
+	Text 0,0,"Press space to scale mesh by 1%"
+	Text 0,20,syntax$
+	
+	Flip
+
+Wend
+ 
+End
+
+:RotateMesh mesh,pitch#,yaw#,roll#
+
+.args
+mesh - mesh handle
+pitch# - pitch of mesh
+yaw# - yaw of mesh
+roll# - roll of mesh
+
+.desc
+Rotates all vertices of a mesh by the specified rotation.
+
+.also
+RotateEntity;TurnEntity
+
+.code
+; RotateMesh Example
+; ------------------
+ 
+; In this example we will demonstrate the use of the RotateMesh command.
+
+; Unlike RotateEntity, RotateMesh actually modifies the actual mesh structure.
+
+; So whereas using RotateEntity 0,45,0 would only rotate an entity by 45 degrees the first time it was 
+; used, RotateMesh 0,45,0 will rotate the mesh every time it is used.
+
+; This is because RotateEntity rotates an entity based on a fixed mesh structure, whereas RotateMesh
+; actually modifies the mesh structure itself.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+ 
+camera=CreateCamera()
+ 
+light=CreateLight()
+
+; Rotate light to give better lighting of cube
+RotateEntity light,60,30,0
+
+; Create cube mesh
+cube=CreateCube()
+
+; Position cube in front of camera so we can see it 
+PositionEntity cube,0,0,5
+ 
+While Not KeyDown(1)
+
+	; If space bar pressed then rotate mesh by 45 degrees on the y axis. Also set syntax$ text.
+	If KeyHit(57)=True Then RotateMesh cube,0,45,0 : syntax$="RotateMesh 0,45,0"
+
+	RenderWorld
+	
+	Text 0,0,"Press space to rotate mesh by 45 degrees on the y axis"
+	Text 0,20,syntax$
+	
+	Flip
+
+Wend
+ 
+End
+
+:PositionMesh mesh,x#,y#,z#
+
+.args
+mesh - mesh handle
+x# - x position of mesh
+y# - y position of mesh
+z# - z position of mesh
+
+.desc
+Moves all vertices of a mesh.
+
+.also
+PositionEntity;MoveEntity;TranslateEntity
+
+.code
+; PositionMesh Example
+; --------------------
+ 
+; In this example we will demonstrate the use of the PositionMesh command.
+
+; Unlike PositionEntity, PositionMesh actually modifies the actual mesh structure.
+
+; So whereas using PositionEntity 0,0,1 would only move an entity by one unit the first time it was 
+; used, PositionMesh 0,0,1 will move the mesh by one unit every time it is used.
+
+; This is because PositionEntity positions an entity based on a fixed mesh structure, whereas 
+; PositionMesh actually modifies the mesh structure itself.
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+ 
+camera=CreateCamera()
+ 
+light=CreateLight()
+ 
+; Create cube mesh
+cube=CreateCube()
+
+; Position cube in front of camera so we can see it 
+PositionEntity cube,0,0,5
+ 
+While Not KeyDown(1)
+
+	; If space bar pressed then position mesh 1 unit along the z axis. Also set syntax$ text.
+	If KeyHit(57)=True Then PositionMesh cube,0,0,1 : syntax$="PositionMesh 0,0,1"
+
+	RenderWorld
+	
+	Text 0,0,"Press space to position the mesh 1 unit along the z axis"
+	Text 0,20,syntax$
+	
+	Flip
+
+Wend
+ 
+End
+
+:UpdateNormals mesh
+
+.args
+mesh - mesh handle
+
+.desc
+Recalculates all normals in a mesh. This is necessary for correct lighting  if you have not set surface normals using 'VertexNormals' commands.
+
+.code
+None.
+
+:MeshesIntersect (mesh_a,mesh_b )
+
+.args
+mesh_a - mesh_a handle
+mesh_b - mesh_b handle
+
+.desc
+Returns true if the specified meshes are currently intersecting.
+
+This  is a fairly slow routine - use with discretion...
+
+This command is  currently the only  polygon->polygon collision checking routine available in Blitz3D.
+
+.code
+; MeshesIntersect Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+drum=LoadMesh("media/oil-drum/oildrum.3ds")
+PositionEntity drum,-20,0,100
+
+crate=LoadMesh("media/wood-crate/wcrate1.3ds")
+PositionEntity crate,20,0,100
+
+While Not KeyDown( 1 )
+
+TurnEntity drum,1,1,1
+TurnEntity crate,-1,-1,-1
+
+RenderWorld
+
+; Test to see if drum and crate meshes are intersecting; if so then display  message to confirm this
+If MeshesIntersect(drum,crate)=True Then Text 0,0,"Meshes are intersecting!"
+
+Flip
+
+Wend
+
+End
+
+:MeshWidth# (mesh)
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the width of a mesh. This is calculated by the actual vertex positions and so the scale of the entity (set by ScaleEntity) will not have an effect on the resultant width. Mesh operations, on the other hand, will effect the result.
+
+.also
+MeshHeight;MeshDepth
+
+.code
+None.
+
+:MeshHeight# (mesh )
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the height of a mesh. This is calculated by the actual vertex positions and so the scale of the entity (set by ScaleEntity) will not have an effect on the resultant height. Mesh operations, on the other hand, will effect the result.
+
+.also
+MeshWidth;MeshDepth
+
+.code
+None.
+
+:MeshDepth# (mesh)
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the depth of a mesh. This is calculated by the actual vertex positions and so the scale of the entity (set by ScaleEntity) will not have an effect on the resultant depth. Mesh operations, on the other hand, will effect the result.
+
+.also
+MeshWidth;MeshHeight
+
+.code
+None.
+
+:CountSurfaces ( mesh )
+
+.args
+mesh - mesh handle
+
+.desc
+Returns the number of surfaces in a mesh.
+
+Surfaces are sections of mesh.  A mesh may contain only one section, or very many. 
+
+.also
+GetSurface.
+
+.code
+None.
+
+:GetSurface ( mesh, index )
+
+.args
+mesh - mesh handle
+index - index of surface
+
+.desc
+Returns the handle of the surface attached to the specified mesh and with  the specified index number.
+
+Index should be in the range 1...CountSurfaces(  mesh ), inclusive. 
+
+You need to 'get a surface', i.e. get its handle, in order to be able to  then use that particular surface with other commands.
+
+.also
+CountSurfaces;FindSurface
+
+.code
+None.
+

@@ -1,0 +1,2640 @@
+:::System Commands
+
+
+::Keyboard Input
+
+
+:GetKey ()
+
+.desc
+Returns an ascii code corresponding to the key last typed by the
+user or 0 if all keyboard events have been reported.
+
+As Blitz uses an internal queue for tracking key presses it is
+sometimes useful to call GetKey multiple times to empty the
+queue. Use the @FlushKeys command to empty the internal 
+key queue.
+
+The @GetKey function is useful for situations when the user is
+expected to type some text.
+
+The @KeyDown function is more apropriate when the player is 
+expected to hold down certain key combinations in a more 
+action oriented game environment.
+
+.also
+KeyDown;WaitKey;FlushKeys
+
+
+:WaitKey ()
+
+.desc
+Returns an ascii code corresponding to the key combination typed
+by the user.
+
+@WaitKey is similar in behavior to the @GetKey function but pauses 
+program execution until a keystroke is made by the user.
+
+.also
+GetKey;Chr
+
+
+:KeyDown (scancode)
+
+.args
+scancode = scancode of key to test
+
+.desc
+Returns @True if the specified key on the keyboard is currently
+being pressed.
+
+The scancode specified is based on the position of the key on the
+keyboard and should not be confused with the ascii character code 
+printed when the key is used in normal use (which may differ with
+systems in other regions / countries).
+
+.hint
+There are physical limitations regarding the rows and columns
+of some physical keyboards that will not report certain key
+combinations. It is advisable to thoroughly test all default
+scancode combinations that a game may provide for keyboard 
+control.
+
+.also
+ScanCodes;KeyHit
+
+
+:KeyHit (scancode)
+
+.args
+scancode = scancode of key to test
+
+.desc
+Returns the number of times the specified key has been pressed since
+the last time the @KeyHit command was called with the specified scancode.
+
+@KeyHit will only return positive once when a key is pressed where as
+@KeyDown will repeatedly return True until the specified key is released.
+
+.also
+ScanCodes;KeyDown;GetKey;WaitKey;FlushKeys
+
+
+:FlushKeys
+
+.desc
+Resets the state of the internal keyboard map so all keys are considered
+up.
+
+.also
+KeyHit;KeyDown
+
+
+
+::Mouse Input
+
+
+:MouseX()
+
+.desc
+Returns the horizontal display position of the mouse pointer.
+
+.also
+MouseY;MouseZ
+
+
+:MouseY()
+
+.desc
+Returns the vertical display position of the mouse pointer.
+
+.also
+MouseX;MouseZ
+
+
+:MouseZ()
+
+.desc
+Returns the mouse wheel position if present.
+
+The value returned by @MouseZ increases as the user scrolls
+the wheel up (away from them) and decreases when the user
+scrolls the wheel down (towards them).
+
+.also
+MouseX;MouseY
+
+
+:MouseDown (button)
+
+.args
+button = 1,2 or 3 (left, right or middle)
+
+.desc
+The @MouseDown function returns @True if the specfied mouse button
+is currently being pressed.
+
+Similar to @KeyDown a corresponding @MouseHit command is available
+that will return @True only once during the period the specifed
+button is being pressed.
+
+.also
+MouseHit
+
+
+:MouseHit (button)
+
+.args
+button = 1,2 or 3 (left, right or middle)
+
+.desc
+The @MouseHit function returns the number of times the specfied 
+mouse button has been pressed down since the last call to @MouseHit
+with the specified button.
+
+Use the @MouseDown command to test if the specified button "is
+currently in a depressed state" as opposed to if the button has
+has just been hit. 
+
+No harm intentional or otherwise to any rodent alive or dead should
+result from the use of this command.
+
+.also
+MouseDown
+
+
+:GetMouse()
+
+.desc
+Returns the mouse button pressed since the last call to @GetMouse
+or 0 if none.
+
+@GetMouse will return 1 if the left button, 2 if the right and
+3 if the middle button has been recently pressed.
+
+Mouse button presses are queued internally by Blitz so it is often
+useful to call @GetMouse repeatedly to empty the queue or use the
+@FlushMouse command.
+
+.also
+FlushMouse;MouseDown
+
+
+:WaitMouse()
+
+.desc
+@WaitMouse causes the program to halt until a mouse button is pressed
+by the user and returns the ID of that button.
+
+@WaitMouse will wait and return 1 for the left button, 2 for the right 
+and 3 for the middle button when pressed.
+
+.also
+GetMouse
+
+
+:ShowPointer
+
+.desc
+@ShowPointer displays the mouse pointer if previously hidden with thhe
+@HidePointer command.
+
+Has no effect in FullScreen modes.
+
+.also
+HidePointer
+
+
+:HidePointer
+
+.desc
+HidePointer makes the mouse pointer invisible when moved over
+the program window when using @Graphics in windowed mode. 
+
+The mouse pointer is always hidden in FullScreen @Graphics mode.
+
+.also
+ShowPointer;Graphics
+
+
+:MoveMouse x,y
+
+.args
+x = horizontal screen position
+y = vertical screen position
+
+.desc
+The #x, #y parameters define a location on the graphics display
+that the mouse pointer is moved to.
+
+By recentering the mouse to the middle of the display every
+frame the #MouseXSpeed and #MouseYSpeed functions can be used
+to provide "mouse look" type control common in first person
+shooters.
+
+.also
+MouseXSpeed;MouseYSpeed
+
+
+:MouseXSpeed()
+
+.desc
+Returns the horizontal distance travelled by the mouse since 
+the last call to MouseXSpeed or MoveMouse.
+
+.also
+MoveMouse;MouseYSpeed
+
+
+:MouseYSpeed()
+
+.desc
+Returns the vertical distance travelled by the mouse since the 
+last call to MouseYSpeed or MoveMouse.
+
+.also
+MoveMouse;MouseXSpeed
+
+
+:MouseZSpeed()
+
+.desc
+Returns the number of clicks the mouse scroll wheel has been 
+turned since the last call to MouseZSpeed.
+
+The result is negative if the wheel is scrolled down (rolled
+back) and positive if scrolled up (rolled forward).
+
+
+:FlushMouse
+
+.desc
+Resets the state of the internal mouse button map so all buttons
+are considered up.
+
+
+
+::Joystick Input
+
+
+:JoyType ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns the type of joystick that is currently connected 
+to the computer.
+
+.table
+JoyType,Description
+0,None
+1,Digital
+2,Analog
+
+The optional #port identifier is required to index
+all the joysticks, wheels and other gaming devices
+connected to the system.
+
+.also
+GetJoy;JoyDown;
+
+
+:GetJoy ([port])
+
+.args
+port = optional joystick port to read
+
+.desc
+Returns the number of any button press that
+has not already been reported by the GetJoy 
+command. 
+
+Returns 0 if the system button buffer is
+empty.
+
+The @GetJoy command may be called multiple
+times until it signals there are no more
+button events queued by returning 0.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+@JoyType
+
+
+:JoyDown ( button [,port] )
+
+.args
+button = number of joystick button to check 
+port = number of joystick port to check (optional) 
+
+.desc
+Returns True if the specified button of the specified
+joystick is pressed.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyHit;KeyDown;MouseDown
+
+
+:JoyHit (button [,port])
+
+.args
+button = number of joystick button to check
+port = number of joystick port to check (optional) 
+
+.desc
+Returns the number of times a specified joystick button 
+has been hit since the last time it was specified in 
+a @JoyHit function call.
+
+The optional #port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+KeyHit;MouseHit
+
+
+:WaitJoy ([port])
+
+.args
+port = optional joystick port to pause for
+
+.desc
+Waits for any joystick button to be pressed and
+returns the button identifier.
+
+@WaitJoy causes the program to pause until any button of the
+specified joystick is pressed.
+
+If there is no gaming device connected or the optional
+port identifier is not a valid device WaitJoy
+will not pause but return 0 immediately.
+
+.also
+JoyType
+
+
+:FlushJoy
+
+.desc
+Resets the state of the internal joystick button map 
+so all buttons of all joysticks are considered up
+and all joystick events are discarded.
+
+@FlushJoy is useful when transitioning from control
+systems based on the state commands such as @JoyDown
+to an event style control using the @GetJoy command
+and any buffered button presses need to be discarded.
+
+.also
+JoyDown;GetJoy
+
+
+:JoyHat ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a compass angle between 0 and 360 degrees in 
+which the direction of the D-Pad or "hat" control
+is being pressed.
+
+@JoyHat returns a value of -1 if the "hat" or D-Pad is 
+currently centered.
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyX #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the direction
+of the joystick in the horizontal axis.
+
+A value near 0.0 represents the joystick at rest position.
+
+Due to the nature of analog joysticks @JoyX and the other
+axis reading commands are unlikely to ever return an exact 
+value of 0.0 and so a tolerance factor may need to be applied
+if a rest position is required.
+
+The @JoyXDir command should be used instead of @JoyX 
+when only the digital state of the stick is required
+(be it left, centered or right).
+
+The optional port identifier provides access to a
+particular game controller, joystick or gamepad connected
+to the system and positively identified by @JoyType.
+
+.also
+JoyXDir;JoyY;JoyZ;JoyHat
+
+
+:JoyXDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+horizontal direction of the joystick be it left, centered
+or right.
+
+.table
+Value,Direction
+-1,left
+0,centered
+1,right
+
+.also
+JoyX;JoyUDir
+
+
+:JoyY #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the direction
+of the the joystick in the vertical axis.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyYDir;JoyX;JoyZ;JoyU;JoyV
+
+
+:JoyYDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+vertical direction of the joystick.
+
+.table
+Value,Direction
+-1,up
+0,centered
+1,down
+
+.also
+JoyY;JoyXDir;JoyVDir
+
+
+:JoyZ #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the rotation
+axis of the joystick or steering wheel.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyZ;JoyU;JoyV
+
+
+:JoyZDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+rotation axis of the joystick.
+
+.table
+Value,Direction
+-1,anti-clockwise
+0,centered
+1,clockwise
+
+.also
+JoyY;JoyXDir
+
+
+:JoyU #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the horizontal
+direction of the second stick of a dual stick joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyV
+
+
+:JoyUDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+horizontal direction of the joystick's second stick be 
+it left, centered or right.
+
+.table
+Value,Direction
+-1,left
+0,centered
+1,right
+
+.also
+JoyU;JoyXDir
+
+
+:JoyV #([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the vertical
+direction of the second stick of a dual stick joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyVDir ( [port] )
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns an integer value of -1, 0 or 1 representing the
+vertical direction of the joystick's second stick.
+
+.table
+Value,Direction
+-1,up
+0,centered
+1,down
+
+.also
+JoyY;JoyXDir
+
+
+:JoyYaw#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+
+Returns a value between -1.0 and 1.0 representing the yaw
+axis if present of the specified joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyPitch#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the pitch
+axis if present of the specified joystick.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+:JoyRoll#([port])
+
+.args
+port = number of joystick port to check (optional)
+
+.desc
+Returns a value between -1.0 and 1.0 representing the roll
+axis if present of the specified joystick.
+
+The roll axis of a joystick commonly refers to a joystick's 
+twistable stick or rudder feature.
+
+See the @JoyX command for more details on using joystick 
+axis commands.
+
+.also
+JoyX;JoyY;JoyZ;JoyU;JoyYaw;JoyPitch;JoyRoll
+
+
+
+::Sound and Music
+
+:LoadSound (filename$)
+
+.args
+filename$ - the name of an existing sound file
+
+.desc
+If successful returns the handle of a sound object to be
+used with the @PlaySound command.
+
+The following file formats are supported:
+
+.table
+Format,Compression,Features
+raw,none,fast loading
+wav,none,fast loading
+mp3,yes,license required
+ogg,yes,license free
+
+The reader should be aware that an additional license is 
+required to distribute software that utilizes playback of 
+mp3 files.
+
+.also
+PlaySound;LoopSound;FreeSound
+
+
+:PlaySound ( sound )
+
+.args
+sound = valid sound handle
+
+.desc
+Returns the channel allocated for playback.
+
+@PlaySound plays a sound previously loaded using the @LoadSound command.
+
+The channel handle returned can subsequently be used to control
+the playback of the sound sample specified.
+
+The inital volume and pitch of the sound may be modified before
+playback using the @SoundVolume and @SoundPitch commands.
+
+.also
+ChannelPlaying;StopChannel;PauseChannel;ResumeChannel;ChannelPitch
+
+
+:FreeSound sound
+
+.args
+sound - valid sound handle
+
+.desc
+The @FreeSound command releases the resources used by
+a sound created by a previous call to @LoadSound.
+
+Usually a program will load all it's sound files at startup
+and let Blitz3D automatically free the resources when the
+program ends.
+
+The @FreeSound command however provides a way of managing
+system resources when large sound files are no longer needed
+by a running program.
+
+.also
+LoadSound
+
+
+:LoopSound sound
+
+.args
+sound = valid sound handle
+
+.desc
+Enables a sound objects looping property. Subsequent playback
+of the sound object using @PlaySound will result in continuous
+looped playback of the sound.
+
+.also
+LoadSound;PlaySound
+
+
+:SoundPitch sound, samplerate
+
+.args
+sound = valid sound handle
+samplerate = playback rate in samples per second
+
+.desc
+Modifies the pitch of an existing sound object by changing it's
+playback rate.
+
+Sounds are commonly recorderd at rates such as 22050 and 44100
+samples per second and their playback rate defaults to the
+recorded rate.
+
+Changing the sounds playback rate with the @SoundPitch command
+will modify the pitch at which it is next played with the
+@PlaySound command.
+
+For more dynamic control see the @ChannelPitch command that
+allows modifying the pitch of a channel during playback of 
+a sound.
+
+.also
+SoundVolume;PlaySound
+
+
+:SoundVolume sound,volume#
+
+.args
+sound = valid sound handle
+volume# = amplitude setting 
+
+.desc
+Modifies the default volume of an existing sound object by changing
+its amplitude setting.
+
+The default volume of a sound returned by @LoadSound is 1.0.
+
+Use values between 0.0 and 1.0 to cause @PlaySound to begin
+playback of the specified sound at a quieter volume and values
+greater than 1.0 for their volume to be amplified.
+
+Use the @ChannelVolume command to modify volumes during sound 
+playback.
+
+
+:SoundPan sound,pan#
+
+.args
+sound = valid sound handle
+pan# = stereo position 
+
+.desc
+Modifies the default balance of an existing sound object by
+changing it's pan setting.
+
+The #pan value can be any float between -1.0 and 1.0 and
+modifies the stereo position used the next time the sound 
+is played using the @PlaySound command.
+
+.table
+pan,effect
+-1,sound played through left speaker
+0,sound played through both speakers
+1,sound played through right speaker
+
+Use the @ChannelPan command to pan the sound during playback.
+
+.also
+PlaySound;ChannelPan
+
+
+:PlayMusic (filename$)
+
+.args
+filename$ - name of music file
+
+.desc
+Returns a valid channel handle or 0 if unsuccessful.
+
+@PlayMusic opens the music file specified and begins
+playback.
+
+Unlike a combination of @LoadSound and @PlaySound, @PlayMusic
+allocates only a small buffer of resources and the music
+file is streamed directly from the file.
+
+.table
+Format,FileSize,Features
+raw;wav,large,industry standard uncompressed
+mod;s3m;xm;it,medium,8 channel module files
+mid,small,midi files depend on the system's music synthesiser
+mp3,medium,requires additional license
+ogg;wma;asf,medium,compressed and freely distributable
+
+The channel handle returned can be used to change various
+playback settings including volume, pitch as well as 
+pause and resume playback itself.
+
+.also
+StopChannel;PauseChannel;ResumeChannel;PlaySound
+
+
+:PlayCDTrack( track,[mode] )
+
+.args
+track = track number to play
+mode = playback mode
+
+.desc
+Plays a CD track and returns a sound channel.
+
+The behavior of the @PlayCDTrack may be modified
+with the optional #mode parameter:
+
+.table
+Mode,Description
+1,play track once - default
+2,loop track
+3,play track once then continue to next track
+
+The @PlayCDTrack requires the user has a CD playback
+facility on their system and that a CD containing
+music tracks is currently inserted.
+
+.also
+StopChannel;PauseChannel;ResumeChannel
+
+
+:StopChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Stop any audio being output on a currently playing channel.
+
+The @PlaySound, @PlayMusic and @PlayCDTrack functions all return
+a channel handle that can be used with @StopChannel to cancel the
+resulting sound playback.
+
+.also
+PlaySound;PlayMusic;PlayCDTrack;PauseChannel
+
+
+:PauseChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Pauses playback in the specified audio channel.
+
+Any sound playing from the result of a @PlaySound, @PlayMusic 
+or @PlayCDTrack may be paused with the @PauseChannel command.
+
+Use the @ResumeChannel command to continue playback after
+pausing an audio channel with @PauseChannel.
+
+.also
+ResumeChannel;StopChannel;PlaySound
+
+
+:ResumeChannel channel
+
+.args
+channel = valid playback channel
+
+.desc
+Continue playback of a previously paused audio channel.
+
+
+:ChannelPitch channel, samplerate
+
+.args
+channel = valid playback channel
+samplerate = playback rate in samples per second
+
+.desc
+Modifies the pitch of an active audio channel by changing it's
+playback rate.
+
+Sound sources are commonly recorderd at rates such as 22050 
+and 44100 samples per second and their playback rate defaults 
+to the recorded rate.
+
+Changing a channel's playback rate with the @ChannelPitch command
+will modify the pitch of the recorded audio currently used as
+a playback source.
+
+.also
+LoadSound;SoundPitch
+
+
+:ChannelVolume channel, volume#
+
+.args
+channel = valid playback channel
+volume# = volume level
+
+.desc
+Modifies the amplitude of the specified audio channel.
+
+A floating point of less than 1.0 will reduce volume
+while a value of larger than 1.0 will increase the volume
+of the specified channel.
+
+Increasing a channel volume above 1.0 should not be 
+attempted if distortion and clamping of the audio output 
+is to be avoided.
+
+To make a channel silent use @StopChannel or @PauseChannel
+as an alternative to a volume setting of 0.0.
+
+.also
+SoundVolume
+
+
+:ChannelPan channel, pan#
+
+.args
+channel = valid playback channel
+pan# = left right stereo position
+
+.desc
+Position the output of an audio channel in left right stereo 
+space.
+
+.table
+value,effective pan
+0.0,Left
+0.25,Center Left
+0.5,Center
+0.75,Center Right
+1.0,Right
+
+Panning the position of sound effects in a video game is a
+useful technique for adding to the immersive experience.
+
+
+:ChannelPlaying ( channel )
+
+.args
+channel = valid playback channel
+
+.desc
+Returns @True if the specified audio output channel is in playback
+mode.
+
+.also
+PlaySound;StopSound;PauseSound
+
+
+
+::Movies
+
+
+:OpenMovie ( moviefile$ )
+
+.args
+moviefile$ - filename of a movie file
+
+.desc
+Locates and starts a movie file playing.
+
+Returns a valid movie handle if the function is successful
+or 0 if the command fails for any reason.
+
+Use the @DrawMovie command to see the movie playing.
+
+Movie files will typically have the AVI, MPEG and MPG
+file extensions.
+
+Blitz3D applications may need to specify DirectX8 
+requirements or the installation of a particular 
+version of Window's media  player software if they 
+are to support movie files using codecs other than 
+MPEG1, CinePak, MotionJPEG and the like.
+
+.also
+DrawMovie;CloseMovie;MoviePlaying;MovieWidth;MovieHeight
+
+
+:CloseMovie movie
+
+.args
+movie - valid open movie file
+
+.desc
+Stops and closes an open movie.
+
+.also
+OpenMovie
+
+
+:DrawMovie movie [,x,y [,width,height] ]
+
+.args
+movie - movie handle
+x - horizontal postition
+y - vertical position
+width - width of movie in pixels
+height - height of movie in pixels
+
+.desc
+Draws the current frame of the specified playing movie
+onto the current graphics buffer.
+
+The movie must not overlap the edges of the current graphics
+buffer or else nothing is drawn. 
+
+The Viewport and Origin are not taken into account.
+
+See the @OpenMovie command for more details regarding supported
+movie files and how to open them before using the @DrawMovie
+command.
+
+.also
+OpenMovie;CloseMovie;MoviePlaying;MovieWidth;MovieHeight
+
+
+:MovieWidth ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns the width of a movie.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MoviePlaying;MovieHeight
+
+
+:MovieHeight ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns the height of a movie.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MoviePlaying;MovieWidth
+
+
+:MoviePlaying ( movie )
+
+.args
+movie - movie handle
+
+.desc
+Returns True if the specified movie is playing.
+
+.also
+OpenMovie;DrawMovie;CloseMovie;MovieWidth;MovieHeight
+
+
+
+::Time
+
+
+:Millisecs()
+
+.desc
+Returns the number of milliseconds since the system was started.
+
+A common use of @Millisecs is to seed the random number generator 
+in combination with the @SeedRnd command.
+
+Because the millisecs counter increases 1000 times per second 
+it can be used to accurately compare time differences during
+the execution of a program.
+
+.hint
+Care should be taken to always use the difference between two
+@MilliSecs results in any time based calculations which removes
+the likelihood the program will suffer when the system clock rolls
+over and MilliSecs() goes from reporting positive values to negative 
+values.
+
+.also
+Delay;SeedRnd
+
+
+:Delay milliseconds
+
+.args
+milliseconds = the amount of milliseconds to delay 
+
+.desc
+This command stops all program execution for the designated time period.
+
+1000 milliseconds = 1 second
+
+.also
+CreateTimer;WaitTimer;MilliSecs
+
+
+:CurrentDate$()
+
+.desc
+Returns the current date in the format: DD MON YYYY (i.e. 10 DEC 2000).
+
+.also
+CurrentTime
+
+
+:CurrentTime$()
+
+.desc
+Returns the current time in the format: HH:MM:SS (i.e. 14:31:57).
+
+.also
+CurrentDate
+
+
+:CreateTimer ( frequency )
+
+.args
+frequency = in cycles per second (hz)
+
+.desc
+Returns a handle to a timer object that can be used with the
+@WaitTimer and @FreeTimer commands.
+
+The frequency of a timer is measured in cycles per second (hz).
+
+A timer with a frequency of 10 hz will have a period of 
+100 milliseconds.
+
+.also
+FreeTimer;WaitTimer
+
+
+:WaitTimer ( timer )
+
+.args
+timer = valid timer handle
+
+.desc
+Pauses program execution until the specified timer fires.
+
+See the @CreateTimer function for more information about
+using timers in Blitz3D.
+
+.also
+CreateTimer;FreeTimer
+
+
+:FreeTimer ( timer )
+
+.args
+timer = valid timer handle
+
+.desc
+Destroys a timer created with the @CreateTimer function.
+
+.also
+CreateTimer
+
+
+
+::Banks
+
+:CreateBank ([size])
+
+.args
+size - optional amount of storage memory to allocate for bank (in bytes)
+
+.desc
+A bank provides direct access to a region of computer memory. Commands 
+such as @ReadBytes, @WriteBytes can be used with banks to perform high
+speed information processing at a lower level than usually required.
+
+Data types that can be Poked in and Peeked from banks include: 
+
+.table
+format,size in bytes,range
+Byte,1,0 to 255
+Short,2,0 to 65535
+Int,4,-2147483647 to 2147483647.
+Float,4,-infinity..infinity
+
+.also
+FreeBank
+
+
+:FreeBank bank
+
+.args
+bank - valid bank handle
+
+.desc
+Frees a bank and the associated storage memory.
+
+.also
+CreateBank
+
+
+:BankSize ( bank )
+
+.args
+bank - valid bank handle
+
+.desc
+Returns the amount in bytes of storgae memory currently allocated
+for this bank.
+
+.also
+CreateBank;ResizeBank;CopyBank
+
+
+:ResizeBank bank,newsize
+
+.args
+bank = valid bank handle
+newsize = new size of bank in bytes 
+
+.desc
+Resizes a previously created bank.
+
+Existing bank data is unmodified unless truncated due to a decrease
+in bank size. A larger newsize will cause the bank to be appended
+with the necessary number of zero value bytes.
+
+.also
+CreateBank;CopyBank
+
+
+:CopyBank src_bank,src_offset,dest_bank,dest_offset,count
+
+.args
+src_bank = handle of source memory bank
+src_offset = offset location to start reading from
+dest_bank = handle of destination memory bank
+dest_offset = offset location to start writing to
+count = number of  bytes to copy
+
+.desc
+Copies data from one memory bank to another.
+
+
+:PeekByte ( bank,offset )
+
+.args
+bank - bank handle
+offset - offset in bytes
+
+.desc
+Reads a byte from a memory bank and returns the value.
+
+A byte takes up one byte of a memory bank.
+
+Values can be in the range 0 to 255.
+
+.also
+PeekShort;PeekInt;PeekFloat
+
+
+:PeekShort ( bank,offset )
+
+.args
+bank - bank handle
+offset - offset in bytes
+
+.desc
+Reads a short from a specified offset in a memory bank and 
+returns the value.
+
+A short takes up two bytes of a memory bank. Values can
+be in the range 0 to 65535.
+
+.also
+PeekByte;PeekInt;PeekFloat
+
+
+:PeekInt ( bank,offset ) 
+
+.args
+bank - bank handle
+offset - offset in bytes
+
+.desc
+Reads an int from a specified offset in a memory bank and returns the value.
+
+An int takes up four bytes of a memory bank.
+
+Values can be in the range -2147483647 to 2147483647.
+
+.also
+PeekByte;PeekShort;PeekFloat
+
+
+:PeekFloat ( bank,offset )
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation will be started at
+
+.desc
+Reads a float from a specified offset in a memory bank and returns the value.
+
+A float takes up four bytes of a memory bank.
+
+.also
+PeekByte;PeekShort;PeekInt
+
+
+:PokeByte bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes
+value - value to be written
+
+.desc
+Writes a byte into a memory bank.
+
+A byte takes up one byte of a memory bank.
+
+Values can be in the range 0 to 255.
+
+.also
+PokeShort;PokeInt;PokeFloat
+
+
+:PokeShort bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes
+value - value to be written
+
+.desc
+Writes a short into a memory bank.
+
+A short takes up two bytes of a memory bank.
+
+Values can be in the range 0 to 65535.
+
+.also
+PokeByte;PokeInt;PokeFloat
+
+
+:PokeInt bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes
+value - value to be written to bank
+
+.desc
+Writes an int into a memory bank.
+
+An int takes up four bytes of a memory bank.
+
+Values can be in the range -2147483647 to 2147483647.
+
+.also
+PokeByte;PokeShort;PokeFloat
+
+
+:PokeFloat bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes
+value - value that will be written to bank
+
+.desc
+Writes a float into a memory bank.
+
+A float takes up four bytes of a memory bank.
+
+.also
+PokeByte;PokeShort;PokeInt
+
+
+
+
+::Files
+
+
+:ReadFile (filename$)
+
+.args
+filename$ = an existing file
+
+.desc
+Returns a filestream handle used by the other filestream and
+stream handling commands to read information out of an existing file.
+
+This command opens the specified file and prepares it to be 
+read.
+
+The file must exists since this function will not create
+a new file but instead fail and return 0.
+
+As with @WriteFile and @OpenFile it is important to close
+a file with @CloseFile at the end of your filing operations.
+
+.also
+OpenFile;WriteFile;CloseFile;SeekFile
+
+
+:WriteFile (filename$)
+
+.args
+filename$ = a valid name for a new file
+
+.desc
+Attempts to create a file with the specified name, prepares
+it for writing and returns a valid filestream handle.
+
+If the file already exists it will be overwritten and any information 
+held will be lost.
+
+If the filename is illegal, the file is already open by
+the application or another program or the user does not 
+have permission to create the file in the specified location 
+the function will fail and return 0.
+
+As with @ReadFile and @OpenFile it is important to close
+a file with @CloseFile at the end of your filing operations.
+
+.also
+CloseFile;WriteLine;WriteInt;WriteShort,WriteString
+
+
+:OpenFile ( filename$ )
+
+.args
+filename$ = an existing file
+
+.desc
+Returns a filestream used by other filestream and stream handling 
+commands to read and write information to an existing file.
+
+This command opens the specified file and prepares it to be 
+updated.
+
+The file must exists since this function will not create
+a new file.
+
+If the filename is illegal or the user does not have permission
+to modify the file or the file does not exist, @OpenFile will
+fail and return 0.
+
+The @FilePos and @SeekFile commands can be used on a filestream
+created with @OpenFile to acheive what is historically known as
+random access file operations.
+
+With this method the file is constructed of fixed size records
+and only certain records are typically read, modified or added
+during a typical file session.
+
+As with @ReadFile and @WriteFile it is important to close
+a file with @CloseFile at the end of any file operations.
+
+.also
+ReadFile;WriteFile;CloseFile;SeekFile
+
+
+:CloseFile filestream
+
+.args
+filestream = valid file handle
+
+.desc
+Close a file previously opened with @OpenFile, @ReadFile or @WriteFile.
+
+Always close a file once the required filestream and stream operations
+have been carried out.
+
+.also
+ReadFile;WriteFile;OpenFile
+
+
+:FilePos ( filestream )
+
+.args
+filestream = valid file handle
+
+.desc
+Returns the current file position for the specified open filestream
+relative to the start of the file.
+
+The current file position is a value in bytes measuered 
+from the beginning of the file.
+
+It is incremented automatically after every read and write and 
+can also be controlled manually with the @SeekFile command.
+
+.also
+SeekFile;OpenFile
+
+
+:SeekFile ( filestream, offset )
+
+.args
+filestream = valid file handle
+offset = an offset in bytes measured from the start of the file
+
+.desc
+Modifies the specified filestream's current file positition.
+
+See @FilePos for more information regarding a file's
+current file position.
+
+.also
+FilePos;OpenFile
+
+
+:ReadDir ( foldername$ )
+
+.args
+foldername$ = path name of directory to be listed
+
+.desc
+Returns a directory handle that can be used with the @NextFile
+and @CloseDir commands to retrieve a list of files in the
+specified directory.
+
+
+:NextFile$ ( directory )
+
+.args
+directory = valid directory handle
+
+.desc
+Returns the name of the next file in the directory specified.
+
+@NextFile returns an empty string if the last file name has 
+already been retrieved by a previous call to @NextFile.
+
+The directory handle must be a valid directory created with the 
+@ReadDir command.
+
+Once a directory listing has been retrieved using repeated
+calls to @NextFile, @CloseDir should be called to close the
+directory.
+
+.also
+NextFile;CloseDir
+
+
+:CloseDir directory
+
+.args
+directory = valid directory handle
+
+.desc
+Any directory opened with @ReadDir must be closed after
+use with the @CloseDir command.
+
+.also
+ReadDir, NextFile$
+
+
+:CreateDir foldername$
+
+.args
+foldername$ = path name of directory to be created
+
+.desc
+This command attempts to create a new directory with the specified
+#foldername.
+
+Do not use a trailing slash at the end of the path/name parameter.
+
+You can use the @FileType function to verify the success of this 
+command.
+
+.also
+FileType;DeleteDir;OpenDir;CurrentDir;ChangeDir
+
+
+:DeleteDir foldername$
+
+.args
+foldername$ = path name of an existing directory
+
+.desc
+Deletes the specified directory from the computer's file
+system.
+
+This command will only succeed if the directory is empty.
+
+Do not use a trailing slash at the end of the path/name parameter.
+
+You can use the @FileType function to verify the success of this 
+command.
+
+.also
+DeleteFile;CurrentDir;ChangeDir
+
+
+:FileType ( filename$ )
+
+.args
+filename$ = a valid file's full path name
+
+.desc
+Returns the type of file specified by #filename.
+
+.table
+value,description
+0,The filename does not exist
+1,The filename is an existing file
+2,The filename is an existing directory
+
+You can use @FileType to validate that a file exists before 
+proceeding with a file operation.
+
+
+:FileSize (filename$)
+
+.args
+filename$ = any valid variable with path/filename
+
+.desc
+Returns the size of the specified file in bytes or 0 if the
+file does not exist.
+
+.also
+FileType;ReadFile
+
+
+:CopyFile from$, to$
+
+.args
+from$ = existing file name
+to$ = file name of a new file to be created
+
+.desc
+Copies the entire contents of one file to another.
+
+If the new file already exists it will be overwritten and all information lost.
+
+.also
+FileType;FileSize
+
+
+:DeleteFile filename$
+
+.args
+filename$ = name of an existing file
+
+.desc
+Deletes the specified file from the computer's file system.
+
+.also
+DeleteDir
+
+
+:CurrentDir$ ()
+
+.desc
+
+Returns the name of the current directory.
+
+The application's current directory is important whenever 
+a relative file name is used in a File system operation.
+
+A relative file name is one that does not begin with the
+drive name, and hence it's location is considered to be
+relative to the path returned by the @CurrentDir function.
+
+See the @ChangeDir command for changing the application's
+current directory.
+
+
+:ChangeDir foldername$
+
+.args
+foldername = an existing directory
+
+.desc
+Modifies the applications current directory affecting the
+subsequent use of any relative file names.
+
+
+
+::File/Stream
+
+
+:Eof ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns True if the file has reached it's End of File.
+
+Returns True if the stream buffers are empty and the stream 
+has been closed at the other end.
+
+Returns -1 if the file has already been closed or some 
+other error has occurred.
+
+.hint
+A program that reads a textfile of unknown lines will repeatedly
+test a file hasn't already reached its end of file by testing the result
+of the @Eof() function and exiting the loop before each call to @ReadLine.
+
+.also
+ReadAvail
+
+
+:ReadAvail ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns the size of data in bytes received and buffered from other end of a stream.
+
+Returns size of data in bytes remaining until the end of a file.
+
+In the case of an interactive stream ReadAvail can be used to avoid
+causing subsequent calls to @ReadByte etc. to block and wait for data
+no currently buffered.
+
+In the case of an opened file, @ReadAvail returns the difference between
+the current read position of the specified file and the size of that file.
+
+
+:ReadByte ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a single byte read from the specified stream or 0 if
+an end of file stream condition is already true.
+
+A byte is an 8 bit binary value that has a possible range
+of 0 through 255 inclusive.
+
+See the @Eof and @ReadAvail functions that may be required
+for data to be read correctly from an open stream or file.
+
+.also
+ReadFile;ReadShort;ReadInt;ReadFloat;Eof;ReadAvail
+
+
+:ReadShort ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a 16 bit value read from the specified stream or 0 if
+an end of file stream condition is already true.
+
+A short is a 16 bit binary value that has a possible range
+of 0 through 65535 inclusive.
+
+See the @Eof and @ReadAvail functions that may be required
+for data to be read correctly from an open stream or file.
+
+.also
+ReadFile;ReadByte;ReadInt;ReadFloat;Eof;ReadAvail
+
+
+:ReadInt ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a 32 bit integer value read from the specified stream 
+or 0 if an end of file stream condition is already true.
+
+A 32 bit int requires 4 bytes of storage.
+
+See the @Eof and @ReadAvail functions that may be required
+for data to be read correctly from an open stream or file.
+
+.also
+ReadFile;ReadByte;ReadShort;ReadFloat;Eof;ReadAvail
+
+
+:ReadFloat ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a 32 bit floating point value read from the 
+specified stream or 0 if an end of file stream 
+condition is already True.
+
+A 32 bit float requires 4 bytes of storage.
+
+See the @Eof and @ReadAvail functions that may be required
+for data to be read correctly from an open stream or file.
+
+.also
+ReadFile;ReadByte;ReadShort;ReadFloat;Eof;ReadAvail
+
+
+:ReadString$ ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a string by first reading an integer count value
+and then reading that many chracters into the resulting
+string.
+
+.hint
+This command should only be used when reading from a binary 
+file or stream. See the @ReadLine function for reading
+strings from text based files.
+
+.also
+WriteString;OpenTCPStream;ReadFile;ReadLine;ReadByte;ReadShort;ReadInt;ReadFloat;ReadBytes;ReadAvail
+
+
+:ReadLine$ ( stream )
+
+.args
+stream = a valid open stream or filestream
+
+.desc
+Returns a string created with characters read from the specified
+input file until either an "end-of-line" or "end-of-file" marker
+were encountered.
+
+An "end-of-line" can be a single carriage return @Chr$(13) or a single
+linefeed @Chr(10) or a carriage return linefeed combination.
+
+
+:ReadBytes bank,stream,offset,count
+
+.args
+bank = variable containing handle to valid bank
+stream = a valid open stream or filestream
+offset = offset from start of bankmemory to read data into 
+count = number of bytes to transfer
+
+.desc
+Reads the contents of a disk file or stream to a memory 
+bank and returns the number of bytes successfully transferred.
+
+.also
+WriteBytes;CopyStream
+
+
+:WriteByte stream,value
+
+.args
+stream = a valid open stream or filestream
+value = an integer value between 0 and 255 inclusive
+
+.desc
+Writes an 8 bit value to the specified stream or file.
+
+A byte is an 8 bit binary value that has a possible range
+of 0 through 255 inclusive.
+
+.also
+WriteShort
+
+
+:WriteShort stream,value
+
+.args
+stream = a valid open stream or filestream
+value = an integer value between 0 and 255 inclusive
+
+
+.desc
+Writes a 16 bit value to the specified stream or file.
+
+A short is a 16 bit binary value that has a possible range
+of 0 through 65535 inclusive and requires 2 bytes of storage.
+
+.also
+WriteFile;WriteByte;WriteInt
+
+
+:WriteInt stream,value
+
+.args
+stream = a valid open stream or filestream
+value = any integer value
+
+.desc
+Write a 32 bit value to the specified stream or file.
+
+A 32 bit int requires 4 bytes of storage.
+
+.also
+WriteFile;WriteByte;WriteShort
+
+
+:WriteFloat stream,value#
+
+.args
+stream = a valid open stream or filestream
+value# = any floating point value
+
+.desc
+Writes a 32 bit floating point value to the specified
+stream.
+
+A 32 bit float requires 4 bytes of storage.
+
+.also
+WriteFile;WriteByte;WriteShort;WriteFloat
+
+
+:WriteString$ stream,text$
+
+.args
+stream = a valid open stream or filestream
+text$ = any text or string variable
+
+.desc
+Writes the size of the string specified followed by
+a sequence of characters representing that string to
+the specified output file or stream.
+
+@WriteString is for use with binary files.
+
+Use @WriteLine instead to output strings to text 
+based files and streams.
+
+.also
+ReadString
+
+
+:WriteLine$ stream,text$
+
+.args
+stream = a valid open stream or filestream
+text = any text or string variable
+
+.desc
+Writes the contents of the text string to the specified
+output stream or file followed by the end of line
+characters @Chr$(13) and @Chr$(10).
+
+.also
+ReadLine
+
+
+:WriteBytes bank,stream,offset,count
+
+.args
+bank = variable containing handle to valid bank
+stream = a valid open stream or filestream
+offset = offset from start of bankmemory to write data from
+count = number of bytes to transfer
+
+.desc
+Writes the contents of a memory bank to a disk file or stream
+and returns the number of bytes successfully transferred.
+
+.also
+WriteBytes;CopyStream
+
+
+:CopyStream src_stream, dest_stream [,buffer_size]
+
+.args
+src_stream - source stream
+dest_stream - destination stream
+buffer_size - buffer size of stream
+
+.desc
+Returns the number of bytes successfully copied from
+src_stream to dest_stream.
+
+If buffer_size is not specified @CopyStream will copy
+data until an @EoF or end of file state exists with the
+specified src_stream.
+
+.also
+CopyFile;ReadBytes;WriteBytes
+
+
+
+::Network
+
+
+:DottedIP$( ip )
+
+.args
+ip - 32 bit integer ip address
+
+.desc
+Returns a string containing the specified 32 bit Internet
+Protocol address in dotted notation e.g. 192.168.0.1.
+
+
+:CountHostIPs( hostname$ )
+
+.args
+hostname$ - name of host
+
+.desc
+Returns the number of valid ip addresses that can be returned
+by the @HostIP command.
+
+.also
+HostIP
+
+
+:HostIP( index )
+
+.args
+index - index of host address
+
+.desc
+Returns an integer 32 bit IP address for the specified
+host address.
+
+Often a host will provide connections to a multiple number
+of networks and local area networks. 
+
+The index specified must be in the range 1...@CountHostIPs()
+inclusive where @CountHostIPs returns the number of network
+connection points available for routing purposes.
+
+.also
+CountHostIPs
+
+
+
+::TCP Network
+
+
+:OpenTCPStream ( ip$,port )
+
+.args
+ip$=IP address of stream
+port=TCP/IP Port Number
+
+.desc
+Returns a valid stream handle if successful, or 0 otherwise.
+
+@OpenStream is used to create a TCP connection with the specified
+server computer on the specified port.
+
+Once a connection is created the resulting stream handle
+can be used to perform two way communications with the remote
+system.
+
+See @CloseTCPStream on how to correctly end a TCP connection.
+
+.also
+CloseTCPStream
+
+
+:CloseTCPStream streamhandle
+
+.args
+stream = active stream returned by the @OpenTCPStream command
+
+.desc
+Once communications over a TCP connection are complete
+@CloseTCPStream is used to close the connection.
+
+This boths frees up system resources on the local computer
+but also signals an @EoF condition at the other end of the 
+connection if the corresponding stream is still open.
+
+.also
+OpenTCPStream;EoF
+
+
+:CreateTCPServer ( port )
+
+.args
+port = an available local port to accept connections through
+
+.desc
+Creates a TCP/IP server on the designated port.
+
+The @AcceptTCPStream function can then be used to accept
+individual connection requests from remote computers.
+
+Returns a TCP/IP server handle if successful or 0 if not.
+
+.also
+AcceptTCPStream
+
+
+:AcceptTCPStream ( serverhandle )
+
+.args
+serverhandle = valid server handle returned by @CreateTCPServer
+
+.desc
+
+
+Accepts an incoming TCP/IP stream, and returns a TCP/IP stream
+if one is available, or 0 if not.
+
+See CreateTCPServer and CloseTCPServer.
+
+
+:CloseTCPServer serverhandle
+
+.args
+serverhandle = handle assigned when the server was created.
+
+.desc
+Closes a TCP/IP server previously
+created with the CreateTCPServer command.
+
+
+:TCPStreamIP( tcp_stream )
+
+.args
+tcp_stream - TCP stream handle
+
+.desc
+Returns the integer
+IP address of the specified tcp_stream. The address returned is always
+that of the client machine.
+
+
+:TCPStreamPort( tcp_stream )
+
+.args
+tcp_stream - TCP stream handle
+
+.desc
+Returns the port number
+of the specified TCP stream. The port number returned is always that of
+the client machine.
+
+
+:TCPTimeouts read_millis,accept_millis
+
+.args
+read_millis - milliseconds value
+accept_millis - milliseconds value 
+
+.desc
+read_millis allows you to control how long reading data
+into a TCP stream can take before causing an error. By default, this is
+set to 10,000 (10 seconds). This means that if data takes longer than 10
+seconds to arrive, an error occurs and the stream can not be used any more.
+
+
+accept_millis allows you to control how the AcceptTCPStream() function
+will wait for a new connection. By default, this value is 0, so AcceptTCPStream()
+will return immediately if there is no new connection available.
+
+
+::UDP Network
+
+
+:CreateUDPStream( [port] )
+
+.args
+port (optional) - port number
+
+.desc
+Returns a UDP stream handle bound to the specified
+UDP port.
+
+If no port is specified, a free port will be allocated.
+
+The @UDPStreamPort() function is used to determine which port
+a UDP stream is bound.
+
+Use the @CloseUDPStream function when UDP communications
+are no longer required.
+
+.also
+CloseUDPStream;UDPTimeOuts;SendUDPMessage
+
+
+:CloseUDPStream udp_stream
+
+.args
+udp_stream - a valid UDP stream handle
+
+.desc
+None
+
+
+:SendUDPMsg udp_stream,dest_ip[,dest_port]
+
+.args
+udp_stream - UDP stream handle
+dest_ip - destination IP address
+dest_port - destination port number, optional
+
+.desc
+Transmits all the data written to the UDP stream 
+to the specified IP address and port.
+
+Data is written using the standard stream commands.
+
+If no destination port is specified, the port number 
+used to create the UDP Stream is used.
+
+Note that IP addresses must be in integer format
+as opposed to dotted IP format.
+
+
+:RecvUDPMsg( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Receives a UDP message into the specified 
+UDP stream. Standard stream read commands
+can then be used to examine the message.
+
+The return value is the integer IP address 
+of the message source, or 0 if no message 
+was available.
+
+You can use UDPMsgPort() to find out the 
+port number of the message source.
+
+
+:UDPStreamIP( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the integer IP address of the specified
+udp_stream. Currently, this always returns 0.
+
+
+:UDPStreamPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the port number of the specified UDP stream.
+
+This can be useful if a UDP stream is created without
+specifying a port number.
+
+
+:UDPMsgIP( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the integer IP address of the sender of the 
+last UDP message received.
+
+This value is also returned by RecvUDPMsg().
+
+
+:UDPMsgPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the port of the sender of the last UDP 
+message received.
+
+
+:UDPTimeouts timeout
+
+.args
+timeout - length of the @RecvUDPMsg timeout in milliseconds
+
+.desc
+@UDPTimeouts provides control over the length of time
+a @RecvUDPMsg function will wait before returning an
+empty result.
+
+By default the RecvUDPMsg timeout is set to 0, meaning the
+function returns immediately if there is no message to be
+received.
+
+
+
+::DirectPlay
+
+
+:StartNetGame()
+
+.desc
+Displays a Windows dialog with options to join or start a new 
+multiplayer network game, via modem, serial connection or 
+TCP/IP (Internet).
+
+A return value of 0 indicates failure, 1 means a game was joined 
+and 2 means a game was created and is being hosted on the 
+local machine. 
+
+Note: This command must be called before any other DirectPlay
+network commands, otherwise they will fail.
+
+.also
+HostNetGame
+
+
+:HostNetGame (gamename$)
+
+.args
+gamename$ = string value designating the game's name
+
+.desc
+This allows you to bypass the 'standard' networked game 
+dialog box (normally using StartNetGame) and start a 
+hosted game directly.
+
+A value of 2 is returned if the hosted game has started 
+successfully. 
+
+
+:JoinNetGame (gamename$,serverIP$)
+
+.args
+gamename$ = valid string containing game name to join
+serverIP$ = IP address of computer hosting game 
+
+.desc
+Use this command to join a network game, bypassing the dialog 
+box normally endured with the StartNetGame command.
+
+This returns 0 if the command failed, or 1 if the game was 
+joined successfully.
+
+
+:StopNetGame
+
+.desc
+Terminate the network game currently in progress.
+
+See @StartNetGame and @HostNetGame for details on starting
+a network game.
+
+If possible, the hosting session will transfer control to 
+another machine participating in the network game.
+
+
+:CreateNetPlayer ( name$ )
+
+.args
+name$ = any valid string holding the player's name.
+
+.desc
+Creates a new local player and returns an integer
+player number to be used in sending and receiving 
+messages on behalf of the player.
+
+A special message is sent to all remote machines playing
+the network game, (see @NetMsgType).
+
+
+:DeleteNetPlayer playerID
+
+.args
+playerID = valid player id returned by CreateNetPlayer
+
+.desc
+Removes the specified player from the network game.
+
+The playerID specified must be a valid value previously
+returned by the @CreateNetPlayer function.
+
+This also causes a special message to
+be sent to all remote machines (see @NetMsgType). 
+
+
+:NetPlayerName$ (playerID)
+
+.args
+playerID = a valid player ID number
+
+.desc
+Returns the name of the player specified.
+
+A Player ID is returned both by the @CreateNetPlayer
+and the @NetMsgFrom functions.
+
+See @NetMsgType, @NetMsgFrom, and @NetMsgTo for sources
+of other important information in a network game.
+
+
+:NetPlayerLocal (playerID)
+
+.args
+playerID = a valid player ID number
+
+.desc
+Returns True if the player specified was created on the
+local machine using the CreateNetPlayer command.
+
+
+:RecvNetMsg()
+
+.desc
+Returns @True if a message has been received since the
+last call to RecvNetMsg and @False if none.
+
+Typically used to confirm a message has been received
+prior to the use of the @NetMsgType, @NetMsgFrom, @NetMsgTo
+and @NetMsgData$ functions.
+
+
+:NetMsgType()
+
+.desc
+Returns a value representing the most recently received
+meesage type:
+
+.table
+Value,Meaning
+1..99,Game specific message type
+100,Player has joined the game
+101,Player has left the game
+102,Player is new host 
+200,Game connection has been lost
+
+
+:NetMsgFrom()
+
+.desc
+Returns the sender's ID number assigned to them when they were created
+with CreateNetPlayer command. Use this to perform actions on the player
+on the local machine.
+
+
+:NetMsgTo()
+
+.desc
+Returns the messages's intended recipient's ID number assigned to them
+when they were created with CreateNetPlayer.
+
+
+:NetMsgData$()
+
+.desc
+The string value returned from this command is the actual message text
+that was sent.
+
+
+:SendNetMsg type,data$,from,to,reliable
+
+.args
+type = game specific value of 1..99
+data$ = string containing message to send 
+from = player ID of the sender
+to = player ID of the recipient (0 for broadcast)
+reliable = @True to send message reliably 
+
+.desc
+Transmits a message to one or all of the players in an
+active net game.
+
+The @Type parameter is a number from 1 to 99 and is useful
+for assigning a game specific id to a message which
+when received is returned by the @NetMsgType function.
+
+The Data$ parameter is the actual string that contains 
+the message you want to send.
+
+FROM is the player's ID that is sending the message. This 
+is the value returned from the CreateNetPlayer() command.
+
+TO is the player's ID you wish to send the message to.
+A default value of 0 will broadcast to ALL players.
+
+The RELIABLE flag will put a priority on the message 
+and it will ensure there is no packet loss in the 
+delivery. However, it can be many times slower than a 
+regular non-reliable message.
+
+
+
+::External 
+
+
+:SystemProperty $( propertyname$ )
+
+.args
+propertyname$ - a valid system property name
+
+.desc
+Returns an information String stored in one of the following
+named properties:
+
+.table
+Name,Description
+AppDir,The folder from which the application was run.
+TempDir,A folder for the current user's temporary documents.
+WindowsDir,Operating System folder for current Windows session.
+SystemDir,System folder for current Windows session.
+AppHWND,Integer identifier of the application's main window.
+AppHINSTANCE,Integer identifier of the application's main window class.
+Direct3D7,Currently used instance of the DirectX7 object.
+Direct3DDevice7,The current @Graphics3D DirectX device handle.
+DirectDraw7,The current @Graphics DirectDraw handle.
+DirectInput7,The current DirectInput device handle.
+
+.also
+GetEnv
+
+:SetEnv environmentvariable$,value$
+
+.args
+environmentvariable$ - name of the system environment variable
+value$ - the value to associate with the named environment variable
+
+.desc
+Sets an environment variable that will be available to any
+userlib functions and processes started with the @ExecFile 
+command.
+
+An environment variable is simply a named string that can be
+used to share information with the host operating system
+and other running programs.
+
+See @GetEnv for an example of some of the useful environment 
+values already created by the Operating System.
+
+.also
+GetEnv
+
+
+:GetEnv$ ( environmentvariable$ )
+
+.args
+environmentvariable$ - name of a system environment variable
+
+.desc
+Returns the value of the specified environment variable if it exists
+or an empty string of the environment variable is undefined.
+
+Environment variables are created both by the system and other
+running programs as well as the operating system itself.
+
+The following are examples of some environment variables
+that contain useful information on a Windows system:
+
+.table
+Name,Description
+COMPUTERNAME, The name of the computer currently running the application
+HOMEDRIVE, Current user's home folder drive location.
+HOMEPATH, Current user's drive relative home folder location.
+NUMBER_OF_PROCESSORS, 1
+OS,Name of the currently used Operating System
+ProgramFiles,Location of current user's Program Files folder
+ComSpec, Full path to the Windows command line tool cmd.exe.
+
+.also
+SetEnv
+
+
+:ExecFile ( file$ )
+
+.args
+file$ - the file to be executed
+
+.desc
+Opens the specified file with the default application tool 
+associated with that file type.
+
+An executable file with a suffix such as .exe and .bat will
+launch itself whereas an html file will cause @ExecFile to
+open a webbrowser in order to display the specified file.
+
+
+:CallDLL ( dll_name$, proc_name$ [,in_bank,out_bank] )
+
+.args
+dll_name$ - name of dll
+proc_name$ - name of procedure 
+in_bank - optional bank with input information
+out_bank - optional bank for receiving output information
+
+.desc
+The DLL is called with pointers to and sizes of bank memory. 
+
+Dll function prototypes should like something like this (Visual C++) example:
+
+extern "C"{
+	_declspec(dllexport) int _cdecl my_dll_func(const void *in,int in_size,void *out,int out_sz );
+}
+
+

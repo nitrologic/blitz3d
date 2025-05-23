@@ -1,0 +1,47 @@
+:Stop
+
+.args
+None
+
+.desc
+If running the program in debug mode, it this command halts the program  and returns you to the editor where you can then step through your code, view  variables, etc.
+
+.also
+DebugLog;End
+
+.code
+; Halt the program and go to the editor/debugger
+
+Stop
+
+:DebugLog message
+
+.args
+message = message text string value
+
+.desc
+You power programmers will just love this. You have your own debug log to write to!  The DebugLog can be viewed from the debugger window during program execution only.
+
+
+For those not familiar to this sort of thing, think of the Debug log like your  own private 'in program notepad'. Use this to write messages to yourself during program execution. For example, you could write the graphic modes that the user has on his system, or just little alerts to let you know your code execution  made it to a certain point in the execution without interrupting it. I'm sure  you'll find a lot of uses for this! See the example if you're still lost.
+
+.also
+Stop
+
+.code
+; DebugLog Example
+
+; Let's start graphics mode
+Graphics 640,480,16
+
+; Now, let's load an image that doesn't exist!
+gfxPlayer=LoadImage("noimagefound.jpg")
+If gfxPlayer=0 Then
+DebugLog "Player's Graphics failed to load!"
+End If
+
+; This is supposed to generate an error. Press F9 to see the log!
+While Not KeyHit(1)
+DrawImage gfxPlayer,100,100
+Wend
+

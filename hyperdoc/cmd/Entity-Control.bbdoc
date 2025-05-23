@@ -1,0 +1,644 @@
+:FreeEntity EntityHandle
+
+.args
+EntityHandle - Handle returned by an Entity creating function such as CreateCube(), CreateLight(), LoadMesh() etc.
+
+.desc
+FreeEntity will free up the internal resources associated  with a particular entity and remove it from the scene.
+
+This command will also free all children entities parented to the entity.
+
+Note that the variable holding the handle (and any variables referencing children handles) are not reset as it is up to the Blitz programmer to zero or ignore their contents following a call to FreeEntity().
+
+.code
+; FreeEntity Example
+; This example creates an entity and
+; allows you to move it, but shows
+; that a handle is no longer valid after
+; FreeEntity is used on it.
+; Run in Debug Mode
+
+Graphics3D 640,480
+AppTitle "FreeEntity Example"
+
+Cam = CreateCamera()
+Lit = CreateLight()
+
+PositionEntity Lit,-5,-5,0  
+PositionEntity Cam,0,0,-5   
+
+AnEntity = CreateCube()    ; This is our Test Entity
+RotateMesh AnEntity,45,45,45
+
+While Not KeyDown(1) ; Until we press ESC
+
+; Use the Left or Right Arrows to Move the Entity
+If KeyDown(203) Then MoveEntity AnEntity,-0.1,0,0 
+If KeyDown(205) Then MoveEntity AnEntity,0.1,0,0
+
+; Use the Space Key to Free the Entity. It will disappear
+; The next time you try to move it, you will get an error
+; Notice that the Handle Variable doesn't change after the
+; Entity is free. It simply becomes invalid.
+
+If KeyHit(57) Then FreeEntity AnEntity ; Hit Space to Free!
+
+RenderWorld ; Draw the Scene
+
+; What is in the AnEntity handle?
+Text 10,10,"Entity Handle: "+AnEntity
+Flip ; Flip it into View
+Wend
+
+End
+
+:CopyEntity ( entity[,parent] )
+
+.args
+entity - Entity Handle
+parent (optional) - Entity that will act as Parent to the copy.
+
+.desc
+Creates a copy of an entity and returns the handle of the newly created copy. This is a new entity instance of an existing entity's mesh! Anything you do to the original Mesh (such as RotateMesh) will effect all the copies. Other properties (such as EntityColor, Position etc.) since they are 'Entity' properties, will be individual to the copy.
+
+If a parent entity is specified, the copied entity will be created at the parent entity's position. Otherwise, it will be created at 0,0,0.
+
+.code
+; CopyEntity Example
+; This example creates an entity and
+; allows you to make copies of it.
+
+Graphics3D 640,480
+AppTitle "CopyEntity Example"
+
+Cam = CreateCamera()
+Lit = CreateLight()
+
+PositionEntity Lit,-5,-5,0  
+PositionEntity Cam,0,0,-5   
+
+AnEntity = CreateCube()    ; This is our Test Entity
+ScaleMesh anEntity,0.4,0.4,0.4
+While Not KeyDown(1) ; Until we press ESC
+
+If KeyHit(57) Then 
+
+; When we hit Space, a new Entity is created
+; These share the same internal mesh structure though!
+; Hence although we are only Rotating the original MESH
+; Linked to the original Entity, since it is a Mesh command,
+; all the Entity Copies are linked to it..
+
+NewEntity = CopyEntity(AnEntity) ; Hit Space to Copy!
+
+; Change the Color of the Entity. Since this is an entity
+; Property, it doesn't effect the other copies.
+EntityColor NewEntity,Rand(255),Rand(255),Rand(255)
+PositionEntity NewEntity,Rand(4)-2,Rand(4)-2,0
+EndIf
+
+SeedRnd MilliSecs()
+
+RotateMesh AnEntity,.25,.35,.45
+
+RenderWorld ; Draw the Scene
+Flip ; Flip it into View
+Wend
+
+End
+
+:EntityColor entity,red#,green#,blue#
+
+.args
+entity - entity handle
+Red# - red value of entity
+Green# - green value of entity
+Blue# - blue value of entity
+
+.desc
+Sets the color of an entity.
+
+The Red, Green and Blue values should be in the range 0-255 with 0 being darkest and 255 brightest. The default entity color is 255,255,255 (White).
+
+.code
+; EntityColor Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Set initial entity color values
+red#=255
+green#=255
+blue#=255
+
+While Not KeyDown( 1 )
+
+; Change red, green, blue values depending on key pressed
+If KeyDown( 2 )=True And red#>0 Then red#=red#-1
+If KeyDown( 3 )=True And red#<255 Then red#=red#+1
+If KeyDown( 4 )=True And green#>0 Then green#=green#-1
+If KeyDown( 5 )=True And green#<255 Then green#=green#+1
+If KeyDown( 6 )=True And blue#>0 Then blue#=blue#-1
+If KeyDown( 7 )=True And blue#<255 Then blue#=blue#+1
+
+; Set entity color using red, green, blue values
+EntityColor cube,red#,green#,blue#
+
+TurnEntity cube,0.1,0.1,0.1
+
+RenderWorld
+
+Text 0,0,"Press keys 1-6 to change EntityColor red#,green#,blue# values
+Text 0,20,"Entity Red: "+red#
+Text 0,40,"Entity Green: "+green#
+Text 0,60,"Entity Blue: "+blue#
+
+Flip
+
+Wend
+
+End
+
+:EntityAlpha entity,alpha#
+
+.args
+Entity - entity handle
+Alpha# - alpha level of entity
+
+.desc
+Sets the entity alpha level of an entity.
+
+The alpha# value should be in a floating point value in the range 0-1. The default entity alpha setting is 1. 
+
+The alpha level is how transparent an entity is. A value of 1 will mean the entity is opaque. A value of 0 will mean the entity is completely transparent, i.e. invisible. Values between 0 and 1 will cause varying amount of transparency. This is useful for imitating the look of objects such as glass and other translucent materials. 
+
+An EntityAlpha value of 0 is especially useful as Blitz3D will not render entities with such a value, but will still involve the entities in collision tests. This is unlike HideEntity, which doesn't involve entities in collisions.
+
+.code
+; EntityAlpha Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+Back=CreateCube()
+
+PositionEntity cube,0,0,5
+PositionEntity back,0,0,15
+ScaleEntity Back,10,2,1
+EntityColor back,255,0,0
+; Set initial entity color values
+Alpha#=1
+
+While Not KeyDown( 1 )
+
+; Change alpha value depending on key pressed
+If alpha#<0.01 Then alpha# = 0
+If alpha#>1 Then alpha# = 1
+If KeyDown( 2 )=True And Alpha#>0 Then Alpha#=Alpha#-0.01
+If KeyDown( 3 )=True And alpha#<1 Then Alpha#=Alpha#+0.01
+; Set entity alpha value
+EntityAlpha cube,Alpha#
+
+
+TurnEntity cube,0.1,0.1,0.1
+TurnEntity back,1,0,0
+
+RenderWorld
+
+Text 0,0,"Press keys 1-2 to change EntityAlpha"
+Text 0,20,"Entity Alpha: "+Alpha
+
+Flip
+
+Wend
+
+End
+
+:EntityShininess Entity, Shininess#
+
+.args
+Entity - entity handle
+Shininess# - shininess of entity
+
+.desc
+Sets the specular shininess of an entity.
+
+The shininess# value should be a floting point number in the range 0-1. The default shininess setting is 0. 
+
+Shininess is how much brighter certain areas of an object will appear to be when a light is shone directly at them. 
+
+Setting a shininess value of 1 for a medium to high poly sphere, combined  with the creation of a light shining in the direction of it, will give it the  appearance of a shiny snooker ball.
+
+.code
+; EntityShininess Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+camera=CreateCamera()
+; Set ambient light to a low level, to increase effect of shininess
+
+AmbientLight 32,32,32
+light=CreateLight()
+RotateEntity light,45,45,0
+
+sphere=CreateSphere(100)
+EntityColor Sphere,255,0,0
+PositionEntity sphere,0,0,4
+
+; Set initial shine value
+
+shine#=0
+
+While Not KeyDown(1)
+; Change shine value depending on key pressed
+
+If KeyDown(2)=True And shine#>0 Then shine#=shine#-0.01
+If KeyDown(3)=True And shine#<1 Then shine#=shine#+0.01
+
+; Set entity shininess using shine value
+EntityShininess sphere,shine#
+
+RenderWorld
+
+Text 0,0,"Press keys 1-2 to change EntityShininess Setting"
+Text 0,20,"Entity Shininess: "+shine#
+
+Flip
+Wend
+End
+
+:EntityTexture entity,texture[,frame][,index]
+
+.args
+entity - entity handle
+texture - texture handle
+frame (optional) - frame of texture. Defaults to 0.
+index (optional) - index number of texture. Should be in the range to 0-7. Defaults  to 0.
+
+.desc
+Applies a texture to an entity.
+
+The optional frame parameter specifies  which texture animation frame should be used as the texture. 
+
+The optional index parameter specifies which index number should be assigned  to the texture. Index numbers are used for the purpose of multitexturing. See TextureBlend. 
+
+A little note about multitexturing and slowdown. Graphics cards support a  maximum amount of textures per object, which can be used with very little, if  any, slowdown. For most cards this is two, but for a GeForce3 it is four. However,  once you use more than this amount, Blitz will emulate the effect itself by  duplicating objects and textures. Obviously, this may then cause slowdown. 
+
+.code
+; EntityTexture Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture entity
+EntityTexture cube,tex
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:EntityBlend Entity, Blend
+
+.args
+Entity - Entity handle
+
+Blend - Blend mode of the entity.
+1: Alpha (default)
+2: Multiply
+3: Add
+
+.desc
+Sets the blending mode of an entity. This blending mode determines the way in which the new RGBA of the pixel being rendered is combined with the RGB of the background.
+
+To calculate the new RGBA of the pixel being rendered, the texture RGBA for the pixel (see @TextureBlend for more information on how the texture RGBA is calculated) is taken, its alpha component multiplied by the entities/brushes (where applicable) alpha value and its color compentent multiplied by the entities/brushes colour. This is the RGBA which will then be blended into the background pixel, and how this is done depends on the EntityBlend value.
+
+Alpha:
+This blends the pixels according to the Alpha value. This is rougly done to the formula:
+
+Rr = ( An * Rn ) + ( ( 1.0 - An ) * Ro )
+Gr = ( An * Gn ) + ( ( 1.0 - An ) * Go )
+Br = ( An * Bn ) + ( ( 1.0 - An ) * Bo )
+
+Where R = Red, G = Green, B = Blue, n = new pixel colour values, r = resultant colour values, o = old pixel colour values.
+
+Alpha blending is the default blending mode and is used with most world objects.
+
+Multiply:
+This blend mode will darken the underlying pixels. If you think of each RGB value as being on a scale from 0% to 100%, where 0 = 0% and 255 = 100%, the multiply blend mode will multiply the red, green and blue values individually together in order to get the new RGB value, roughly according to:
+
+Rr = ( ( Rn / 255.0 ) * ( Ro / 255.0 ) ) * 255.0
+Gr = ( ( Gn / 255.0 ) * ( Go / 255.0 ) ) * 255.0
+Br = ( ( Bn / 255.0 ) * ( Bo / 255.0 ) ) * 255.0
+
+The alpha value has no effect with multiplicative blending. Blending a RGB value of 255, 255, 255 will make no difference, while an RGB value of 128, 128, 128 will darken the pixels by a factor of 2 and an RGB value of 0, 0, 0 will completely blacken out the resultant pixels. An RGB value of 0, 255, 255 will remove the red component of the underlying pixel while leaving the other color values 
+untouched.
+
+Multiply blending is most often used for lightmaps, shadows or anything else that needs to 'darken' the resultant pixels.
+
+Add: 
+Additive blending will add the new color values to the old, roughly according to:
+
+Rr = ( Rn * An ) + Ro
+Gr = ( Gn * An ) + Go
+Br = ( Bn * An ) + Bo
+
+The resultant RGB values are clipped out at 255, meaning that multiple additive effects can quickly cause visible banding from smooth gradients.
+
+Additive blending is extremely useful for effects such as laser shots and fire.
+
+.also
+TextureBlend;EntityAlpha
+
+.code
+Graphics3D 640,480
+
+SetBuffer BackBuffer()
+
+SeedRnd MilliSecs()
+
+
+; create camera
+camera=CreateCamera()
+CameraClsColor camera,160,160,160
+PositionEntity camera,0,0,-30
+middle=CreatePivot()
+EntityParent camera,middle
+
+; create add texture - white cirlce on a black background
+For n=0 To 50
+Color 5+(n*5),5+(n*5),5+(n*5)
+Oval 10+n,10+n,236-(n*2),236-(n*2),1
+Next
+
+blob_tex=CreateTexture(256,256)
+blob=CreateImage(256,256)
+GrabImage blob,0,0
+CopyRect 0,0,256,256,0,0,ImageBuffer(blob),TextureBuffer(blob_tex)
+FreeImage blob
+
+max_blobs=100
+
+; create blobs using add blend mode
+Dim blobs(max_blobs) ; blob sprites
+Dim xyblobs#(max_blobs,2) ; blob vector
+
+For n=0 To max_blobs
+	blobs(n)=CreateSprite()
+	EntityFX blobs(n),1
+	EntityBlend blobs(n),3 ;set blend mode to add
+	EntityTexture blobs(n),blob_tex
+	xyblobs(n,0)=Rnd(-.1,.1)
+	xyblobs(n,1)=Rnd(-.1,.1)
+	xyblobs(n,2)=Rnd(-.1,.1)
+	EntityColor blobs(n),Rand(0,255),Rand(0,255),Rand(0,255) ;give it a colour
+	Next
+
+; create cube texture
+Color 255,255,255
+Rect 0,0,256,256,1
+For n=0 To 7
+	If n=0 Then Color 0,0,0
+	If n=1 Then Color 0,0,255
+	If n=2 Then Color 0,255,0
+	If n=3 Then Color 0,255,255
+	If n=4 Then Color 255,0,0
+	If n=5 Then Color 255,0,255
+	If n=6 Then Color 255,255,0
+	If n=7 Then Color 255,255,255
+	Rect n*32,n*32,32,32,1
+	Next
+Color 0,0,0
+For n=0 To 255 Step 32
+Line 0,n,255,n
+Line n,0,n,255
+Next
+
+cube_tex=CreateTexture(256,256)
+cube=CreateImage(256,256)
+GrabImage cube,0,0
+CopyRect 0,0,256,256,0,0,ImageBuffer(cube),TextureBuffer(cube_tex)
+FreeImage cube
+
+; create cube
+cube=CreateCube()
+ScaleEntity cube,11,11,11
+EntityTexture cube,cube_tex
+EntityFX cube,17 ;set fullbright and 2 sided textures
+EntityBlend cube,2 ;set multiply blend
+
+Repeat
+
+; move the blobs around
+For n=0 To max_blobs
+	MoveEntity blobs(n),xyblobs(n,0),xyblobs(n,1),xyblobs(n,2)
+	;bounce off sides
+	If EntityX(blobs(n))<-10 Or EntityX(blobs(n))>10 Then xyblobs(n,0)=-xyblobs(n,0)
+	If EntityY(blobs(n))<-10 Or EntityY(blobs(n))>10 Then xyblobs(n,1)=-xyblobs(n,1)
+	If EntityZ(blobs(n))<-10 Or EntityZ(blobs(n))>10 Then xyblobs(n,2)=-xyblobs(n,2)
+	Next
+
+; turn camera
+TurnEntity middle,.1,.2,.3
+
+
+UpdateWorld
+RenderWorld
+Flip
+
+
+Until KeyHit(1)
+
+:EntityFX entity,fx
+
+.args
+entity - entity handle
+
+fx -
+0: nothing (default)
+1: full-bright
+2: use vertex colors instead of brush color
+4: flatshaded
+8: disable fog
+16: disable backface culling
+32: force alpha-blending
+
+.desc
+Sets miscellaneous effects for an entity.
+
+Flags can be added to combine  two or more effects. For example, specifying a flag of 3 (1+2) will result in  a full-bright and vertex-coloured brush.
+
+Flag 32, to force alpha-blending, must be used in order to enable vertex alpha (see VertexColor).
+
+.also
+VertexColor
+
+.code
+None.
+
+:EntityAutoFade entity,near#,far#
+
+.args
+entity - entity handle
+near# - distance in front of the camera at which entity's will start being faded
+far# - distance in front of the camera at which entity's will stop being faded  (and will be invisible)
+
+.desc
+Enables auto fading for an entity. This will cause an entity's alpha level  to be adjusted at distances between near and far to create a 'fade-in' effect.
+
+.code
+None.
+
+:PaintEntity entity,brush
+
+.args
+entity - entity handle
+brush - brush handle
+
+.desc
+Paints a entity with a brush.
+
+The reason for using PaintEntity to apply  specific properties to a entity using a brush rather than just using EntityTexture,  EntityColor, EntityShininess etc, is that you can pre-define one brush, and  then paint entities over and over again using just the one command rather than  lots of separate ones. 
+
+.code
+None.
+
+:EntityOrder entity,order
+
+.args
+entity - entity handle
+order - order that entity will be drawn in
+
+.desc
+Sets the drawing order for an entity.
+
+An order value of 0 will mean the  entity is drawn normally. A value greater than 0 will mean that entity is drawn  first, behind everything else. A value less than 0 will mean the entity is drawn  last, in front of everything else. 
+
+Setting an entity's order to non-0 also disables z-buffering for the entity,  so should be only used for simple, convex entities like skyboxes, sprites etc. 
+
+EntityOrder affects the specified entity but none of its child entities,  if any exist. 
+
+.code
+None.
+
+:ShowEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Shows an entity. Very much the opposite of HideEntity.
+
+Once an entity has been hidden using HideEntity,  use show entity to make it visible and involved in collisions again.  Note that ShowEntity has no effect if the enitities parent object is hidden.
+
+Entities are shown by default after creating/loading them, so you should  only need to use ShowEntity after using HideEntity. 
+
+ShowEntity affects the specified entity only - child entities are not affected.
+
+.code
+None.
+
+:HideEntity entity
+
+.args
+entity - entity handle
+
+.desc
+Hides an entity, so that it is no longer visible, and is no longer involved  in collisions.
+
+The main purpose of hide entity is to allow you to create entities  at the beginning of a program, hide them, then copy them and show as necessary  in the main game. This is more efficient than creating entities mid-game. 
+
+If you wish to hide an entity so that it is no longer visible but still involved  in collisions, then use EntityAlpha 0 instead.  This will make an entity completely transparent. 
+
+HideEntity affects the specified entity and all of its child entities, if  any exist. 
+
+.code
+None.
+
+:NameEntity entity,name$
+
+.args
+entity - entity handle
+name$ - name of entity
+
+.desc
+Sets an entity's name.
+
+.also
+EntityName
+
+.code
+None.
+
+:EntityParent entity,parent[,global]
+
+.args
+entity - entity handle
+parent - parent entity handle
+global (optional) - true for the child entity to retain its global position  and orientation. Defaults to true.
+
+.desc
+Attaches an entity to a parent.
+
+Parent may be 0, in which case the entity  will have no parent. 
+
+.code
+None.
+
+:GetParent ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns an entity's parent.
+
+.code
+None.
+

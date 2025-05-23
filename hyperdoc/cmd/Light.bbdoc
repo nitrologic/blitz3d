@@ -1,0 +1,171 @@
+:CreateLight ( [type][,parent] )
+
+.args
+type (optional) - type of light
+1: directional (default)
+2: point
+3: spot
+
+parent (optional) - parent entity of light
+
+.desc
+Creates a light.
+
+Lights work by affecting the colour of all vertices within  the light's range. You need at to create at least one light if you wish to use 3D graphics otherwise everything will appear flat.
+
+The optional type parameter allows you to specify the type of light you wish to create. A value of 1 creates a directional light. This works similar to a  sun shining on a house. All walls facing a certain direction are lit the same.  How much they are lit by depends on the angle of the light reaching them.  Directional lights have infinite 'position' and infinite range.
+
+A value of 2 creates a point (or omni) light. This works a little bit like a light bulb  in a house, starting from a central point and gradually fading outwards.
+
+A value of 3 creates a spot light. This is a cone of light. This works similar  to shining a torch in a house. It starts with an inner angle of light, and then  extends towards an outer angle of light.  You can adjust the angles of a 'spot' light with the LightConeAngles command.
+
+The optional parent parameter allow you to specify a parent entity for the  light so that when the parent is moved the child light will move with it. However,  this relationship is one way; applying movement commands to the child will not affect the parent. 
+
+Specifying a parent entity will still result in the light being created at  position 0,0,0 rather than at the parent entity's position.
+
+
+Other notes:
+There is a DirectX limit on the number of lights available per scene - this is either 8 or 16 depending on your video card, but you should always assume 8.
+
+Also, you should remember that each light added effects the rendering speed.
+
+Lights do not cast shadows, like they do in real life.
+
+Most games get around these issues by the use of a pre-calculated 'baked' lightmap texture for the static geometry in the scene.
+
+Other lighting techniques include: adjusting vertex colors, dynamic shadows, and/or dynamic lights (ie. moving the lights around in the scene as they are needed).
+
+.also
+LightRange;LightColor;LightConeAngles;AmbientLight
+
+.code
+Graphics3D 640,480
+
+camera = CreateCamera()
+MoveEntity camera,0,0,-3
+
+ball = CreateSphere()
+
+lite = CreateLight(1) ; change this to 2 or 3 to see different lights
+MoveEntity lite,5,0,0
+PointEntity lite,ball ; make sure light is pointing at ball
+
+While Not KeyDown(1)
+RenderWorld:Flip
+Wend
+End
+
+:LightRange light,range#
+
+.args
+light - light handle
+range# - range of light (default: 1000.0)
+
+.desc
+Sets the range of a light.
+
+The range of a light is how far it reaches.  Everything outside the range of the light will not be affected by it.
+
+The value is very approximate, and should be experimented with for best results.
+
+.also
+CreateLight;LightColor;LightConeAngles
+
+.code
+Graphics3D 640,480
+
+camera = CreateCamera()
+MoveEntity camera,0,0,-3
+
+ball = CreateSphere()
+
+lite = CreateLight(2) ; try different lights 1 to 3
+MoveEntity lite,5,0,-5
+PointEntity lite,ball
+
+range# = 0.5
+LightRange lite,range
+
+While Not KeyDown(1)
+RenderWorld:Flip
+If KeyHit(57) Then ; hit SPACEBAR to increase light range
+range = range + 0.5
+LightRange lite,range
+EndIf
+Wend
+End
+
+:LightColor light,red#,green#,blue#
+
+.args
+light - light handle
+red# - red value of light
+green# - green value of light
+blue# - blue value of light
+
+.desc
+Sets the color of a light.
+
+An r,g,b value of 255,255,255 will brighten  anything the light shines on.
+
+An r,g,b value of 0,0,0 will have no affect on anything it shines on.
+
+An r,g,b value of -255,-255,-255 will darken anything it shines on. This is  known as 'negative lighting', and is useful for shadow effects.
+
+.also
+CreateLight;LightRange;LightConeAngles
+
+.code
+Graphics3D 640,480
+
+camera = CreateCamera()
+MoveEntity camera,0,0,-3
+
+ball = CreateSphere()
+
+lite = CreateLight() ; try different lights 1 to 3
+MoveEntity lite,5,0,-15
+PointEntity lite,ball
+
+
+While Not KeyDown(1)
+RenderWorld:Flip
+If KeyHit(57) Then LightColor lite,Rnd(255),Rnd(255),Rnd(255) ; press SPACEBAR to try different light colors
+Wend
+End
+
+:LightConeAngles light,inner_angle#,outer_angle#
+
+.args
+light - light handle
+inner_angle# - inner angle of cone
+outer_angle# - outer angle of cone
+
+.desc
+Sets the 'cone' angle for a 'spot' light.
+
+The default light cone angles setting  is 0,90.
+
+.also
+CreateLight;LightRange;LightColor
+
+.code
+Graphics3D 640,480
+
+camera = CreateCamera()
+MoveEntity camera,0,0,-40
+
+flat = CreatePlane(10)
+TurnEntity flat,-90,0,0
+
+lite = CreateLight(3) ; try different lights 1 to 3
+MoveEntity lite,0,0,-15
+
+While Not KeyDown(1)
+RenderWorld:Flip
+If KeyHit(57) Then ; press SPACEBAR to randomly change the 'cone' of light
+LightConeAngles lite, Rand(120),Rand(120)
+EndIf
+Wend
+End
+

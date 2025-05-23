@@ -1,0 +1,768 @@
+:CreateTerrain ( grid_size[,parent] )
+
+.args
+grid_size - no of grid squares along each side of terrain, and must be a  power of 2 value, e.g. 32, 64, 128, 256, 512, 1024.
+parent (optional) - parent entity of terrain
+
+.desc
+Creates a terrain entity and returns its handle.
+
+The terrain  extends from 0,0,0 to grid_size,1,grid_size. 
+
+A terrain is a special type of polygon object that uses real-time level of  detail (LOD) to display landscapes which should theoretically consist of over  a million polygons with only a few thousand. The way it does this is by constantly  rearranging a certain amount of polygons to display high levels of detail close  to the viewer and low levels further away. 
+
+This constant rearrangement of polygons is occasionally noticeable however,  and is a well-known side-effect of all LOD landscapes. This 'pop-in' effect  can be reduced in lots of ways though, as the other terrain help files will  go on to explain. 
+
+The optional parent parameter allows you to specify a parent entity for the  terrain so that when the parent is moved the child terrain will move with it.  However, this relationship is one way; applying movement commands to the child  will not affect the parent. 
+
+Specifying a parent entity will still result in the terrain being created  at position 0,0,0 rather than at the parent entity's position.  
+
+.also
+LoadTerrain. 
+
+.code
+; CreateTerrain Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create terrain
+terrain=CreateTerrain(128)
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+Flip
+
+Wend
+
+End
+
+:LoadTerrain ( file$[,parent] )
+
+.args
+file$ - filename of image file to be used as height map
+parent (optional) - parent entity of terrain
+
+.desc
+Loads a terrain from an image file and returns the terrain's handle.
+
+The  image's red channel is used to determine heights. Terrain is initially the same  width and depth as the image, and 1 unit high. 
+
+Tips on generating nice terrain:
+
+* Smooth or blur the height map
+* Reduce the y scale of the terrain
+* Increase the x/z scale of the terrain
+* Reduce the camera range 
+
+When texturing an entity, a texture with a scale of 1,1,1 (default) will  be the same size as one of the terrain's grid squares. A texture that is scaled  to the same size as the size of the bitmap used to load it or the no. of grid  square used to create it, will be the same size as the terrain. 
+
+The optional parent parameter allows you to specify a parent  entity for the terrain so that when the parent is moved the child terrain will  move with it. However, this relationship is one way; applying movement commands  to the child will not affect the parent.  
+
+Specifying a parent entity will still result in the terrain being created  at position 0,0,0 rather than at the parent entity's position.  
+
+A heightmaps dimensions (width and height) must be the same and must be a power of 2, e.g. 32, 64, 128, 256, 512, 1024. 
+
+.also
+CreateTerrain.
+
+.code
+LoadTerrain Example
+-------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+Flip
+
+Wend
+
+End
+
+:TerrainSize ( terrain )
+
+.args
+terrain - terrain handle
+
+.desc
+Returns the grid size used to create a terrain.
+
+.code
+; TerrainSize Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+While Not KeyDown( 1 )
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+; Output terrain size to screen
+Text 0,20,"Terrain Size: "+TerrainSize(terrain)
+
+Flip
+
+Wend
+
+End
+
+:TerrainDetail terrain,detail_level[,vertex_morph]
+
+.args
+terrain - terrain handle
+detail_level - detail level of terrain
+vertex_morph (optional) - True to enable vertex morphing of terrain. Defaults  to False.
+
+.desc
+Sets the detail level for a terrain. This is the number of triangles used  to represent the terrain. A typical value is 2000.
+
+The optional vertex_morph  parameter specifies whether to enable vertex morphing. It is recommended you  set this to True, as it will reduce the visibility of LOD 'pop-in'. 
+
+.code
+; TerrainDetail Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+; Set terrain detail value
+terra_detail=4000
+
+; Set vertex morph value
+vertex_morph=True
+
+While Not KeyDown( 1 )
+
+; Change terrain detail value depending on key pressed
+If KeyDown(26) Then terra_detail=terra_detail-10
+If KeyDown(27) Then terra_detail=terra_detail+10
+
+; Toggle vertex morphing on/off when spacebar is pressed
+If KeyHit(57)=True Then vertex_morph=1-vertex_morph
+
+; Set terrain detail, vertex morphing
+TerrainDetail terrain,terra_detail,vertex_morph
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+Text 0,20,"Use [ and ] keys to change terrain detail level"
+Text 0,40,"Press spacebar to enable/disable vertex morphing"
+Text 0,60,"Terrain Detail: "+terra_detail
+If vertex_morph=True Then Text 0,80,"Vertex Morphing: True" Else Text 0,80,"Vertex  Morphing: False"
+
+Flip
+
+Wend
+
+End
+
+:TerrainShading terrain,enable
+
+.args
+terrain - terrain handle
+enable - True to enable terrain shading, False to to disable it. The default  mode is False.
+
+.desc
+Enables or disables terrain shading.
+
+Shaded terrains are a little slower  than non-shaded terrains, and in some instances can increase the visibility  of LOD 'pop-in'. However, the option is there to have shaded terrains if you  wish to do so. 
+
+.code
+; TerrainShading Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,45,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+While Not KeyDown( 1 )
+
+; Toggle terrain shading value between 0 and 1 when spacebar is pressed
+If KeyHit(57)=True Then terra_shade=1-terra_shade
+
+; Enable/disable terrain shading
+TerrainShading terrain,terra_shade
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+Text 0,20,"Press spacebar to toggle between TerrainShading True/False"
+If terra_shade=True Then Text 0,40,"TerrainShading: True" Else Text 0,40,"TerrainShading:  False"
+
+Flip
+
+Wend
+
+End
+
+:TerrainHeight# ( terrain,grid_x,grid_z )
+
+.args
+terrain - terrain handle
+grid_x - grid x coordinate of terrain
+grid_z - grid z coordinate of terrain
+
+.desc
+Returns the height of the terrain at terrain grid coordinates x,z. The value  returned is in the range 0 to 1.
+
+.also
+TerrainY. 
+
+.code
+; TerrainHeight Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+terra_size=32 ; initial size of terrain, and no. of grids segments, along each  side
+x_scale=10 ; x scale of terrain
+y_scale=50 ; y scale of terrain
+z_scale=10 ; z scale of terrain
+marker_x=terra_size/2 ; initial x position of marker
+marker_z=terra_size/2 ; initial z position of marker
+
+camera=CreateCamera()
+PositionEntity camera,(terra_size*x_scale)/2,50,0 ; position wherever; just  try and get good view of terrain!
+RotateEntity camera,30,0,0 ; again, try and get good view of terrain
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create terrain
+terra=CreateTerrain(terra_size)
+ScaleEntity terra,x_scale,y_scale,z_scale
+
+; Texture terrain
+grass_tex=LoadTexture("media/mossyground.bmp")
+EntityTexture terra,grass_tex
+
+; Create marker
+marker=CreateSphere()
+ScaleEntity marker,1,1,1
+EntityColor marker,255,0,0
+
+While Not KeyDown(1)
+
+; Change marker position values depending on cursor key pressed
+If KeyHit(205)=True Then marker_x=marker_x+1
+If KeyHit(203)=True Then marker_x=marker_x-1
+If KeyHit(208)=True Then marker_z=marker_z-1
+If KeyHit(200)=True Then marker_z=marker_z+1
+
+; Get terrain height at marker position
+marker_y#=TerrainHeight(terra,marker_x,marker_z)
+
+; If A pressed then increase marker_y value and modify terrain
+If KeyDown(30)=True
+If marker_y#<1 Then marker_y#=marker_y#+0.005
+ModifyTerrain terra,marker_x,marker_z,marker_y#
+EndIf
+
+; If Z pressed then decrease marker_y value and modify terrain
+If KeyDown(44)=True
+If marker_y#>0 Then marker_y#=marker_y#-0.005
+ModifyTerrain terra,marker_x,marker_z,marker_y#
+EndIf
+
+; Position marker, taking into account x, y and z scales of terrain
+PositionEntity marker,marker_x*x_scale,marker_y#*y_scale,marker_z*z_scale
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move marker over the terrain"
+Text 0,20,"Press A or Z to alter height of terrain at marker's position"
+Text 0,40,"Terrain Height: "+marker_y#
+
+Flip
+
+Wend
+
+End
+
+:ModifyTerrain terrain,grid_x,grid_z,height#[,realtime]
+
+.args
+terrain - terrain handle
+grid_x - grid x coordinate of terrain
+grid_y - grid y coordinate of terrain
+height# - height of point on terrain. Should be in the range 0-1.
+realtime (optional) - True to modify terrain immediately. False to modify terrain  when RenderWorld in next called. Defaults to False.
+
+.desc
+Sets the height of a point on a terrain.
+
+.code
+; ModifyTerrain Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+terra_size=32 ; initial size of terrain, and no. of grids segments, along each  side
+x_scale=10 ; x scale of terrain
+y_scale=50 ; y scale of terrain
+z_scale=10 ; z scale of terrain
+marker_x=terra_size/2 ; initial x position of marker
+marker_z=terra_size/2 ; initial z position of marker
+
+camera=CreateCamera()
+PositionEntity camera,(terra_size*x_scale)/2,50,0 ; position wherever; just  try and get good view of terrain!
+RotateEntity camera,30,0,0 ; again, try and get good view of terrain
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create terrain
+terra=CreateTerrain(terra_size)
+ScaleEntity terra,x_scale,y_scale,z_scale
+
+; Texture terrain
+grass_tex=LoadTexture("media/mossyground.bmp")
+EntityTexture terra,grass_tex
+
+; Create marker
+marker=CreateSphere()
+ScaleEntity marker,1,1,1
+EntityColor marker,255,0,0
+
+While Not KeyDown(1)
+
+; Change marker position values depending on cursor key pressed
+If KeyHit(205)=True Then marker_x=marker_x+1
+If KeyHit(203)=True Then marker_x=marker_x-1
+If KeyHit(208)=True Then marker_z=marker_z-1
+If KeyHit(200)=True Then marker_z=marker_z+1
+
+; Get terrain height at marker position
+marker_y#=TerrainHeight(terra,marker_x,marker_z)
+
+; If A pressed then increase marker_y value and modify terrain
+If KeyDown(30)=True
+If marker_y#<1 Then marker_y#=marker_y#+0.005
+ModifyTerrain terra,marker_x,marker_z,marker_y#
+EndIf
+
+; If Z pressed then decrease marker_y value and modify terrain
+If KeyDown(44)=True
+If marker_y#>0 Then marker_y#=marker_y#-0.005
+ModifyTerrain terra,marker_x,marker_z,marker_y#
+EndIf
+
+; Position marker, taking into account x, y and z scales of terrain
+PositionEntity marker,marker_x*x_scale,marker_y#*y_scale,marker_z*z_scale
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move marker over the terrain"
+Text 0,20,"Press A or Z to alter height of terrain at marker's position"
+Text 0,40,"Terrain Height: "+marker_y#
+
+Flip
+
+Wend
+
+End
+
+:TerrainX# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated x coordinate on a terrain.
+
+.also
+TerrainY, TerrainZ. 
+
+.code
+; TerrainX Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+While Not KeyDown( 1 )
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+; Output TerrainX value to screen
+Text 0,20,"TerrainX: "+TerrainX(terrain,x#,terra_y#,z#)
+
+Flip
+
+Wend
+
+End
+
+:TerrainY# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated y coordinate on a terrain.
+
+Gets the ground's  height, basically. 
+
+.also
+TerrainX, TerrainZ, TerrainHeight. 
+
+.code
+; TerrainY Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+While Not KeyDown( 1 )
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)
+
+PositionEntity camera,x#,terra_y#+5,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+; Output TerrainY value to screen
+Text 0,20,"TerrainY: "+terra_y#
+
+Flip
+
+Wend
+
+End
+
+:TerrainZ# (terrain,x#,y#,z# )
+
+.args
+terrain - terrain handle
+x# - world x coordinate
+y# - world y coordinate
+z# - world z coordinate
+
+.desc
+Returns the interpolated z coordinate on a terrain.
+
+.also
+TerrainX, TerrainY. 
+
+.code
+; TerrainZ Example
+; ----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,1,1,1
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load terrain
+terrain=LoadTerrain( "media/height_map.bmp" )
+
+; Scale terrain
+ScaleEntity terrain,1,50,1
+
+; Texture terrain
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture terrain,grass_tex,0,1
+
+; Set terrain detail, enable vertex morphing
+TerrainDetail terrain,4000,True
+
+While Not KeyDown( 1 )
+
+If KeyDown( 203 )=True Then x#=x#-0.1
+If KeyDown( 205 )=True Then x#=x#+0.1
+If KeyDown( 208 )=True Then y#=y#-0.1
+If KeyDown( 200 )=True Then y#=y#+0.1
+If KeyDown( 44 )=True Then z#=z#-0.1
+If KeyDown( 30 )=True Then z#=z#+0.1
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.1
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.1
+
+x#=EntityX(camera)
+y#=EntityY(camera)
+z#=EntityZ(camera)
+
+terra_y#=TerrainY(terrain,x#,y#,z#)+5
+
+PositionEntity camera,x#,terra_y#,z#
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the terrain"
+
+; Output TerrainZ value to screen
+Text 0,20,"TerrainZ: "+TerrainZ(terrain,x#,terra_y#,z#)
+
+Flip
+
+Wend
+
+End
+

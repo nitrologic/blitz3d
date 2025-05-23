@@ -1,0 +1,19 @@
+A function is defined using the \verb'Function' keyword: 
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb+Function+ {\it functionname} {\it typetag}\verb+(+{\it parameters}\verb+)+ 
+\>	{statements} 
+\verb+End Function+ 
+\end {tabbing}
+
+{\it functionname} is any valid identifier. 
+
+{\it typetag} is the type of value returned by the function. If {\it typetag} is omitted, the function returns an integer value by default. 
+
+{\it parameters} is a comma separated list of variables which is passed to the function when it is called, each parameter may be given an optional type tag. Parameters are always local. 
+
+A function may use the \verb'Return' statement to return a result. \verb'Return' may optionally be followed by an expression. 
+
+If there is no Return statement, or a Return without any expression is used, the function returns a default value of 0 for numeric functions, an empty string ("") for string functions, or a 'Null' object for custom type functions. 
+

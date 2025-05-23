@@ -1,0 +1,39 @@
+:::The Blitz3D SDK
+
+::What is it?
+
+The Blitz3D SDK provides an interface to the 
+documented 3D Graphics Commands for software
+developers using other programming languages
+such as C++, JavaScript and BlitzMax.
+
+::Installation Guide
+
+The Blitz3DSDK is distributed as a single Windows
+executable install file that must be installed
+independently to the Blitz3D programming language.
+
+The following description uses the free demo version
+of the SDK to illustrate installation of the Blitz3D
+SDK.
+
+::The Blitz3D Interface
+
++int Blitz3D (HWND owner=0)
+
+.desc
+Initializes the Blitz3D engine using an optional
+HWND window parameter.
+
+Applications that wish to provide their own 
+Windows message pump from an alternate window 
+should specify the owner window's HWND.
+
+::Visual Studio Example
+
+::BlitzMax Example
+
+::FireFox Plugin Example
+
+::Other Language Support 
+ 

@@ -1,0 +1,292 @@
+:::Appendix
+
+::Scancode table
+
+
++Keyboard Scancodes
+
+.table
+RawKey,ScanCode,Comments
+ESCAPE,1
+1,2
+2,3
+3,4
+4,5
+5,6
+6,7
+7,8
+8,9
+9,10   
+0,11
+Minus(-),12,On Main Keyboard 
+Equals(=),13
+Backspace,14,Backspace key 
+Tab,15
+Q,16
+W,17
+E,18
+R,19
+T,20   
+Y,21
+U,22
+I,23
+O,24
+P,25
+Left Bracket ([),26
+Right Bracket (]),27
+Return/Enter,28,Return/Enter on Main Keyboard 
+Left Control,29
+A,30   
+S,31
+D,32
+F,33
+G,34
+H,35
+J,36
+K,37
+L,38
+Semi-Colon (;),39
+Apostrophe ('),40   
+Grave,41,Accent Grave 
+Left Shift,42
+Backslash (\),43
+Z,44
+X,45
+C,46
+V,47
+B,48
+N,49
+M,50   
+Comma,51
+Period (.),52,On Main keyboard 
+Slash (/),53,On Main Keyboard 
+Right Shift,54
+Multiply (*),55,On Numeric Keypad 
+Left Alt/Menu,56
+Space,57
+Capital,58
+F1,59
+F2,60   
+F3,61
+F4,62
+F5,63
+F6,64
+F7,65
+F8,66
+F9,67
+F10,68
+NumLock,69
+Scroll Lock,70   
+NumPad,7,71
+NumPad,8,72
+NumPad,9,73
+Subtract (-),74,On Numeric Keypad 
+NumPad,4,75
+NumPad,5,76
+NumPad,6,77
+Add (+),78,On Numeric Keypad 
+NumPad,1,79
+NumPad,2,80   
+NumPad,3,81
+NumPad 0,82
+Decimal (.),83,On Numeric Keypad 
+OEM_102,86,On UK/Germany Keyboards 
+F11,87
+F12,88
+F13,100 (NEC PC98) 
+F14,101,(NEC PC98) 
+F15,102,(NEC PC98) 
+Kana,112,Japanese Keyboard 
+ABNT_C1,115,/? on Portugese (Brazilian) keyboards 
+Convert,121,Japanese Keyboard 
+NoConvert,123,Japanese Keyboard 
+Yen,125,Japanese Keyboard 
+ABNT_C2,126,Numpad . on Portugese (Brazilian) keyboards 
+Equals,141,= on numeric keypad (NEC PC98) 
+PrevTrack,144,Previous Track (DIK_CIRCUMFLEX on Japanese keyboard) 
+AT,145,(NEC PC98) 
+Colon (:),146,(NEC PC98) 
+Underline,147,(NEC PC98) 
+Kanji,148,Japanese Keyboard 
+Stop,149,(NEC PC98) 
+AX,150 Japan AX 
+Unlabeled,151,(J3100) 
+Next Track,153,Next Track 
+Enter,156,ENTER on Numeric Keypad 
+Right Control,157
+Mute,160 Mute 
+Calculator,161,Calculator 
+Play/Pause,162,Play/Pause 
+Media Stop,164,Media Stop 
+Volume Down,174,Volume - 
+Volume Up,176,Volume + 
+Web Home,178,Web Home 
+Comma,179,On Numeric Keypad (NEX PC98) 
+Divide (/),181,On Numeric Keypad 
+SysReq,183
+Right Alt/Menu,184,Right Alt 
+Pause,197,Pause 
+Home,199,Home on Arrow Pad 
+Up,200 Up Arrow on Arrow Keypad 
+Page Up/Prior,201,Page Up on Arrow Keypad 
+Left,203,Left Arrow on Arrow Keypad 
+Right,205,Right Arrow on Arrow Keypad 
+End,207,End Key on Arrow Keypad 
+Down,208,Down Key on Arrow Keypad 
+Next,209,Next Key on Arrow Keypad 
+Insert,210 Insert Key on Arrow Keypad 
+Delete,211,Delete Key on Arrow Keypad 
+Left Windows,219,Left Windows Key 
+Right Windows,220 Right Windows Key 
+Apps,221,Apps Menu Key 
+Power,222,System Power 
+Sleep,223,System Sleep 
+Wake,227,System Wake 
+Web Search,229
+Web Favorites,230   
+Web Refresh,231
+Web Stop,232
+Web Forward,233
+Web Back,234
+My Computer,235
+Mail,236
+Media Select,237
+
++Ascii Chart
+
+.table
+ASCII code,Symbol,Traditional Use
+0,NUL,End of File or String
+1,SOH,Start of Header
+2,STX,Start of Text
+3,ETX,End of Text
+4,EOT,End of Transmission
+5,ENQ,Enquiry
+6,ACK,Acknowledgement
+7,BEL,Bell
+8,BS,Backspace
+9,HT,Horizontal Tab
+10,LF,Line Feed
+11,VT,Vertical Tab
+12,FF,Form Feed
+13,CR,Carriage Return
+14,SO,Shift Out
+15,SI,Shift In
+16,DLE,Data Link Escape
+17,DC1,(XON) Device Control 1
+18,DC2,Device Control 2
+19,DC3,Device Control 3
+20,DC4,(XOFF) Device Control 4
+21,NAK,Negative Acknowledgement
+22,SYN,Synchronous Idle
+23,ETB,End of Trans. Block
+24,CAN,Cancel
+25,EM,End of Medium
+26,SUB,Substitute
+27,ESC,Escape
+28,FS,File Separator
+29,GS,Group Separator
+30,RS,Request to Send / Record Separator
+31,US,Unit Separator
+32,SP,Space
+33,!,Exclamation ark
+34,",Double quote
+35,#,Number sign
+36,$,Dollar sign
+37,%,Percent
+38,&,Ampersand
+39,',Single quote
+40,(,Left opening parenthesis
+41,),Right closing parenthesis
+42,*,Asterisk
+43,+,Plus
+44,',Single quote
+45,-,Minus or dash
+46,.,Dot
+47,/,Forward slash
+48,0
+49,1
+50,2
+51,3
+52,4
+53,5
+54,6
+55,7
+56,8
+57,9
+58,:,colon
+59,;,semi-colon
+60,<,less than
+61,=,equal sign
+62,>,greater than
+63,?,question mark
+64,@,AT symbol
+65,A
+66,B
+67,C
+68,D
+69,E
+70,F
+71,G
+72,H
+73,I
+74,J
+75,K
+76,L
+77,M
+78,N
+79,O
+80,P
+81,Q
+82,R
+83,S
+84,T
+85,U
+86,V
+87,W
+88,X
+89,Y
+90,Z
+91,[,left opening bracket
+92,\,back slash
+93,],right closing bracket
+94,^,caret cirumflex
+95,_,underscore
+96,`
+97,a
+98,b
+99,c
+100,d
+101,e
+102,f
+103,g
+104,h
+105,i
+106,j
+107,k
+108,l
+109,m
+110,n
+111,o
+112,p
+113,q
+114,r
+115,s
+116,t
+117,u
+118,v
+119,w
+120,x
+121,y
+122,z
+123,{,left opening brace
+124,|,vertical bar
+125,},right closing brace
+126,~,tilde
+127,DEL,delete 
+
+::The b3d File Format 
+
+::Glossary
+
+

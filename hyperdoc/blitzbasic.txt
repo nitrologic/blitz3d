@@ -1,0 +1,2270 @@
+:::The BlitzBASIC Language
+
+
+::Language Reference
+
++Keywords
+
+The following keywords are built into Blitz, and may not be used as 
+identifiers (variables, function names, labels, etc.):
+
+After, And, Before, Case, Const, Data, Default, Delete, Dim, Each, Else, 
+ElseIf, End, EndIf, Exit, False, Field, First, Float, For, Forever, Function, 
+Global, Gosub, Goto, If, Insert, Int, Last, Local, Mod, New, Next, Not, Null, 
+Or, Pi, Read, Repeat, Restore, Return, Sar, Select, Shl, Shr, Step, Str, 
+Then, To, True, Type, Until, Wend, While, Xor, Include
+
+
++Comments
+
+You add comments to your programs using the ';' character.
+
+Everything following the ';' until the end of the line will be 
+ignored, this is useful for commenting your code - so you can 
+always look through and follow each line in a logical manner. 
+
+The following code shows comments in use;
+
+
++Identifiers
+
+Identifiers are used for constant names, variable names, array 
+names, function names and custom type names. 
+
+Blitz identifiers must start with an alphabetic character followed
+by any number of alphanumeric characters including the underscore 
+('_') character. 
+
+Indentifiers are not case sensitive. 
+
+For example, 'Test', 'TEST' and 'test' are equivalent and treated as the 
+same identifier.
+
+However, it is allowed for identifiers to be reused for functions and 
+custom type name.
+
+For example, you can have a variable called 'test', a function called 'test' 
+and a custom type name called 'test'. Blitz will be able to tell which one 
+you are refering to by the context in which it is used. 
+
+
++Data Types
+
+There are 3 basic data types: 
+
+Integer values are numeric values with no fractional part in them.
+
+For example: 5,-10,0 are integer values. 
+
+All integer values in your program must be in the range -2147483648 to +2147483647. 
+
+
+Floating point values are numeric values that include a fractional part. 
+
+For example: .5, -10.1, 0.0 are all floating point values. 
+
+
+Strings variables are used to contain text. 
+
+For example: "Hello", "What's up?", "***** GAME OVER *****", ""
+
+Typically, integer values are faster than floating point values, which 
+are themselves faster than strings. 
+
+
++Constants
+
+Constants may be of any basic data type. Constants are variables that have 
+fixed values that will not change (ever) during the course of your program. 
+
+These are useful tools for things like screen resolution variables, etc.
+
+Floating point constants must include a decimal point. 
+
+For example: 
+
+
+'5' is an integer constant, but '5.0' is a floating point constant.
+
+String constants must be surrounded by quotation marks.
+
+For example:
+.code
+"This is a string constant". 
+.endcode
+
+The 'Const' keyword is used to assign an identifier to a constant.
+
+For example:
+.code
+Const one_hundred=100 
+.endcode
+
+You can then use the identifier 'one_hundred' anywhere in your 
+program instead of '100'. 
+
+A more useful example might be:
+.code
+Const width=640,height=480 
+.endcode
+You can then use the more readable 'width' and 'height' throughout 
+your program instead of '640' and '480'. 
+
+Also, if you ever decide to change the width and height values, you 
+only have to do so at one place in the program.
+
+There are two built-in Integer constants - 'true' and 'false'.
+
+'true' is equal to 1, and 'false' is equal to 0. 
+
+There is also a built in floating point constant for Pi. 
+
+::Variables
+
++Variable Types
+
+Variables may be of any basic data type, or a custom type.
+
+A variable's type is determined by a special character that follows its identifier.
+
+These special characters are called 'type tags' and are: 
+.table
+Type Tag,Description
+%,For integer variables 
+#,For floating point variables 
+$,For string variables 
+.{typename},For custom type variables
+
+Here are some examples of valid variables: 
+.code
+Score%
+Lives% 
+x_speed# 
+y_speed# 
+name$ 
+title$ 
+ali.Alien 
+player.Player
+.endcode
+
+The type tag only needs to be added the first time you use a variable, 
+after that you can leave the type tag off if you wish. 
+
+If you don't supply a type tag the first time a variable is used, the 
+variable defaults to an integer. 
+
+It is illegal to use the same variable name with a different type. 
+
+For example, if you already have an integer variable called 'name%', 
+it is illegal to also have a string variable called 'name$' 
+
++Setting Variables
+
+The '=' keyword is used to assign a value to a variable. For example: 
+.code
+score%=0
+.endcode
+assigns the value '0' to the integer variable 'score'.
+
++Variable Scope
+
+Variables may also be either 'global', or 'local'.
+
+This refers to where in a program a variable may be used.
+
+- Global variables can be used from anywhere in the program. 
+
+- Local variables can only be used within the function they are created in. 
+
+The 'Global' keyword is used to define one or more global variables.
+
+For example: 
+.code
+Global Score=0,Lives=3,Player_up=1 
+.endcode
+defines 3 global variables. 
+
+Similarly, 'Local' is used to define local variables: 
+.code
+Local temp_x=x,temp_y=y 
+.endcode
+
+If you use a variable without defining it as either local or global, 
+it defaults to being local. 
+
+
++Arrays
+
+Arrays are created using the standard BASIC 'Dim' statement, and 
+may be of any number of dimensions.
+
+For example: 
+.code
+Dim arr(10)
+.endcode
+Creates a one dimensional array called 'arr' with 11 elements
+numbered 0...10.
+
+Arrays may be of any basic type, or a custom type.
+
+The type of an array is specified using a type tag.
+
+For example: 
+.code
+Dim Deltas#(100)
+.endcode
+Creates an array called 'Deltas' of 101 floating point elements. 
+
+If the type tag is omitted, the array defaults to an integer array. 
+
+An array may be dimensioned at more than one point in a program, each 
+time an array is dimensioned, it's previous contents are discarded.
+
+Arrays may be dimensioned inside functions, but a corresponding 'Dim' 
+statement of the same array must also appear somewhere in the main 
+program.
+
+For example:
+.code
+Dim test(0,0) 
+
+Function Setup( x,y ) 
+
+Dim test(x,y) 
+
+End Function 
+.endcode
+
++Expressions
+
+The following operators are supported, listed in order of precedence: 
+
+.table
+operator,type
+ New First Last,custom type operators (unary)  
+ Before After,object operators (unary)  
+ Int Float Str,type conversion operators (unary)  
+ + - ~,arithmetic posate(?) negate bitwise complement (unary)  
+ ^,arithmetic 'to-the-power-of' (binary)  
+ * / Mod,arithmetic multiply; divide; remainder (binary)  
+ Shl Shr Sar,bitwise shift operators (binary)  
+ + -,arithmetic add; subtract (binary)  
+ < > <= >= = <>,comparison operators (binary)  
+ And Or Xor,bitwise And Or and Exclusive Or (binary)  
+ Not,logical Not (unary)
+
+Unary operators take one operand, while binary operators take two. 
+
+Arithmetic operators produce a result of the same type as the 
+operands. For example, adding two integers produces an integer 
+result. 
+
+If the operands of a binary arithmetic or comparison operator 
+are not of the same type, one of the operands is converted 
+using the following rules: 
+
+If one operand is a custom type object, the other must be 
+an object of the same type, or 'Null'.
+
+Else if one operand is a string, the other is converted to a string. 
+
+Else if one operand is floating point, the other is converted to 
+floating point. 
+
+Else both operands must be integers. 
+
+When floating point values are converted to integer, the value is 
+rounded to the nearest integer. When integers and floating point 
+values are converted to strings, an ascii representation of the 
+value is produced. 
+
+When strings are converted to integer or floating point values, 
+the string is assumed to contain an ascii representation of a 
+numeric value and converted accordingly. Conversion stops at 
+the first non-numeric character in the string, or at the end 
+of the string. 
+
+The only arithmetic operation allowed on string is '+', which 
+simply concatenates the two operands.
+
+Int, Float and Str can be used to convert values.
+
+They may be optionally followed by the appropriate type 
+tag - ie: 'Int%', 'Str$' and 'Float#'. 
+
+Comparison operators always produce an integer result: 1 for true,
+0 for false. 
+
+If one of the operators is a custom type object, the other must 
+be an object of the same type, or 'Null', and the only comparisons 
+allowed are '=' and '<>'. 
+
+Bitwise and logical operators always convert their operands to 
+integers and produce an integer result. 
+
+The Not operator returns 0 for a non-zero operand, otherwise 1.
+
+When an expression is used to conditionally execute code - for 
+example, in an 'If' statement - the result is converted to an 
+integer value. A non-zero result means true, a zero result 
+means false. 
+
+
+::Program Flow
+
+The following constructs are available for controlling program flow. 
+
++If...Then 
+.code
+If {expression} Then {statements1} Else {statements2} 
+.endcode
+Evaluates the 'If' expression and, if true, executes the 'Then' statements. 
+If false, the 'Else' statements are executed instead. The 'Else' part is optional - 
+statements are executed until the end of the line.
+.code
+If {expression1}
+     {statements1} 
+Else If {expression2}
+     {statements2} 
+Else If {expression3}
+     {statements3}
+Else 
+     {statements4} 
+EndIf 
+.endcode
+
+This form of the If statement allows for more than one line of statements. 
+
+The 'Else If' and 'Else' parts are optional. The 'Else' part is executed only 
+if none of the 'If' or 'Else If' expressions were true. 
+.code
+While ... Wend
+
+While {expression} 
+     {statements} 
+Wend 
+.endcode
+A While loop continues executing until {expression} evaluates to false. 
+
+{expression} is evaluated at the start of each loop. 
+
++For ... Next
+.code
+For {variable}={initalvalue} To {finalvalue} Step {step} 
+     {statements} 
+Next 
+.endcode
+A For/Next loop first assigns {initialvalue} to {variable} and then 
+starts looping. The loop continues until {variable} reaches {finalvalue} 
+and then terminates. Each loop, the constant value {step} is added 
+to {variable}. 
+
+If a step value is omitted, a default value of 1 is used. 
+.code
+For {variable}=Each {typename} 
+     {statements} 
+Next 
+.endcode
+
+This form of the For/Next loop allows you to iterate over all objects 
+of a custom type. 
+
++Repeat ... Until/Forever
+
+.code
+Repeat 
+     {statements} 
+Until {expression} 
+.endcode
+
+A Repeat loop continues executing until {expression} evaluates to true.
+
+{expression} is evaluated at the end of each loop. 
+.code
+Repeat 
+     {statements} 
+Forever 
+.endcode
+A Repeat/Forever loop simply executes {statements} until the program ends, or 
+an 'Exit' command is executed. 
+
++Select ... Case
+
+.code
+Select {expression} 
+     Case {expressions1}
+          {statements1} 
+     Case {expressions2} 
+          {statements2}
+     Default 
+          {statements3} 
+End Select 
+.endcode
+First the 'Select' expression is evaluated. It is then compared with each of 
+the 'Case' expression lists. If it matches a 'Case', then the statements in 
+the 'Case' are executed. 
+
+If the 'Select' expression matches none of the 'Case' expressions, the statements 
+in the optional 'Default' section are executed. 
+
++Breaking Out Of A Loop
+
+The 'Exit' command may be used to break out of any For...Next, While...Wend, 
+Repeat...Until or Repeat...Forever loop. 
+
++Using Includes
+
+Blitz also supports the 'Include' command. Include allows source code from an 
+external file to be compiled as if it were part of the main program. Include must be followed by a quote enclosed filename. For example... 
+.code
+Include "anotherfile.bb" 
+.endcode
+Include allows you to break your program up into smaller, more manageable chunks. 
+
+
+::Functions
+
++About
+
+A function is defined using the 'Function' keyword: 
+.code
+Function {funcname}{typetag}( {params} ) 
+     {statements} 
+End Function 
+.endcode
+{funcname} is any valid identifier. 
+
+{typetag} is the type of value returned by the function.
+
+If {typetag} is omitted, the function returns an integer value by default. 
+
+{params} is a comma separated list of variables which is passed to the
+function when it is called, each parameter may be given an optional type
+tag. Parameters are always local. 
+
+A function may use the 'Return' statement to return a result. Return may
+optionally be followed by an expression. 
+
+If there is no Return statement, or a Return without any expression is 
+used, the function returns a default value of 0 for numeric functions, 
+an empty string ("") for string functions, or a 'Null' object for custom 
+type functions. 
+
+
+::Custom Types
+
++What Are They?
+
+TYPE is your best friend. It is used to create a 'collection' of 
+objects that share the same parameters and need to be interated 
+through quickly and easily.
+
+Think about Space Invaders. There are many aliens on the screen 
+at one time. Each of these aliens have a few variables that they 
+all need: x and y coordinates plus a variable to control which 
+graphic to display (legs out or legs in). Now, we could make 
+hundreds of variables like invader1x, invader1y, invader2x, 
+invader2y, etc. to control all the aliens, but that wouldn't 
+make much sense would it?
+
+You could use an array to track them; invader(number,x,y,graphic), 
+and then loop through them with a FOR ... NEXT loop but that 
+is a lot of work!
+
+The TYPE variable collection was created to handle just this 
+sort of need.
+
+TYPE defines an object collection. Each object in that collection 
+inherits its own copy of the variables defined by the TYPE's FIELD 
+command. Each variable of each object in the collection can be read
+individually and can be easily iterated through quickly. 
+
+Use the FIELD command to assign the variables you want between 
+the TYPE and END TYPE commands.
+
+If it helps, think of a TYPE collection as a database. 
+
+Each object is a record of the database, and every variable 
+is a field of the record. Using commands like BEFORE, AFTER, 
+and FOR ... EACH, you can change the pointer of the 
+'database' to point to a different record and retrieve/set 
+the variable 'field' values.
+
++Defining A Type
+
+Custom types are defined using the 'Type' keyword. For example: 
+.code
+Type MyType 
+	Field x,y 
+End Type 
+.endcode
+Creates a custom type called 'MyType' with 2 fields - x and y.
+
+Fields within a custom type may themselves be of any basic 
+type or custom type. Type tags are used to determine the 
+type of a field.
+
+For example: 
+.code
+Type MyType 
+	Field x,y 
+	Field description$ 
+	Field delta_x#,delta_y# 
+End Type 
+.endcode
+
++Creating a Type Instance
+
+You can create variables or arrays of custom types using a '.' 
+type tag followed by the type name. For example: 
+.code
+Global mine.MyType
+Dim all_mine.MyType( 100 ) 
+.endcode
+Before a custom type variable or array element can be used, it 
+must be initialized using the 'New' operator. 
+
+For example: 
+.code
+mine.MyType=New MyType 
+.endcode
+The 'New' operator creates an 'object' of type 'MyType', and 
+returns a 'pointer' to the new object. The identifier following 
+the 'New' operator must be a valid custom type name. 
+
+The fields within a custom type are accessed using the '\' character.
+
+For example: mine\x=100 Print mine\x 
+
++Destroying a Type Instance
+
+When you've finished with an object, you should delete it using 
+the 'Delete' command. For example: 
+.code
+Delete mine 
+.endcode
+This releases the memory used by the object. 
+
++Determining Existance
+
+The special keyword 'Null' is used to represent non-existent objects.
+
+An object is non-existent if it hasn't been initialized yet using 'New',
+or has been released using 'Delete'.
+
+For example: 
+.code
+mine.MyType=New MyType 
+If mine<>Null 
+     Print "exists!" 
+Else 
+     Print "doesn't exist!" 
+EndIf 
+Delete mine 
+If mine<>Null 
+     Print "exists!" 
+Else 
+     Print "doesn't exist!" 
+EndIf 
+.endcode
+...will print the following:
+.code
+exists! 
+doesn't exist! 
+.endcode
+
+Each custom type has an associated list of objects known as a 'type list'. 
+
+When an object is created using 'New', it is automatically added to the 
+type list. When an object is released using 'Delete', it is removed from
+the type list.
+
+This list is dynamic - once an instance has been deleted, its place in 
+the collection is deleted and all the other objects after it will 
+'move up' in the collection hiearchy.
+
++Iteration Through Type Lists
+
+The 'First', 'Last', 'After' and 'Before' operators allow you to access 
+type lists. The 'First' operator returns the object at the start of the 
+type list. For example: 
+.code
+mine.MyType=First MyType 
+.endcode
+This sets the 'mine.MyType' variable to the first object of custom 
+type 'MyType'. 
+
+Similarly, 'Last' returns the object at the end of the list. 
+
+If the type list is empty, 'First' and 'Last' return 'Null'. 
+
+You can use 'After' to find the object after an object, and 'Before' to 
+find the object before an object. 
+
+For example: 
+.code
+mine.MyType=First MyType ;mine=first object in the type list 
+mine=After( mine ) ;mine=second object 
+mine=After( mine ) ;mine=third object 
+mine=Before( mine ) ;mine=second object 
+mine=Before( mine ) ;mine=first again! 
+.endcode
+'After' and 'Before' return 'Null' if there is no such object. For example: 
+.code
+mine.MyType=Last MyType ;mine=last object 
+mine=After( mine ) ;object after last does not exist! 
+.endcode
+When an object is created using 'New', it is placed at the end of 
+it's type list by default. 
+
+However, You can move objects around within the type list using Insert.
+
+For example: 
+.code
+mine1.MyType=New MyType
+mine2.MyType=New MyType 
+Insert mine2 Before mine1 
+.endcode
+This has the effect of placing the 'mine2' object before the 'mine1' 
+object in the type list.
+
+You can also use 'After' instead of 'Before' with Insert. 
+
+Here's an example of moving an object to the start of it's type list: 
+.code
+Insert mine Before First MyType 
+.endcode
+A special form of For...Next allows you to easily iterate over all 
+object of a custom type. For example: 
+.code
+For mine.MyType=Each MyType 
+Next 
+.endcode
+This will cause the variable 'mine.MyType' to loop through all existing 
+objects of cutom type MyType. 
+
+Finally, the 'Delete Each' command allows you to delete all objects
+of a particular type. For example: 
+.code
+Delete Each MyType 
+.endcode
+
+
+::Type Conversion
+
+:Int ( value[$] )
+
+.args
+value = a number, or a string representation of a number
+
+.desc
+Converts the value to the nearest integer.
+
+This is the same as BlitzBASIC's automatic type conversion where
+floating point values are rounded to the nearest integer value and
+string values are converted to 0 if they do not contain a series
+of the decimal digits 0 to 9.
+
+Int( "10" ) ... result is 10
+
+Int( "3.7" ) ... result is 3, stops at "." the first non digit
+
+Int( "junk3" ) ... result is 0, stops at "j"
+
+In the case of floats that are exactly half way between two integers
+the result returned is the nearest even integer.
+
+Int( 2.5 ) ... result is 2
+
+Int( 3.5 ) ... result is 4
+
+.also
+Float; Floor; Ceil
+
+
+:Float# ( value[$] )
+
+.args
+value = a number, or a string which represents a number
+
+.desc
+Converts the value to a floating point number.
+
+Converting an integer variable to a float is useful when a calculation
+using integer values in fact requires floating point precision:
+
+a=5:b=3:Print a/b ... results in the value of 1 due to integer division
+
+a=5:b=3:Print Float(a)/b ... results in 1.66667 due to floating point division
+
+If @Float is applied to a string it converts as much as possible:
+
+Float( "10" ) ... result is 10.0
+
+Float( "3junk" ) ... result is 3.0
+
+Float( "junk3" ) ... result is 0.0
+
+.also
+Int; Floor; Ceil
+
+
+:Str$ ( value[#] )
+
+.args
+value = integer, floating point number or user type
+
+.desc
+@Str converts from an integer or floating point number to a BlitzBasic
+String.
+
+
+::Logical Operators
+
+
+:True
+
+.desc
+@True is a BlitzBASIC integer constant with a value of 1.
+
+.also
+False;Not;If;Select;While;Repeat
+
+
+:False
+
+.desc
+@False is a BlitzBASIC integer constant with a value of 0.
+
+.also
+True;Not;If;Select;While;Repeat
+
+
+:Not
+
+.desc
+The @Not operator returns @True if the argument is zero and @False if nonzero.
+
+.also
+True;False
+
+
+::Integer Operators
+
+
+:And
+
+.desc
+@And performs a binary AND operation.
+
+The binary result of an @And operation contains only bits that are 1 
+in both arguments.
+
+.table
+A,B,A And B
+0,0,0
+1,0,0
+0,1,0
+1,1,1
+
+.also
+Or;Not;Xor
+
+
+:Or
+
+.desc
+
+@Or performs a binary OR operation.
+
+The binary result of an @Or operation contains bits that are 1 
+in either of the arguments.
+
+.table
+A,B,A Or B
+0,0,0
+1,0,1
+0,1,1
+1,1,1
+
+.also
+And;Not;Xor
+
+
+:Xor
+
+.desc
+@Xor performs a binary Exclusive Or operation.
+
+The binary result of an @Xor operation contains only bits that are 1
+in either but not both arguments.
+
+.table
+A,B,A Xor B
+0,0,0
+1,0,1
+0,1,1
+1,1,0
+
+.also
+And; Or; Not
+
+
+:Shl shiftcount
+
+.args
+shiftcount = number of bits to shift left
+
+.desc
+@Shl results in a value binary shifted left @shiftcount bits.
+
+.also
+Shr,Sar
+
+
+:Shr shiftcount
+
+.args
+shiftcount = number of bits to shift right
+
+.desc
+@Shr results in a value binary shifted right @shiftcount bits.
+
+.also
+Sar;Shl
+
+
+:Sar shiftcount
+
+.args
+shiftcount = number of bits to arithmetically shift right
+
+.desc
+@Sar results in a value arithmetic shifted right @shiftcount bits.
+
+@Sar differs from @Shr in that the most significant bit remains
+after each shift generating a different result for negative numbers
+than the equivalent @Shr.
+
+.also
+Shl;Shr
+
+
+::Float Operators
+
+
+:Pi
+
+.desc
+@Pi is a BlitzBASIC float constant with a value of 3.141592.
+
+
+:Sgn ( x# )
+
+.args
+x = float or integer 
+
+.desc
+This function is used to determine whether the specified number
+is greater than 0, equal to 0 or less than 0 and returns 1, 0 or -1
+respectively.
+
+
+:Abs ( x# )
+
+.args
+x = float or integer
+
+.desc
+The @Abs operator returns the absolute value of x. An absolute
+function returns the positive version of any negative values and returns
+the same number for positive values.
+
+
+:Mod ( x# )
+
+.desc
+The result of the @Mod operator is the remainder after dividing the
+preceeding number by x.
+
+
+::Mathematical Functions
+
+
+:Floor# ( x# )
+
+.args
+x = any number
+
+.desc
+@Floor returns the largest integral value not greater than x.
+
+Floor(  1.75 ) ... 1.0
+
+Floor( -1.75 ) ... -2.0
+
+.also
+Ceil;Float;Int
+
+
+:Ceil# ( x# )
+
+.args
+x = any number
+
+.desc
+@Ceil returns the smallest integral value not less than x.
+
+Ceil(  1.75 ) ... 2.0
+
+Ceil( -1.75 ) ... -1.0
+
+.also
+Floor;Float;Int
+
+
+:Sqr# ( x# )
+
+.args
+x# = any floating point number
+
+.desc
+@Sqr returns the square root of the specified value.
+
+The square root of a negative value returns the special value NaN which
+stands for Not a Number.
+
+
+:Exp# ( x# )
+
+.args
+x = any number.
+
+.desc
+@Exp is the same as performing the function e^x where e = 2.71828.
+
+For the curious, e is defined by the sum of the following series:
+
+2 + 1/(2) + 1/(2*3) + 1/(2*3*4) + 1/(2*3*4*5) + ...
+
+.also
+Log
+
+
+:Log# ( x# )
+
+.args
+x = any positive number.
+
+.desc
+@Log returns the natural logarithm of x. This is the inverse of Exp( ).
+
+y = Log( x ) means y satifies x = Exp( y ).
+
+The base of the natural logarithm is e = Exp(1) = 2.71828...
+
+.also
+Exp,Log10
+
+
+:Log10# ( x# )
+
+.args
+x = any positive number.
+
+.desc
+@Log10 returns the common logarithm of x. This is the inverse of raising 10 to a power.
+
+y = Log10( x ) means y satifies x = 10 ^ y.
+
+.also
+Log
+
+
+
+::Trigonometry Functions
+
+
+:Sin# ( x# )
+
+.args
+x# = angle in degrees.
+
+.desc
+Sine of an angle. The angle is measured in degrees. 
+
+.also
+ASin, Cos, ACos, Tan, Atan, ATan2
+
+
+:Cos# ( x# )
+
+.args
+x# = angle in degrees.
+
+.desc
+Cosine of an angle. The angle is measured in degrees. 
+
+.also
+ASin, Cos, ACos, Tan, Atan, ATan2
+
+
+:Tan# ( x# )
+
+.args
+x# = angle in degrees.
+
+.desc
+Tangent of an angle. The angle is measured in degrees.
+
+In trigonometry, tangent is defined as sine divided by cosine.
+
+
+:ASin# ( x# )
+
+.args
+x = a number in the range -1.0 to +1.0
+
+.desc
+ASin returns the inverse Sine of the number in degrees.
+
+
+:ACos# ( x# )
+
+.args
+x = a number in the range -1.0 to +1.0
+
+.desc
+ACos returns the inverse Cosine of the number in degrees.
+
+
+:ATan# ( x# )
+
+.args
+x = any number.
+
+.desc
+ATan returns the arctangent of the number in degrees.
+
+.also
+ATan2
+
+
+:ATan2# ( y#, x# )
+
+.args
+y = any number
+x = any number
+
+.desc
+ATan2 returns the four quadrant inverse tangent of the coordinate
+located at (x,y) in degrees.
+
+@ATan2 is useful for finding the angle in degrees between two points.
+Given two points (x1,y1) and (x2,y2) Atan2(y2-y1,x2-x1) will return
+the angle the second point is located relative to the first.
+
+Note the reverse order, ATan2( y, x ) rather than ATan2( x, y).
+
+
+
+::Random Number Functions
+
+
+:Rnd #( lowvalue#, highvalue# )
+
+.args
+lowvalue# = Lowest value to generate
+highvalue# = Highest value to generate
+
+.desc
+The @Rnd function returns a floating point number with a value anywhere 
+between lowvalue and highvalue. 
+
+The start and end values are inclusive.
+
+@Rnd is the floating point version of the @Rand function.
+
+.hint
+See the @SeedRnd command to avoid receiving the same sequence
+of random numbers each time your program is run.
+
+.also
+Rand;SeedRnd
+
+
+:Rand ( [lowvalue,] highvalue )
+
+.args
+lowvalue = lowest value or result, defaults to 1
+highvalue = highest value of result 
+
+.desc
+The @Rand function returns an integer number with a value anywhere
+between the low and high values specified inclusive.
+
+@Rand is the integer version of the @Rnd function.
+
+The low value defaults to 1 if no value is specified. 
+
+The high value is the highest number that can be randomly generated.
+
+.hint
+See the @SeedRnd command to avoid receiving the same sequence
+of random numbers each time your program is run.
+
+.also
+Rnd;SeedRnd
+
+
+:SeedRnd seed
+
+.args
+seed = valid integer number
+
+.desc
+The @SeedRnd command seeds or scrambles the random number generator.
+
+Typically the value used is that returned by the @MilliSecs function
+which effectively randomizes the subsequent sequence of numbers returned
+by the @Rnd and @Rand functions:
+
+.code
+SeedRnd MilliSecs().
+.endcode
+
+A constant seed may be used for programs that require the
+same series of random numbers to be generated.
+
+See the RndSeed function to read the current seed value of the
+random number generator.
+
+.also
+Rand;Rnd,RndSeed
+
+
+:RndSeed ()
+
+.desc
+Returns the current random number seed value.
+
+This allows you to 'catch' the state of the random generator, usually for 
+the purpose of restoring it later.
+
+The random number seed is modified with the @SeedRnd command
+and is also modified every time a random number is  generated 
+by calling the @Rnd and @Rand functions.
+
+.also
+Rand,Rnd,SeedRnd
+
+
+
+::String Functions
+
+:Left$ (string$, length)
+
+.args
+string$ = a valid string variable
+length = a valid integer value up to the length of the string.
+
+.desc
+Use @Left to copy a certain number of characters from the left side of a string.
+
+Typically used to truncate strings to a maximum length.
+
+If length is larger than the length of the string an unmodified copy of string is returned.
+
+.also
+Right;Mid
+
+
+:Right$ (string$, length)
+
+.args
+string$ = a valid string variable
+length = the number of characters on the right to return 
+
+.desc
+Use @Right to copy a certain number of characters from the right side of a string.
+
+If length is larger than the length of the string an unmodified copy of string is returned.
+
+.also
+Left;Mid
+
+
+:Mid$ (string$, offset, characters)
+
+.args
+string$ = a valid string
+offset = location within the string to start reading
+characters = how many characters to read from the offset point
+
+.desc
+Use @Mid to fetch a substring of length characters from position offset
+in a string.
+
+The offset value is 1 based, meaning 1 not 0 signifies the first character
+of the string.
+
+If the offset or offset plus length extends beyond the length of the string
+the return value is cropped appropriately.
+
+.also
+Left;Right
+
+
+:Replace$ (string$, find$, replace$)
+
+.args
+string$ = a valid string variable
+find$ = a valid string
+replace$ = a valid string 
+
+.desc
+The @Replace command replaces any occurance of the characters in find$
+with the characters in replace$ similar to the way in which a wordprocessor's
+find and replace feature works.
+
+If replace$ is an empty string @Replace can be used to remove entirely
+any occurances of find$ from string$.
+
+.also
+Instr
+
+
+:Instr (string1$, string2$, offset)
+
+.args
+string1$ = the string you wish to search
+string2$ = the string to find
+offset = valid integer starting position to being search (optional) 
+
+.desc
+The @Instr command searches for an occurance of string2 within string1
+starting at the optional position offset.
+
+The command returns the location (number of characters from the left) of
+the string you are looking for.
+
+@Instr returns 0 if no match is found.
+
+The result of @Instr and the offset parameter are both 1 based, meaning
+1 and not 0 represent the first character of the String.
+
+
+:Upper$ (string$)
+
+.args
+string$ = a valid string or string variable
+
+.desc
+@Upper replaces any lower case charcters in string@ with their upper case
+equivalents.
+
+.also
+Lower
+
+
+:Lower$ (string$)
+
+.args
+string$ = a valid string variable
+
+.desc
+@Lower replaces any upper case charcters in string@ with their lower case
+equivalents.
+
+.also
+Upper
+
+
+:Trim$( string$ )
+
+.args
+string$ - a valid string
+
+.desc
+@Trim returns a string with any leading and trailing non printable characters 
+such as spaces removed.
+
+
+:LSet$ (string$, length)
+
+.args
+string$ = a valid string or string variable
+length = size of returned string measured in characters
+
+.desc
+@LSet returns a string with the specified length by padding the
+specified string with spaces.
+
+
+:RSet$ (string$, length)
+
+.args
+string$ = a valid string or string variable
+length = size of returned string measured in characters
+
+.desc
+@RSet returns a string with the specified length by padding the
+specified string with spaces. Unlike @LSet the padding is added
+to the left side of the result effectively right justifying the
+specified string.
+
+
+:Chr$ (integer)
+
+.args
+integer = valid ASCII code in the range 0..255
+
+.desc
+Use @Chr to convert a known ASCII code (for example 65) to its character
+string equivelant (i.e. the letter "A").
+
+
+:Asc (string$)
+
+.args
+string$ = a valid string variable
+
+.desc
+@Asc returns the ASCII value of the first letter of the specified string.
+
+
+:Len (string$)
+
+.args
+string$ = a valid string variable
+
+.desc
+@Len returns the length (number of characters) of the specified string.
+
+
+:Hex$ (integer)
+
+.args
+integer = any integer number
+
+.desc
+@Hex converts any integer value into it's hexadecimal representation.
+
+
+:Bin$ (integer)
+
+.args
+integer = any integer number
+
+.desc
+@Bin converts any integer value into it's binary representation.
+
+
+:String$ (string$, count)
+
+.args
+string$ = a valid string or string variable
+count = the number of times to repeat the string 
+
+.desc
+The @String command makes a string by repeating the specified string
+bt the specified number of times.
+
+
+::Flow Control
+
+
+:End
+
+.desc
+The @End command causes the program to finish executing immediately.
+
+.also
+Stop
+
+
+:If
+
+.desc
+@If executes a code block only if the included expression evaluates to @True.
+
+Use this to check the value of a variable or to see if a condition is @True or @False.
+
+The code between @If and @EndIf is executed if the condition is @True.
+
+Use @Else to execute alternative code when the expression is not @True.
+
+Use the @Not operator at the beginning of an expression to execute code 
+if the expression evaluates to @False.
+
+Lastly, a sequence of @ElseIf commands can be written when a series 
+of exclusive conditions need to be tested.
+
+If you get too deep in condition checking, consider using a @Select structure instead.
+
+.also
+Then;Else;ElseIf;EndIf;True;False;Select
+
+
+:Then
+
+.desc
+The @Then statement is an optional command that can be used to separate
+the expression following an @If statement and the code to be executed.
+
+.also
+If;Else;ElseIf;EndIf;Select
+
+
+:Else
+
+.desc
+The @Else statement allows you to split code following an @If statement
+into that which will be executed if the @If expression evaluates to @True
+and that while will be execute otherwise.
+
+.also
+If;Then;ElseIf;EndIf;Select
+
+
+:ElseIf
+
+.desc
+The @ElseIf statement defines an expression that is evaluated only if the 
+preceeding @If was false. The code following an @ElseIf is only executed 
+if the original @If expression evaluates to @False and the condition 
+following the @ElseIf evaluates to @True.
+
+.also
+If;Then;Else;ElseIf;EndIf;Select
+
+
+:EndIf
+
+.desc
+Terminates a multiline @If code block.
+
+.also
+If;Then;Else;ElseIf;Select
+
+
+:Select variable
+
+.args
+variable - a valid variable
+
+.desc
+The @Select command uses the value of a variable or epression to define which
+of the @Case code blocks following the @Select command are executed.
+
+A special @Default code block can also be included that will be
+executed if NONE of the @Cases match the variable's value.
+
+A @Select structure must be terminated with the @EndSelect command.
+
+A @Select @Case block can be a tidy alternative to a large nested 
+@If @Then @ElseIf sequence.
+
+.also
+Case;Default;True;False;If
+
+
+:Case value [,value [,value ... ] ]
+
+.args
+value = a valid value of the @Select variable
+
+.desc
+When using a @Select structure, the @Case command defines the starting point 
+of a code block that is executed when the preceeding @Select value matches 
+any of the @Case values listed.
+
+.also
+Select;Default;End Select
+
+
+:Default
+
+.desc
+In a @Select structure if none of the @Case statements succeed, the code
+block defined after a @Default statement is executed.
+
+.also
+Select;Case;End Select
+
+
+:End_Select
+
+.desc
+This command ends the @Select structure.
+
+.also
+Select;Case;Default
+
+
+:For counter
+
+.args
+counter = an integer, float or custom type variable
+
+.desc
+A @For ... @Next loop using a specified counter variable, executes
+the code block between the @For and @Next commands for each value
+of the counter.
+
+The counter is initialized to the specied value and incremented
+by either 1 or the value specified after the optional @Step keyword
+until it reached the value specified after the @To keyword.
+
+A special version of the @For ... @Next command is available in Blitz
+that uses a custom type variable and the @Each keyword to iterate
+through each instance of a specified custom type.
+
+.also
+To;Step;Each;Next;Exit;While;Repeat
+
+
+:To targetvalue
+
+.args
+targetvalue = an integer or float constant or variable
+
+.desc
+The @To keyword is used as part of a @For ... @Next command to
+specify the final value for the counter variable before the loop
+ends. The code For i=1 To 5 defines a loop that will repeat 5 times
+with the variable i being assigned the sequence of values 1, 2, 3, 4, 5
+inclusive.
+
+.also
+For;Next;Step
+
+
+:Step amount
+
+.args
+amount = any integer or floating point constant
+
+.desc
+The @Step keyword specifies the amount added to the counter variable
+with each iteration of a @For...Next loop.
+
+@Step can be a negative number but must be constant (not a variable 
+amount).
+
+.also
+For;To;Each;Next
+
+
+:Next
+
+.desc
+The @Next command marks the end of a @For...@Next loop.
+
+.also
+For;To;Step
+
+
+:Exit
+
+.desc
+The @Exit command is used to break out of a loop. @Exit can be used
+to terminate @For...Next, @While...Wend, @Repeat...Until and
+@Repeat..Forever loops prematurely. 
+
+.also
+For;While;Repeat
+
+
+:Repeat
+
+.desc
+The @Repeat ... @Until structure allows you to perform  a series of commands 
+until a specific condition has been met.
+
+Unlike a @While ... @Wend loop, a @Repeat .... @Until will ALWAYS execute
+the enclosed code block atleast once.
+
+.also
+Until;Forever;Exit;While
+
+
+:Until condition
+
+.args
+condition = a valid expression
+
+.desc
+The condition following the @Until command is used to decide if program
+execution loops back to the beginning of the @Repeat code block or continues
+on.
+
+.also
+Repeat;Forever;Exit;While;For
+
+
+:Forever
+
+.desc
+A @Forever command can be used in place of @Until to have the code
+block repeated forever.
+
+The @Forever command is the same as using @Until @False which will
+also always loop back to the beginning of the @Repeat block.
+
+.also
+Repeat;Until;Exit;While;For
+
+
+:While condition
+
+.args
+condition = a valid conditional statement
+
+.desc
+The @While ... @Wend structure is used to execute a block of commands
+repeatedly.
+
+Unlike a @Repeat ... @Until structure the loop condition follows the @While
+command at the beginning of the block and so can be used when the situation
+dictates the code block may never be executed.
+
+.also
+Wend;Exit;Repeat;For
+
+
+:Wend
+
+.desc
+The @Wend command marks the end of a @While ... @Wend loop.
+
+See the @While  command for complete details.
+
+.also
+While;Exit;Repeat;For
+
+
+:Goto label
+
+.args
+label = an existing program label
+
+.desc
+The @Goto command is used to jump to the location of a Blitz program
+marked with the specified label. A program label is declared in a Blitz
+program by preceeding the label name with a period.
+
+.also
+Exit;Gosub;Function
+
+
+:Gosub label
+
+.args
+label = a valid exisiting label
+
+.desc
+@Gosub is similar to the @Goto statement but the current location in 
+the program is stored before execution jumps to the specified label.
+
+The @Return statement can then be used to return program execution
+back to where the @Gosub call occurred.
+
+Although @Gosub is useful for executing the same code from various
+points of a program use of @Function's is the recomended way to 
+implement subroutines in Blitz programs.
+
+
+.also
+Return;Function;Goto
+
+
+:Return [ value ]
+
+.args
+value = optional integer, float, string or custom type
+
+.desc
+
+@Return is used from within a @Function or at the end of a labeled subroutine
+called with @Gosub to return control back to where it was called.
+
+@Return can pass a value back to the calling function of the type declared 
+in the function name.
+
+No value can be returned when used with Gosub.
+
+.also
+Function;Gosub
+
+
+::Function Declarations
+
+
+:Function name[type]( [argument[,argument...]] )
+
+.args
+name = a valid name that is not a Blitz keyword
+type = any type specifier - default is integer
+argument = a list of comma separated variable names
+
+.desc
+A @Function declaration is used to define a code block most commonly known
+as a subroutine. The code defined in a @Function is only executed when
+the function is called, i.e. it's name is used somewhere in a program
+in similar manner to the way the inbuilt Blitz commands are called.
+
+When a @Function is called any parameters specified are assigned to the
+argument variables declared in the @Function declaration.
+
+The code inside a @Function has it's own name space. This means any
+variables declared inside the @Function are lost at the end of the @Function
+or following the @Return statement. This also means that only variables
+declared outside the function as @Global or @Const are accessible from 
+the code within a @Function.
+
+.also
+Return;Gosub;Local;Global
+
+
+:End_Function
+
+.desc
+The @End_Function is used to terminate a @Function structure.
+
+If program execution reaches the end of a @Function an implied @Return
+command is executed.
+
+.also
+Function
+
+
+::Variable Declarations
+
+
+:Const variable=value
+
+.args
+variable - a valid integer, float or string variable name 
+value - a constant number or string literal 
+
+.desc
+@Const declares a variable as a constant (a variable whose value
+will never change and cannot be changed) and assigns the specified 
+value to it.
+
+.also
+Global;Local;Dim
+
+
+:Global variable
+
+.args
+variable = a valid variable name
+
+.desc
+@Global variables are used for values that must be accessible from
+with program functions as well as the main program code.
+
+@Global fixed size arrays can be created by appending an
+optional [size] declaration after the variable name and optional
+type.
+
+.also
+Local;Const;Dim;Function
+
+
+:Local variable
+
+.args
+variable = a valid variable name
+
+.desc
+@Local variables are used for values that need not be shared with
+code defined within a @Function.
+
+Variables in Blitz are automatically assumed to be @Local if they have
+not been declared as @Global or @Const prior to their first use.
+
+@Local fixed size arrays can be created by appending an
+optional [size] declaration after the variable name and optional
+type.
+
+
+.also
+Global;Const;Dim;Function
+
+
+:Dim array_name[type](dimension1[,dimension2][,...])
+
+.args
+array_name = array name
+type = optional type specifier - defaults to integer
+dimension1 = size of first dimension
+dimension2 = size of second dimension etc.
+
+.desc
+The @Dim statement both declares a variable as an Array of the
+specified Type and allocates enough storage space to accomadate
+the size of the dimensions specified.
+
+An Array variable is used to contain a list or table of values
+of the same type.
+
+A one dimensional array is created by specifying a single dimension
+and creates a list of values that can then be indexed using the
+arrayname[index] syntax where index is any integer value between
+0 and dimension1 inclusive.
+
+A multi dimensional array is created by specifying multiple
+dimension sizes which then creates a table that can be indexed
+using the arrayname[index1,index2] syntax.
+
+Arrays are always Global in scope, and must be defined in the 
+main program. 
+
+Arrays can be resized by using the Dim statement again with the 
+same array name and different dimensions, however the contents 
+of the array will be lost.
+
+Fixed size single dimension arrays that can be used in both
+Local scope and @Type @Field's are an alternative. To specify
+a fixed size array the variable should be declared with a
+constant dimension specified in square brackets following
+it's type such as Local a#[20].
+
+.also
+Global;Local;Field
+
+
+
+::User Types
+
+
+:Type typename
+
+.args
+typename = the name of the type to be declared
+
+.desc
+The @Type ... @End Type declaration allows the definition of a user
+type in Blitz.
+
+User types allow the storage of a collection of values within a single
+variable. Unlike an array, the elements in a @Type known as @Field's
+do not themselves all have to be the same type.
+
+@Type's are similar in design to records in a database and structs
+in the C programming language.
+
+A variable declared as a certain user type means it will be used to
+reference an instance of a user type as opposed to actually being
+allocated storage to contain the data itself.
+
+User typed variables begin their life as @Null meaning the variable
+is used to reference data of the specified @Type but currently
+does not point to an actual instance of such data. 
+
+The @New command is used to allocate actual storage for the
+values declared in a @Type. The @Delete command is used to 
+free that storage area.
+
+Blitz maintains an internal list of all instances of each Type
+so instead of maintaining references in single variables or 
+Arrays of types the commands Each, First, Last, Before and After
+can be used to reference instances within the list of all Types
+that have been created.
+
+.also
+Field;New;Delete;Null;First;Last;Before;After;Insert
+
+
+:Field variable[,variable[,variable]...]
+
+.args
+variable = standard variable declaration
+
+.desc
+A @Field declaration is used within a @Type ... @EndType structure 
+to declare the named elements that make up the @Type.
+
+@Field variables may be of any type including User Type's and
+fixed arrays.
+
+.also
+Type;End Type
+
+
+:End_Type
+
+.desc
+@End_Type ends a @Type declaration.
+
+.also
+Type
+
+
+:New typename
+
+.args
+typename = any previously defined user type
+
+.desc
+Creates a new instance of the user type specified.
+
+The @New command allocates storage to contain the values as listed
+in the @Fields of the specified @Type's declaration and resets all
+numeric fields in the new instance to zero and all type reference
+fields to null.
+
+@New not only returns a pointer to the storage that can be assigned
+to a variable of type @Type but adds the instance to an internal
+list for that specific @Type.
+
+.also
+Type;Delete;Before;After;First;Last;Each;Insert;Delete
+
+
+:Delete instance
+
+.args
+instance = a custom Type variable 
+
+.desc
+Deletes a user object created by the @New command.
+
+The @Delete command frees up the storage allocated by the referenced
+instance of the @Type and sets all variables that references that type
+including the one specified to @Null.
+
+A special form of @Delete allows the removal of all instances of a certain
+@Type by using the @Delete @Each TypeName syntax.
+
+.also
+New;Type
+
+
+:Null
+
+.desc
+@Null is the value assigned to any custom type variables to signify they
+do not currently reference an actual instance of their custom type.
+
+Care should be taken that variables are not @Null before using them
+to reference fields to avoid an "Object Does Not Exist" runtime
+error.
+
+Custom Type variables can be compared with the value @Null for such
+purposes and assigned the value @Null in order to signify they
+are currently "unassigned" to an actual instance of the @Type
+created with the @New command.
+
+The @Delete command automatically sets any user type variables
+to @Null that referenced the object being deleted.
+
+.also
+Delete;Type;New
+
+
+:Each typename
+
+.args
+typename = the name of a previously declared @Type structure
+
+.desc
+The @Each operator can be used in two ways.
+
+The For ... Each loop provides a method of easily iterating through
+each object of a specified @Type.
+
+The @Delete @Each command combination is an easy method of deleting
+every object of the specified @Type.
+
+.also
+Type;New;Before;After;First;Last;Insert;Delete
+
+
+:First typename
+
+.args
+typename = the name of a previously declared @Type structure
+
+.desc
+
+The @First operator can be used to either assign the first member
+in a @Type's internal list to a variable or following an @Insert
+command to specify the specified object be moved to the beginning
+of the list.
+
+
+.also
+Insert;Last;Type
+
+:Last typename
+
+.args
+typename = the name of a previously declared @Type structure
+
+.desc
+The @Last operator can be used to either assign the last member
+in a @Type's internal list to a variable or following an @Insert
+command to specify the specified object be moved to the end
+of the list.
+
+.also
+Insert;First;Type
+
+
+:Before typeinstance
+
+.args
+typeinstance = a custom type variable 
+
+.desc
+
+@Before can be used to reference the object if any that appears before that specified
+in the internal type list. If the object specified is the first in the list @Before returns 
+@Null.
+
+@Before can alse be used to qualify the position of an @Insert command.
+
+.also
+Insert;After;Type
+
+
+:After typeinstance
+
+.args
+typeinstance = a custom type variable 
+
+.desc
+
+@After can be used to reference the object if any that appears after that specified
+in the internal type list. If the object specified is the last in the list @After returns 
+@Null.
+
+.also
+Insert;After;Type
+
+
+:Insert objectname
+
+.desc
+The @Insert command allows objects in a @Type collection to be reordered.
+
+Usualy the order of objects in the @Type's internal list is the order they
+were created as the @New comand always appends the new object to the end
+of the list.
+
+The @Insert command can be used to position objects in a particular location
+in the list by using the @First, @Last, @Before or @After commands.
+
+This is useful for sorting a list as in the following example.
+
+.also
+First;Last;Before;After;New;Type
+
+
+:Handle (object)
+
+.args
+object = an instance of a custom type
+
+.desc
+The @Handle command allows you to retrieve an integer handle for a specific
+instance of a custom type.
+
+Because the result is an integer, @Handle allows a reference to any type
+of object to be stored in a standard integer variable where custom type
+variables may only reference objects of a single specified type. This freedom
+opens the door for those wishing to implement more abstract functions that
+can deal with multiple types of data.
+
+.also
+Object
+
+
+:Object.typename(objecthandle)
+
+.args
+typename = the custom type the Object function should return
+objecthandle = an integer handle produced by the Handle function
+
+.desc
+The @Object function takes the integer handle of an object and
+if it exists returns an actual reference to the object given it
+is of the @Type specified.
+
+.also
+Handle
+
+
+
+::Program Data
+
+
+:Data list_of_values
+
+.args
+list_of_values = a list of comma delimited values (strings must be inside quotes)
+
+.desc
+The @Data statement is used to embed lists of constant values within
+a program as an alternative to reading them from an external file.
+
+The values are assigned to variables using the @Read command.
+
+The current data pointer which moves through the @Data after each
+@Read command can be repositioned using the @Restore command.
+
+.also
+Read;Restore
+
+
+:Read variable[,variable[,variable...]]
+
+.args
+variable = an integer, float or string variable
+
+.desc
+The @Read command reads the next value from a program's Data statements
+and assigns it to the specified variable.
+
+You can read multiple values at one time by supplying a list of variables
+to the @Read statement: Read X,Y,Z for example.
+
+.also
+Data;Restore
+
+
+:Restore label
+
+.args
+label = an exisiting label
+
+.desc
+The @Restore command is used to reposition the internal data pointer that
+is used to fetch values for the @Read command from a program's Data 
+statements.
+
+A program label is declared in a Blitz program by preceeding the label 
+name with a period.
+
+.also
+Read;Data
+
+
+::Compiler Directives
+
+:Include filename$
+
+.args
+filename$ - name of an existing .bb source file
+
+.desc
+The @Include command allows a large program to be split into small
+chunks.
+
+The Blitz compiler internally replaces any Include declarations
+in a program with the actual lines from the file specified.
+
+
+
+::Application Control
+
+
+:AppTitle title$ [,close_prompt$]
+
+.args
+title$ - the text to be used in a program's task bar entry and any window title
+close_prompt$ - the text displayed after the user tries to close a program window
+
+.desc
+@AppTitle sets the application's name, affecting the application's taskbar
+entry, and the titlebar of any @Graphics and @Graphics3D windows.
+
+An optional close_prompt will prompt the user to confirm closing and
+application window using the specified text.
+
+The defaut is no close_prompt which results in the program ending immediately
+if the user clicks the close button of a program's graphics window.
+
+.also
+End;Graphics;Graphics3D
+
+
+:CommandLine$()
+
+.desc
+Returns the command line arguments if any specified when the program
+was run.
+
+@CommandLine arguments are useful for running a program in a variety
+of modes either specified by the user from an actual command line
+or more commonly specified in shortcut icons created to invoke the
+application in a variety of modes.
+
+The Blitz3D IDE allows the simulation of command line arguments
+during development with the Command Line Argument option that can
+be found in the Blitz3D editor's Program menu.
+
+
+:RuntimeError message$
+
+.args
+message$ = explanation text to display to the user
+
+.desc
+If you program encounters a critical error such as a
+the result of a @LoadImage command was 0 you can
+end the program with an appropriate error message
+displayed to the user using the RuntimeError command.
+
+.also
+End;Stop
+
+
+:Stop
+
+.desc
+In debug mode the @Stop command causes the program to
+halt and the Blitz3D Debugger to be activated.
+
+Stopping a program at a certain break point allows all
+variables in use to be examined in the Debugger, a
+process which may provide a better understanding of 
+the behavior or mis-behavior of the program being debugged.
+
+Once a program is Stopped, execution may be resumed
+until the next @Stop command is encountered or the
+Blitz3D Debugger may be used to step through the
+program a line at a time.
+
+.also
+DebugLog;End
+
+
+:DebugLog message$
+
+.args
+message$ = message text string value
+
+.desc
+In debug mode the message specified is output to the
+log window of the Blitz3D debugger.
+
+@DebugLog can be used to log information relevant
+to the programs execution in places of uncertain behavior
+with the resulting log providing a programmer with
+details that can lead to fuller understanding of
+its execution state.
+
+As the Blitz3D Debugger is only available when a
+program is in a stopped state and closes completely
+in the case of an @End statement programmers may
+choose to implement their own file based @DebugLog 
+function to be called instead.
+
+.also
+Stop
+

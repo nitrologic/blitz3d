@@ -1,0 +1,107 @@
+:CreateUDPStream( [port] )
+
+.args
+port (optional) - port number
+
+.desc
+If no port is specified, a free port will be allocated and you can then use UDPStreamPort() to find out the allocated port.
+
+.code
+None.
+
+:CloseUDPStream udp_stream
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+None
+
+.code
+None.
+
+:SendUDPMsg udp_stream,dest_ip[,dest_port]
+
+.args
+udp_stream - UDP stream handle
+dest_ip - destination IP address
+dest_port (optional) - destination port number
+
+.desc
+Transmits all the data written to the UDP stream to the specified IP address  and port. Data is written using the standard stream commands. If no destination  port is specified, the port number used to create the UDP Stream is used.
+
+
+Note that IP addresses must be in integer format, NOT in dotted IP format.
+
+.code
+None.
+
+:RecvUDPMsg( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Receives a UDP message into the specified UDP stream. Standard stream read  commands can then be used to examine the message.
+
+
+The return value is the integer IP address of the message source, or 0 if no  message was available. You can use UDPMsgPort()  to find out the port number of the message source.
+
+.code
+None.
+
+:UDPStreamIP( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the integer IP address of the specified udp_stream. Currently, this  always returns 0.
+
+.code
+None.
+
+:UDPStreamPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the port number of the specified UDP stream. This can be useful  if you've created the UDP stream without specifying a port number.
+
+.code
+None.
+
+:UDPMsgIP( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the integer IP address of the sender of the last UDP message received.  This value is also returned by RecvUDPMsg().
+
+.code
+None.
+
+:UDPMsgPort( udp_stream )
+
+.args
+udp_stream - UDP stream handle
+
+.desc
+Returns the port of the sender of the last UDP message received.
+
+.code
+None.
+
+:UDPTimeouts recv_millis
+
+.args
+recv_millis - milliseconds value
+
+.desc
+recv_millis allows you to control how long the  RecvUDPMsg() function will wait for a new message. By default, this is set  to 0, meaning RecvUDPMsg() will return immediately  if there is no message to be received.
+
+.code
+None.
+

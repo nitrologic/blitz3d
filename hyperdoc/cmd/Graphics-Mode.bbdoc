@@ -1,0 +1,159 @@
+:CountGfxModes3D()
+
+.args
+None.
+
+.desc
+Returns the number of 3D compatible modes available on the selected 3D graphics card, and sets up the info to be returned by GfxModeWidth, GfxModeHeight, GfxModeDepth etc (see 2D commands). 
+
+Any difference between CountGfxModes3D and CountGfxModes has been made largely irrelevant by newer cards as they now tend to support 3D in all graphics modes. However there are a few older cards that do not support 3D in some graphics modes, hence the inclusion of the CountGfxModes3D command.
+
+.code
+; CountGfxModes3D()
+; -----------------
+
+Graphics 800,600,0,2
+
+For i=1 To CountGfxModes3D()
+
+	Print "Mode "+i+": ("+GfxModeWidth(i)+"x"+GfxModeHeight(i)+"x"+GfxModeDepth(i)+")"
+
+Next
+
+WaitKey()
+
+:GfxMode3D(mode)
+
+.args
+mode - graphics mode number from 1 - CountGfxModes ()
+
+.desc
+GfxMode3D returns True if the specified graphics mode is 3D-capable.
+
+GfxMode3D is generally used after obtaining a list of available display modes from a user's system via CountGfxModes (). You apply this to each mode in turn (or a selected mode) to see if you can enter 3D mode. If this returns False, calling Graphics3D () with this mode's details will fail!
+
+If you don't wish to perform this check, the only Graphics3D call you can make with a guarantee of working on 99% of 3D graphics cards is 'Graphics3D 640, 480'. However, see GfxModeExists' gfx3d parameter for another method of performing this check.
+
+.code
+For a = 1 To CountGfxModes ()
+If GfxMode3D (a)
+Print "Mode " + a + " is 3D-capable"
+Else
+Print "Mode " + a + " is NOT 3D-capable"
+EndIf
+Delay 100
+Next
+
+:GfxMode3DExists( width, height, depth)
+
+.args
+width - the width of the display mode you want to check for
+height - the height of the display mode you want to check for
+depth - the depth of the display mode you want to check for
+
+.desc
+GfxMode3DExists will test to see whether the host machine's graphics card supports a certain video mode, as specified by the width, height and depth parameters, and also whether the specified video mode is 3D-capable.
+
+If these answer to both these things is yes, then the command will return true, otherwise false.
+
+Most, if not all modern graphics cards are 3D-capable in all available graphics modes, however a few older ones are 2D-capable only in certain video modes hence the need for GfxMode3DExists as well as GfxModeExists.
+
+.code
+If GfxMode3DExists (2500, 2500, 64)
+Graphics3D 2500, 2500, 64
+Else
+RuntimeError "Domestic PC display hardware isn't yet capable of silly resolutions  like 2500 x 2500 x 64-bit!"
+EndIf
+
+:GfxDriver3D(driver)
+
+.args
+driver - display driver number to check, from 1 to CountGfxDrivers ()
+
+.desc
+GfxDriver3D returns True if the specified graphics driver is 3D-capable.
+
+GfxDriver3D is generally used after obtaining a list of available graphics drivers from a user's system via CountGfxDrivers(). You apply this to each driver in turn (or a selected driver) to see if it is 3D-capable. If this returns False, the driver can not perform 3D operations.
+
+On systems with more than one display driver, you can use this to check each for 3D capability before choosing one via the SetGfxDriver command.
+
+.code
+For a = 1 To CountGfxDrivers ()
+If GfxDriver3D (a)
+Print GfxDriverName (a) + " is 3D-capable"
+Else
+Print GfxDriverName (a) + " is NOT 3D-capable"
+EndIf
+Delay 100
+Next
+
+:GfxDriverCaps3D()
+
+.args
+None.
+
+.desc
+Returns the 'caps level' of the current graphics driver. Values are:
+
+100: card supports all 'standard' Blitz3D operations.
+110: card supports all standard ops plus cubic environment mapping.
+
+3D Graphics code must be set before you call this command in order for it to work.
+
+.also
+CreateTexture;Graphics3D
+
+.code
+Graphics3D 640,480,0,2
+
+caps=GfxDriverCaps3D()
+
+Select caps
+
+	Case 100 msg$="Your graphics card does not support cubic environment mapping."
+
+	Case 110 msg$="Your graphics card does support cubic environment mapping."
+
+End Select
+
+Print msg$
+
+WaitKey()
+
+:Windowed3D()
+
+.args
+None.
+
+.desc
+Windowed3D returns true if the host machine's selected graphics card is capable of rendering 3D graphics in a window using the current desktop colour depth.
+
+This mainly concerns older graphics cards, some of which may not be able to render 3D in a window at all, while others maybe be able to only render in a window if the user's desktop is set to a certain colour depth such as 16.
+
+.code
+If Windowed3D ()
+Graphics3D 640, 480, 0, 2
+Print "Windowed mode!"
+Else
+Graphics3D 640, 480, 0, 1
+Print "Full screen modes only!"
+EndIf
+
+MouseWait
+End
+
+:HWTexUnits()
+
+.args
+None.
+
+.desc
+Returns the number of hardware texturing units available.
+
+.code
+Graphics3D 640,480,0,2
+
+Print HWTexUnits()
+
+WaitKey()
+

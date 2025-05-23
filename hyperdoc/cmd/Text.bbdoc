@@ -1,0 +1,353 @@
+:Print [string$]
+
+.args
+string$ (optional) - string variable or value
+
+.desc
+Writes a string to the front buffer (i.e. the screen), and starts a new  line.
+
+
+If the optional string parameter is omitted, then the command will just  start a new line. .also
+Write.
+
+.code
+; Print Example
+; -------------
+
+Print "Blitz "
+Print "Basic"
+
+
+:Write string$
+
+.args
+string$ - string variable or value
+
+.desc
+Writes a string to the front buffer (i.e. the screen), but doesn't then  start a new line (unlike Print).
+
+
+.also
+Print. 
+
+.code
+; Write Example
+; -------------
+
+Write "Blitz "
+Write "Basic"
+
+
+:Locate x,y
+
+.args
+x=x coordinate on the screen
+y=y coordinate on the screen 
+
+.desc
+Sometimes you want to place the PRINT and Input$ commands at a specific location on the screen.  This command locates the 'cursor' to the designated location.
+
+.code
+; Locate example
+
+strName$=Input$("What is your name?")
+
+Locate 100,200
+
+Print "Hello there, " + strName$
+
+While Not KeyHit(1)
+Wend 
+
+
+:Text x,y,string$,[center x],[center y]
+
+.args
+x = starting x coordinate to print text
+y = starting 4 coordinate to print text
+string$ = string/text to print
+center x = optional; true = center horizontally
+center y = optional; true = center vertically 
+
+.desc
+Prints a string at the designated screen coordinates. You can center the  text on the coordiates by setting center x/center y to TRUE. This draws the  text in the current drawing color.
+
+
+Note: Printing a space with text will NOT render a block - a space is an empty  value. So printing " " will not make a box appear.
+
+.code
+; Text example
+
+; enable graphics mode
+Graphics 800,600,16
+
+; wait for ESC key before ending
+While Not KeyHit(1)
+;print the text, centered horizontally at x=400, y=0
+Text 400,0,"Hello There!",True,False
+Wend
+
+
+:LoadFont (fontname$[,height][,bold][,italic][,underlined])
+
+.args
+fontname$ - name of font to be loaded, e.g. "arial"
+height - height of font in points (default is 12)
+bold - True to load bold version of font, False not to (default is False)
+italic - True to load italic version of font, False not to (default is False)
+underlined - True to load underlined version of font, False not to (default is False)
+
+.desc
+Loads a font and returns a font handle.
+
+
+You can then use the font handle  with commands such as SetFont and FreeFont. 
+
+
+Note: Blitz doesn't work with SYMBOL fonts, like Webdings and WingDings.
+
+.code
+; LoadFont/SetFont/FreeFont Example
+; ---------------------------------
+
+; Enable Graphics mode
+Graphics 800,600
+
+; Set global on font variables
+Global fntArial,fntArialB,fntArialI,fntArialU
+
+; Load fonts to a file handle variables
+fntArial=LoadFont("Arial",24)
+fntArialB=LoadFont("Arial",18,True)
+fntArialI=LoadFont("Arial",32,False,True)
+fntArialU=LoadFont("Arial",14,False,False,True)
+
+; Set the font and print text
+SetFont fntArial
+Text 400,0,"This is just plain Arial 24 point",True
+
+SetFont fntArialB
+Text 400,30,"This is bold Arial 18 point",True
+
+SetFont fntArialI
+Text 400,60,"This is italic Arial 32 point",True
+
+SetFont fntArialU
+Text 400,90,"This is underlined Arial 14 point",True
+
+; Standard 'wait for ESC' from user
+While Not KeyHit(1)
+Wend
+
+; Clear all the fonts from memory!
+FreeFont fntArial
+FreeFont fntArialB
+FreeFont fntArialI
+FreeFont fntArialU
+
+:SetFont fonthandle
+
+.args
+fontname = string containing font name
+height = font height desired
+bold = set to TRUE to load font as BOLD
+italic = set to TRUE to load font as ITALIC
+underlined set to TRUE to load font as UNDERLINED 
+
+.desc
+This activates a TrueType font previously loaded into memory (though the LoadFont command) for future use with printing commands  such as Text.
+
+
+Note: Blitz doesn't work with SYMBOL fonts, like Webdings and WingDings.
+
+
+Be sure to free the memory used by the font went you are done using the FreeFont command. 
+
+.code
+; LoadFont/SetFont/FreeFont example
+
+; enable graphics mode
+Graphics 800,600,16
+
+; Set global on font variables
+Global fntArial,fntArialB,fntArialI,fntArialU
+
+;Load fonts to a file handle variables
+fntArial=LoadFont("Arial",24,False,False,False)
+fntArialB=LoadFont("Arial",18,True,False,False)
+fntArialI=LoadFont("Arial",32,False,True,False)
+fntArialU=LoadFont("Arial",14,False,False,True)
+
+; set the font and print text
+SetFont fntArial
+Text 400,0,"This is just plain Arial 24 point",True,False
+
+SetFont fntArialB
+Text 400,30,"This is bold Arial 18 point",True,False
+
+SetFont fntArialI
+Text 400,60,"This is italic Arial 32 point",True,False
+
+SetFont fntArialU
+Text 400,90,"This is underlined Arial 14 point",True,False
+
+; Standard 'wait for ESC' from user
+While Not KeyHit(1)
+Wend
+
+; Clear all the fonts from memory!
+FreeFont fntArial
+FreeFont fntArialB
+FreeFont fntArialI
+FreeFont fntArialU
+
+
+:FreeFont fonthandle
+
+.args
+fonthandle = A handle to a previously loaded font.
+
+.desc
+This removes a TrueType font previously loaded into memory (though the LoadFont command).
+
+
+Note: Blitz doesn't work with SYMBOL fonts, like Webdings and WingDings.
+
+.code
+; LoadFont/SetFont/FreeFont example
+
+; enable graphics mode
+Graphics 800,600,16
+
+; Set global on font variables
+Global fntArial,fntArialB,fntArialI,fntArialU
+
+;Load fonts to a file handle variables
+fntArial=LoadFont("Arial",24,False,False,False)
+fntArialB=LoadFont("Arial",18,True,False,False)
+fntArialI=LoadFont("Arial",32,False,True,False)
+fntArialU=LoadFont("Arial",14,False,False,True)
+
+; set the font and print text
+SetFont fntArial
+Text 400,0,"This is just plain Arial 24 point",True,False
+
+SetFont fntArialB
+Text 400,30,"This is bold Arial 18 point",True,False
+
+SetFont fntArialI
+Text 400,60,"This is italic Arial 32 point",True,False
+
+SetFont fntArialU
+Text 400,90,"This is underlined Arial 14 point",True,False
+
+; Standard 'wait for ESC' from user
+While Not KeyHit(1)
+Wend
+
+; Clear all the fonts from memory!
+FreeFont fntArial
+FreeFont fntArialB
+FreeFont fntArialI
+FreeFont fntArialU
+
+:FontWidth()
+
+.args
+None.
+
+.desc
+This returns the width, in pixels, of the currently selected font (using SetFont - previously loaded with LoadFont). This command returns the width of the  WIDEST character of the font.
+
+.code
+; FontWidth()/FontHeight example
+
+; enable graphics mode
+Graphics 800,600,16
+
+; Set global on font variable
+Global fntArial
+
+;Load fonts to a file handle variables
+fntArial=LoadFont("Arial",13,False,False,False)
+
+; set the font and print sizes
+SetFont fntArial
+Text 400,0,"The font width of the widest character is:"+ FontWidth(),True,False
+Text 400,30,"The height of the font is:"+ FontHeight(),True,False
+
+; Standard 'wait for ESC' from user
+While Not KeyHit(1)
+Wend
+
+; Clear all the fonts from memory!
+FreeFont fntArial
+
+
+:FontHeight()
+
+.args
+None.
+
+.desc
+This returns the height, in pixels, of the currently selected font (using SetFont - previously loaded with LoadFont).
+
+.code
+; FontWidth()/FontHeight example
+
+; enable graphics mode
+Graphics 800,600,16
+
+; Set global on font variable
+Global fntArial
+
+;Load fonts to a file handle variables
+fntArial=LoadFont("Arial",13,False,False,False)
+
+; set the font and print sizes
+SetFont fntArial
+Text 400,0,"The font width of the widest character is:"+ FontWidth(),True,False
+Text 400,30,"The height of the font is:"+ FontHeight(),True,False
+
+; Standard 'wait for ESC' from user
+While Not KeyHit(1)
+Wend
+
+; Clear all the fonts from memory!
+FreeFont fntArial
+
+
+:StringWidth (string)
+
+.args
+string = any valid string or string variable
+
+.desc
+This will return the size, in pixels, the width of the indicated string.  This is useful for determining screen layout, scrolling of text, and more. This  is calculated based on the size of the currently loaded font.
+
+.code
+; StringWidth/Height Example
+
+a$="Hello Shane!"
+Print "A$=" + a$
+Print "This string is "+ StringWidth(a$) + " pixels wide and"
+Print "it is " + StringHeight(a$) + " tall, based on the current font!"
+
+
+:StringHeight (string)
+
+.args
+string = any valid string or string variable
+
+.desc
+This will return the size, in pixels, the height of the indicated string.  This is useful for determining screen layout, scrolling of text, and more. This  is calculated based on the size of the currently loaded font.
+
+.code
+; StringWidth/Height Example
+
+a$="Hello Shane!"
+Print "A$=" + a$
+Print "This string is "+ StringWidth(a$) + " pixels wide and"
+Print "it is " + StringHeight(a$) + " tall, based on the current font!"
+
+

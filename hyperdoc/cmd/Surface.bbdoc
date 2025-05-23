@@ -1,0 +1,443 @@
+:CreateSurface ( mesh[,brush] )
+
+.args
+mesh - mesh handle
+brush (optional) - brush handle
+
+.desc
+Creates a surface attached to a mesh and returns the surface's handle.
+
+Surfaces are sections of mesh which are then used to attach triangles to. You  must have at least one surface per mesh in order to create a visible mesh, however  you can use as many as you like. Splitting a mesh up into lots of sections allows  you to affect those sections individually, which can be a lot more useful than  if all the surfaces are combined into just one.
+
+.code
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+mesh = CreateMesh()
+surf = CreateSurface(mesh)
+
+v0 = AddVertex (surf, -5,-5,0,  0  ,0)
+v1 = AddVertex (surf,  5,-5,0,  1  ,0)
+v2 = AddVertex (surf,  0, 5,0,  0.5,1)
+
+tri = AddTriangle (surf,v0,v2,v1)
+
+cam = CreateCamera()
+MoveEntity cam, 0,0,-7
+
+RenderWorld
+Flip
+
+WaitKey
+End
+
+:PaintSurface surface,brush
+
+.args
+surface - surface handle
+brush - brush handle
+
+.desc
+Paints a surface with a brush.
+
+This has the effect of instantly altering  the visible appearance of that particular surface, i.e. section of mesh, assuming  the brush's properties are different to what was applied to the surface before. 
+
+.also
+PaintEntity, PaintMesh. 
+
+.code
+None.
+
+:ClearSurface surface,[clear_verts][,clear_triangles]
+
+.args
+surface - surface handle
+clear_verts (optional) - true to remove all vertices from the specified surface,  false not to. Defaults to true.
+clear_triangles (optional) - true to remove all triangles from the specified  surface, false not to. Defaults to true.
+
+.desc
+Removes all vertices and/or triangles from a surface.
+
+This is useful for  clearing sections of mesh. The results will be instantly visible. 
+
+After clearing a surface, you may wish to add vertices and triangles to it  again but with a slightly different polygon count for dynamic level of detail  (LOD). 
+
+.code
+None.
+
+:FindSurface ( mesh,brush)
+
+.args
+mesh - mesh handle
+brush - brush handle
+
+.desc
+Attempts to find a surface attached to the specified mesh and created with  the specified brush. Returns the surface handle if found or 0 if not.
+
+See  .also CountSurfaces, GetSurface. 
+
+.code
+None.
+
+:AddVertex ( surface,x#,y#,z#[,u#][,v#][,w#] )
+
+.args
+surface - surface handle
+x# - x coordinate of vertex
+y# - y coordinate of vertex
+z# - z coordinate of vertex
+u# (optional) - u texture coordinate of vertex
+v# (optional) - v texture coordinate of vertex
+w# (optional) - w texture coordinate of vertex - not used, included for future expansion
+
+.desc
+Adds a vertex to the specified surface and returns the vertices' index number,  starting from 0.
+
+x,y,z are the geometric coordinates of the vertex, and u,v,w are texture mapping coordinates.
+
+A vertex is a point in 3D space which is used to connect edges of a triangle together. Without any vertices, you can't have any triangles. At least three  vertices are needed to create one triangle; one for each corner. 
+
+The optional u, v and w parameters allow you to specify texture coordinates for a vertex, which will determine how any triangle created using those vertices will be texture mapped. The u, v and w parameters specified will take effect on both texture coordinate sets (0 and 1). This works on the following basis: 
+
+The top left of an image has the uv coordinates 0,0. 
+The top right has coordinates 1,0
+The bottom right is 1,1.
+The bottom left 0,1. 
+
+Thus, uv coordinates for a vertex correspond to a point in the image. For example, coordinates 0.9,0.1 would be near the upper right corner of the image. 
+
+So now imagine you have a normal equilateral triangle. By assigning the bottom left vertex a uv coordinate of 0,0, the bottom right a coordinate of 1,0 and the top centre 0.5,1, this will texture map the triangle with an image that fits it.
+
+When adding a vertex its default color is 255,255,255,255.
+
+.code
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+mesh = CreateMesh()
+surf = CreateSurface(mesh)
+
+v0 = AddVertex (surf, -5,-5,0,  0  ,0)
+v1 = AddVertex (surf,  5,-5,0,  1  ,0)
+v2 = AddVertex (surf,  0, 5,0,  0.5,1)
+
+tri = AddTriangle (surf,v0,v2,v1)
+
+cam = CreateCamera()
+MoveEntity cam, 0,0,-7
+
+RenderWorld
+Flip
+
+WaitKey
+End
+
+:AddTriangle ( surface,v0,v1,v2 )
+
+.args
+surface - surface handle
+v0 - index number of first vertex of triangle
+v1 - index number of second vertex of triangle
+v2 - index number of third vertex of triangle
+
+.desc
+Adds a triangle to a surface and returns the triangle's index number, starting  from 0.
+
+The v0, v1 and v2 parameters are the index numbers of the vertices  created using AddVertex. 
+
+Depending on how the vertices are arranged, then the triangle will only be  visible from a certain side. Imagine that a triangle's vertex points are like  dot-to-dot pattern, each numbered v0, v1, v2. If these dots, starting from v0,  through to V2, form a clockwise pattern relative to the viewer, then the triangle  will be visible. If these dots form an anti-clockwise pattern relative to the  viewer, then the triangle will not be visible. 
+
+The reason for having one-sided triangles is that it reduces the amount of  triangles that need to be rendered when one side faces the side of an object  which won't be seen (such as the inside of a snooker ball). However, if you  wish for a triangle to be two-sided, then you can either create two triangles,  using the same set of vertex numbers for both but assigning them in opposite  orders, or you can use CopyEntity and FlipMesh together.
+
+.code
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+mesh = CreateMesh()
+surf = CreateSurface(mesh)
+
+v0 = AddVertex (surf, -5,-5,0,  0  ,0)
+v1 = AddVertex (surf,  5,-5,0,  1  ,0)
+v2 = AddVertex (surf,  0, 5,0,  0.5,1)
+
+tri = AddTriangle (surf,v0,v2,v1)
+
+cam = CreateCamera()
+MoveEntity cam, 0,0,-7
+
+RenderWorld
+Flip
+
+WaitKey
+End
+
+:VertexCoords surface,index,x#,y#,z#
+
+.args
+surface - surface handle
+index - index of vertex
+x# - x position of vertex
+y# - y position of vertex
+z# - z position of vertex
+
+.desc
+Sets the geometric coordinates of an existing vertex.
+
+This is the command  used to perform what is commonly referred to as 'dynamic mesh deformation'.  It will reposition a vertex so that all the triangle edges connected to it,  will move also. This will give the effect of parts of the mesh suddenly deforming. 
+
+.code
+None.
+
+:VertexNormal surface,index,nx#,ny#,nz#
+
+.args
+surface - surface handle
+index - index of vertex
+nx# - normal x of vertex
+ny# - normal y of vertex
+nz# - normal z of vertex
+
+.desc
+Sets the normal of an existing vertex.
+
+.code
+None.
+
+:VertexColor surface,index,red#,green#,blue#[,alpha#]
+
+.args
+surface - surface handle
+index - index of vertex
+red# - red value of vertex
+green# - green value of vertex
+blue# - blue value of vertex
+alpha# - optional alpha transparency of vertex (0.0 to 1.0 - default: 1.0)
+
+.desc
+Sets the color of an existing vertex.
+
+
+NB. If you want to set the alpha individually for vertices using the alpha# parameter then you need to use EntityFX flags: 32 (to force alpha-blending) and 2 (to switch to vertex colors), like this:
+EntityFX myEntity, 32+2
+
+.also
+EntityFX;VertexAlpha;VertexRed;VertexGreen;VertexBlue
+
+.code
+None.
+
+:VertexTexCoords surface,index,u#,v#[,w#][,coord_set]
+
+.args
+surface - surface handle
+index - index of vertex
+u# - u# coordinate of vertex
+v# - v# coordinate of vertex
+w# (optional) - w# coordinate of vertex
+coord_set (optional) - co_oord set. Should be set to 0 or 1.
+
+.desc
+Sets the texture coordinates of an existing vertex.
+
+.code
+None.
+
+:CountVertices ( surface )
+
+.args
+surface - surface handle
+
+.desc
+Returns the number of vertices in a surface.
+
+.code
+None.
+
+:CountTriangles ( surface )
+
+.args
+surface - surface handle
+
+.desc
+Returns the number of triangles in a surface.
+
+.code
+None.
+
+:VertexX# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the x coordinate of a vertex.
+
+.code
+None.
+
+:VertexY# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the y coordinate of a vertex.
+
+.code
+None.
+
+:VertexZ ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the z coordinate of a vertex.
+
+.code
+None.
+
+:VertexNX# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the x component of a vertices normal.
+
+.code
+None.
+
+:VertexNY# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the y component of a vertices normal.
+
+.code
+None.
+
+:VertexNZ# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the z component of a vertices normal.
+
+.code
+None.
+
+:VertexRed# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the red component of a vertices color.
+
+.code
+None.
+
+:VertexGreen# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the green component of a vertices color.
+
+.code
+None.
+
+:VertexBlue# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the blue component of a vertices color.
+
+.code
+None.
+
+:VertexAlpha# ( surface,index )
+
+.args
+surface - surface handle 
+index - index of vertex
+
+.desc
+Returns the alpha component of a vertices color, set using @VertexColor.
+
+.also
+VertexRed;VertexGreen;VertexBlue;VertexColor
+
+:VertexU# ( surface,index [,coord_set] )
+
+.args
+surface - surface handle
+index - index of vertex
+coord_set (optional) - UV mapping coordinate set. Should be set to 0 or 1.
+
+.desc
+Returns the texture u coordinate of a vertex.
+
+.also
+VertexV, VertexTexCoords
+
+.code
+None.
+
+:VertexV# ( surface,index [,coord_set] )
+
+.args
+surface - surface handle
+index - index of vertex
+coord_set (optional) - UV mapping coordinate set. Should be set to 0 or 1.
+
+.desc
+Returns the texture v coordinate of a vertex.
+
+.also
+VertexU, VertexTexCoords
+
+.code
+None.
+
+:VertexW# ( surface,index )
+
+.args
+surface - surface handle
+index - index of vertex
+
+.desc
+Returns the texture w coordinate of a vertex.
+
+.code
+None.
+
+:TriangleVertex ( surface,triangle_index,corner )
+
+.args
+surface - surface handle
+triangle_index - triangle index
+corner - corner of triangle. Should be 0, 1 or 2.
+
+.desc
+Returns the vertex of a triangle corner.
+
+.code
+None.
+

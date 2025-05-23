@@ -1,0 +1,518 @@
+:LoadSound (filename$)
+
+.args
+filename$ - name of sound file. Formats supported: raw/wav/mp3/ogg
+
+.desc
+This command loads a sound file into memory. It returns a number if successful,  or 0 if there was a problem loading the sound. You must assign the value this  returns to a variable (preferably a Global variable)  for subsequent playback using (PlaySound). Look at the example. 
+
+.code
+; Assign a global variable for the sound
+Global sndPlayerDie
+
+; Load the sound file into memory
+
+sndPlayerDie=LoadSound("sounds/die.wav")
+
+; Play the sound
+
+PlaySound sndPlayerDie
+
+
+:FreeSound sound_variable
+
+.args
+sound_variable - and valid variable previously created with the LoadSound  command.
+
+.desc
+When you are finished using a sound effect, you should free up the memory  its using and delete the sound. This command will delete a sound instance variable  created with the LoadSound command.
+
+Why would you want to do this? Perhaps you have different sets of sounds for  different levels of your game? Perhaps your music loop changes from level to  level. You want to do the RIGHT thing and manage your own resources. Just because  you CAN load every sample for the whole game at once, consider someone that  doesn't have as much memory as you do. You want to ensure that your game appeals  to the widest audience possible. Note: You don't have to manually free these  resources when your program terminates - Blitz does this automatically.
+
+.code
+; Load a sound into memory
+sndOneUp=LoadSound("audio1up.wav")
+
+; Free the memory up and delete the sound
+FreeSound sndOneUp
+
+
+:LoopSound sound_variable
+
+.args
+sound_variable = variable previously assigned with a LoadSound command. 
+
+.desc
+This command sets up play back a sound file (.WAV or .MP3) in an endless  loop (like for background music). You must load a variable with a sound file  using the LoadSound command. Use a Global variable  to ensure your sound loop can be played from anywhere in your program. Note:  This command doesn't actually PLAY the sound loop, just sets it up for looping.  You still need to execute the PlaySound command  to hear the sound.
+
+.code
+; Assign a global variable for the sound loop
+Global sndMusicLoop
+
+; Load the sound loop file into memory
+
+sndMusicLoop=LoadSound("sounds/loop1.wav")
+
+; Set the sound loop
+
+LoopSound sndMusicLoop
+
+PlaySound sndMusicLoop
+
+
+:SoundPitch sound_variable, hertz
+
+.args
+sound_variable = any valid sound variable previously created with the LoadSound  command.
+
+hertz = valid playback hertz speed (up to 44000 hertz).
+
+.desc
+Alters the pitch of a sound previously loaded with the LoadSound command. By changing the pitch, you can  often reuse sounds for different uses or to simulate a 'counting up/down' sound.  To make the sound 'higher pitched', increase the hertz. Conversely, decreasing the hertz will 'lower' the pitch. Note: this is in relation to the original hertz frequency of the sound.
+
+.code
+; Load the sound (11,000 hertz)
+
+snd1Up = LoadSound("audiooneup.wav")
+
+; Play the sound normally
+PlaySound snd1Up
+
+; Change the pitch UP and play it
+SoundPitch snd1Up, 11000*2 ;twice original frequency
+PlaySound snd1Up
+
+; Change the pitch down and play it
+SoundPitch snd1Up, 11000/2 ;1/2 original frequency
+PlaySound snd1Up
+
+:SoundVolume sound_variable,volume#
+
+.args
+sound_variable = any valid sound variable previously created with the LoadSound  command.
+volume# = floating point number from 0 (silence) to 1 (full volume)
+
+.desc
+Alter the playback volume of your sound effect with this command. This command  uses a floating point number from 0 to 1 to control the volume level.
+
+Please see ChannelVolume for more options! 
+
+.code
+; Load sound sample
+sndDeath=LoadSound("audiodeath.wav")
+
+; Change volume level to half
+SoundVolume sndDeath,.5
+
+; Play sound
+PlaySound sndDeath
+
+
+:SoundPan sound_variable,pan#
+
+.args
+sound_variable = any valid sound variable previously created with the  LoadSound command.
+pan# = floating point number from -1 (left) to 0 (center) to 1 (right)
+
+.desc
+Use this command to pan your sound effect between the left and right speakers  (or restore the panning to the center). Use this for cool panning stereo sounds  during your game.
+
+.code
+; Load sound sample
+sndDeath=LoadSound("audiodeath.wav")
+
+; Pan sound effect half to the left
+SoundPan sndDeath,-.5
+
+; Play sound
+PlaySound sndDeath
+
+
+:PlaySound ( sound_variable )
+
+.args
+sound_variable = variable previously assigned with a LoadSound command.
+
+.desc
+This plays a sound previously loaded and assigned to a variable using the LoadSound command. See example.
+
+You will need to assign a channel variable handle to the sound when you play  it. All subsequent sound handling commands require you use the CHANNEL variable,  not the sound variable to control the sound - such as StopChannel, PauseChannel, ResumeChannel, ChannelPitch, ChannelVolume, ChannelPan,  and ChannelPlaying.
+
+.code
+; Assign a global variable for the sound
+Global sndPlayerDie
+
+; Load the sound file into memory
+
+sndPlayerDie=LoadSound("sounds/die.wav")
+
+; Play the sound
+
+chnDie=PlaySound ( sndPlayerDie )
+
+:PlayMusic (filename$)
+
+.args
+filename$ - name of music file. Formats supported:  raw/mod/s3m/xm/it/mid/rmi/wav/mp2/mp3/ogg/wma/asf
+
+.desc
+This command will load and play a music file.
+
+You MUST use a channel variable  in order to stop or adjust the music playing. You may use StopChannel, PauseChannel, ResumeChannel, etc. with this command.
+
+You can't 'preload' the audio like you can a sound sample via the LoadSound command. Every time you call the PlayMusic  command, the file is reloaded and played. This means that if you use the command  while some graphics are moving on-screen, you may get a slight pause when the  hard drive seeks and grabs the music file. To avoid this, you might want to  use the PlaySound/LoopSound  commands instead.
+
+.code
+; Load and play the background music
+
+chnBackground=PlayMusic("music\background.wav")
+
+:PlayCDTrack( track,[mode] )
+
+.args
+track = track number to play
+mode = 1; play track once, 2; loop track, 3; play track to end of CD
+
+.desc
+Plays a CD track and returns a sound channel.
+
+The optional mode parameter allows variations of playback. Remember, the playback happens through the CD cable inside the computer that attaches to the sound card. Many  computers (for some reason), don't have this cable inside properly attached. If this is the case, you will NOT hear CD sound even though you hear other sound  effects and music.
+
+.code
+; PlayCDTrack example
+
+; Get a track to play from user
+track=Input$("Enter a CD track number to play:")
+
+; Play the track, assign a channel - just play once
+chnCD=PlayCDTrack(track,1)
+
+; Figure out what time it is now
+oldTime=MilliSecs()
+; Play until the channel is over or ESC
+While ChannelPlaying(chnCD) And (Not KeyHit(1))
+; clear and print the time elapsed
+Cls 
+Locate 0,0
+Print "Time Elapsed (sec):" + ((MilliSecs()-oldTime)/1000)
+Wend
+
+; Stop the channel
+StopChannel chnCD
+
+:StopChannel channel_handle
+
+.args
+channel_handle = variable assigned to the channel when played 
+
+.desc
+This command replaced StopSound in the latter  versions of Blitz Basic.
+
+Once you have a sound playing, and a channel variable attached to it, you use  this command to stop the sound. This works for all sound channel types, including  MP3, WAV, MIDI, and CD track playback.
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+; Prepare the sound for looping
+LoopSound sndWave
+
+chnWave=PlaySound(sndWave)
+
+Print "Playing sound for 2 seconds ..."
+Delay 2000
+
+Print "Pausing sound for 2 seconds ..."
+PauseChannel chnWave
+Delay 2000
+
+Print "Restarting sound ..."
+ResumeChannel chnWave
+Delay 2000
+
+Print "Changing Pitch of sound ..."
+;StopChannel chnWave
+ChannelPitch chnWave, 22000
+Delay 2000
+
+Print "Playing new pitched sound ..."
+Delay 2000
+
+Print "Left speaker only"
+ChannelPan chnWave,-1
+Delay 2000
+
+Print "Right speaker only"
+ChannelPan chnWave,1
+Delay 2000
+
+Print "All done!"
+StopChannel chnWave
+
+
+:PauseChannel channel_handle
+
+.args
+channel_handle = variable assigned to the channel when played 
+
+.desc
+When you are playing a sound channel, there may come a time you wish to  pause the sound for whatever reason (like to play another sound effect). This  command does this - and the channel can be resumed with the ResumeChannel command. You can use StopChannel to actually halt the sound. This works  with any channel playback (WAV, MP3, MIDI, etc.).
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+; Prepare the sound for looping
+LoopSound sndWave
+
+chnWave=PlaySound(sndWave)
+
+Print "Playing sound for 2 seconds ..."
+Delay 2000
+
+Print "Pausing sound for 2 seconds ..."
+PauseChannel chnWave
+Delay 2000
+
+Print "Restarting sound ..."
+ResumeChannel chnWave
+Delay 2000
+
+Print "Changing Pitch of sound ..."
+;StopChannel chnWave
+ChannelPitch chnWave, 22000
+Delay 2000
+
+Print "Playing new pitched sound ..."
+Delay 2000
+
+Print "Left speaker only"
+ChannelPan chnWave,-1
+Delay 2000
+
+Print "Right speaker only"
+ChannelPan chnWave,1
+Delay 2000
+
+Print "All done!"
+StopChannel chnWave
+
+
+:ResumeChannel channel
+
+.args
+channel - a music or sound channel previously allocated via LoadSound, PlayMusic,  etc.
+
+.desc
+ResumeChannel is used to continue the playing of a sound sample or music  track on the given channel after you have temporarily halted playback on that  channel (via PauseChannel).
+
+.code
+Graphics 640, 480, 0, 2
+
+musicchannel = PlayMusic ("oohyeahbaby.mp3") ; Replace with a music file on  your hard drive!
+
+Repeat
+
+    Print "Press a key to pause the music..."
+    WaitKey
+
+    PauseChannel musicchannel
+
+    Print "Press a key to continue the music..."
+    WaitKey
+
+    ResumeChannel musicchannel
+
+Until KeyHit (1)
+
+End
+
+
+:ChannelPitch channel_handle, hertz
+
+.args
+channel_handle = variable assigned to the channel when played
+hertz = pitch to apply to the channel (try 8000-44000)
+
+.desc
+You can alter the pitch of a sound channel that is playing (or in use and just paused). I'm sure you can think of numerous uses for this command!  Use the frequency of your sound as the 'baseline' for pitch change. So if your  sample is at 11025 hertz, increase the pitch to 22050 to make the pitch twice as high, 8000 to make it lower, etc. While similar to SoundPitch,  this command let's you change the pitch individually of each and every channel  in use.
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+; Prepare the sound for looping
+LoopSound sndWave
+
+chnWave=PlaySound(sndWave)
+
+Print "Playing sound for 2 seconds ..."
+Delay 2000
+
+Print "Pausing sound for 2 seconds ..."
+PauseChannel chnWave
+Delay 2000
+
+Print "Restarting sound ..."
+ResumeChannel chnWave
+Delay 2000
+
+Print "Changing Pitch of sound ..."
+;StopChannel chnWave
+ChannelPitch chnWave, 22000
+Delay 2000
+
+Print "Playing new pitched sound ..."
+Delay 2000
+
+Print "Left speaker only"
+ChannelPan chnWave,-1
+Delay 2000
+
+Print "Right speaker only"
+ChannelPan chnWave,1
+Delay 2000
+
+Print "All done!"
+StopChannel chnWave
+
+:ChannelVolume channel_handle, volume#
+
+.args
+channel_handle = variable assigned to the channel when played
+volume# = volume level floating value between 0 and 1 
+
+.desc
+While SoundVolume happily changes the volume  of the entire program, this command will let you adjust volume rates on a 'per  channel' basis. Extremely useful.
+
+The volume value is a floating point value between 0 and 1 (0 = silence, .5  = half volume, 1= full volume). You can do other cool stuff like ChannelPitch and ChannelPan  too!
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+; Prepare the sound for looping
+LoopSound sndWave
+
+chnWave=PlaySound(sndWave)
+
+Print "Playing sound for 2 seconds ..."
+Delay 2000
+
+Print "Pausing sound for 2 seconds ..."
+PauseChannel chnWave
+Delay 2000
+
+Print "Restarting sound ..."
+ResumeChannel chnWave
+Delay 2000
+
+Print "Changing volume of sound ..."
+ChannelVolume chnWave, .5
+Delay 2000
+
+Print "Playing new half-volume sound ..."
+Delay 2000
+
+Print "Left speaker only"
+ChannelPan chnWave,-1
+Delay 2000
+
+Print "Right speaker only"
+ChannelPan chnWave,1
+Delay 2000
+
+Print "All done!"
+StopChannel chnWave
+
+
+:ChannelPan channel_handle, pan#
+
+.args
+channel_handle = variable assigned to the channel when played
+pan# = panning floating value to denote channel playback 
+
+.desc
+When you want to do real sound panning effects, this is the command you'll  use. This will allow you to pan the sound channels on a 'per channel' basis  between the left and right speakers. This command makes it very easy to produce  some really killer stereophonic effects!
+
+The pan value is between -1 and 1 with 0 being perfect center. -1 is full left,  and 1 is full right. To make it somewhere in between, try -.5 for 50% left or  .75 for 75% right.
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+; Prepare the sound for looping
+LoopSound sndWave
+
+chnWave=PlaySound(sndWave)
+
+Print "Playing sound for 2 seconds ..."
+Delay 2000
+
+Print "Pausing sound for 2 seconds ..."
+PauseChannel chnWave
+Delay 2000
+
+Print "Restarting sound ..."
+ResumeChannel chnWave
+Delay 2000
+
+Print "Changing Pitch of sound ..."
+ChannelPitch chnWave, 22000
+Delay 2000
+
+Print "Playing new pitched sound ..."
+Delay 2000
+
+Print "Left speaker only"
+ChannelPan chnWave,-1
+Delay 2000
+
+Print "Right speaker only"
+ChannelPan chnWave,1
+Delay 2000
+
+Print "All done!"
+StopChannel chnWave
+
+
+:ChannelPlaying (channel_handle)
+
+.args
+channel_handle = variable assigned to the channel when played 
+
+.desc
+Often you will need to know if a sound channel has completed playing or  not. This command will return 1 if the sound is still playing or 0 if it has  stopped. Use this to restart your background music or some other sound that  might have stopped unintentionally.
+
+Note: This command currently doesn't seem to work with a channel assigned to  CD track playback.
+
+.code
+; Channel examples
+
+Print "Loading sound ..."
+; Load the sample - you'll need to point this to a sound on your computer
+; For best results, make it about 5-10 seconds...
+sndWave=LoadSound("level1.wav")
+
+Print "Playing full sample until sound is done ..."
+chnWave=PlaySound(sndWave) 
+While ChannelPlaying(chnWave)
+Wend 
+Print "All done!"
+
+

@@ -1,0 +1,426 @@
+:CreateBank ([size])
+
+.args
+size - size of memory bank in bytes (default is 0 bytes)
+
+.desc
+The bank commands allow  you to perform high-speed data operations on a block of memory. This is useful  for writing your own compression/decompression routines, passing and receiving  data to and from a DLL and more.  Banks start at 0 and finish at size-1.
+
+The data types available for use with a bank are: 
+
+Byte - takes up one byte. Values can be in the range 0 to 255.
+Short - takes up two bytes. Values can be in the range 0 to 65535.
+Int - takes up four bytes. Values can be in the range -2147483647 to 2147483647.
+Float - takes up four bytes.
+
+.also
+FreeBank
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:FreeBank bank
+
+.args
+bank - bank handle
+
+.desc
+Frees a bank.
+
+.also
+CreateBank
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:BankSize (bankhandle)
+
+.args
+bankhandle - handle assigned to the bank when created.
+
+.desc
+Use this command to determine the size of an existing bank.
+
+.also
+CreateBank;ResizeBank;CopyBank
+
+.code
+; BankSize, ResizeBank, CopyBank Example
+
+; create a bank
+bnkTest=CreateBank(5000)
+
+; Fill it with rand Integers
+For t = 0 To 4999
+PokeByte bnkTest,t,Rand(9)
+Next
+
+; Resize the bank
+ResizeBank bnkTest,10000
+
+; Copy the first half of the bank to the second half
+CopyBank bnkTest,0,bnkTest,5000,5000 
+
+; Print final banksize
+Print BankSize(bnkTest)
+
+:ResizeBank bankhandle,new_size
+
+.args
+bankhandle = handle assigned to bank when created
+new_size = new size of bank in bytes 
+
+.desc
+Resizes a previously created memory bank. Existing bank data is unmodified,  but may be moved in memory. Also see CreateBank, CopyBank, and BankSize.
+
+.code
+; BankSize, ResizeBank, CopyBank Example
+
+; create a bank
+bnkTest=CreateBank(5000)
+
+; Fill it with rand Integers
+For t = 0 To 4999
+PokeByte bnkTest,t,Rand(9)
+Next
+
+; Resize the bank
+ResizeBank bnkTest,10000
+
+; Copy the first half of the bank to the second half
+CopyBank bnkTest,0,bnkTest,5000,5000 
+
+; Print final banksize
+Print BankSize(bnkTest)
+
+
+:CopyBank src_bank,src_offset,dest_bank,dest_offset,count
+
+.args
+src_bank = handle of source memory bank
+src_offset = offset location to start copying from
+dest_bank = handle of destination memory bank
+dest_offset = offset location to start writing to
+count = how many bytes to copy
+
+.desc
+Copies data from one memory bank to another.
+
+.code
+; BankSize, ResizeBank, CopyBank Example
+
+; create a bank
+bnkTest=CreateBank(5000)
+
+; Fill it with rand Integers
+For t = 0 To 4999
+PokeByte bnkTest,t,Rand(9)
+Next
+
+; Resize the bank
+ResizeBank bnkTest,10000
+
+; Copy the first half of the bank to the second half
+CopyBank bnkTest,0,bnkTest,5000,5000 
+
+; Print final banksize
+Print BankSize(bnkTest)
+
+:PeekByte(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation will be started at
+
+.desc
+Reads a byte from a memory bank and returns the value.
+
+
+A byte takes up  one byte of a memory bank. Values can be in the range 0 to 255.
+
+.also
+PeekShort;PeekInt;PeekFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PeekShort(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation will be started at
+
+.desc
+Reads a short from a memory bank and returns the value.
+
+
+A short takes  up two bytes of a memory bank. Values can be in the range 0 to 65535.
+
+.also
+PeekByte;PeekInt;PeekFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PeekInt(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation will be started at
+
+.desc
+Reads an int from a memory bank and returns the value.
+
+
+An int takes up  four bytes of a memory bank. Values can be in the range -2147483647 to 2147483647.
+
+.also
+PeekByte;PeekShort;PeekFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PeekFloat(bank,offset)
+
+.args
+bank - bank handle
+offset - offset in bytes, that the peek operation will be started at
+
+.desc
+Reads a float from a memory bank and returns the value.
+
+
+A float takes  up four bytes of a memory bank.
+
+.also
+PeekByte;PeekShort;PeekInt
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PokeByte bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation will be started at
+value - value that will be written to bank
+
+.desc
+Writes a byte into a memory bank.
+
+
+A byte takes up one byte of a memory  bank. Values can be in the range 0 to 255.
+
+.also
+PokeShort;PokeInt;PokeFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PokeShort bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation will be started at
+value - value that will be written to bank
+
+.desc
+Writes a short into a memory bank.
+
+
+A short takes up two bytes of a memory  bank. Values can be in the range 0 to 65535.
+
+.also
+PokeByte;PokeInt;PokeFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PokeInt bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation will be started at
+value - value that will be written to bank
+
+.desc
+Writes an int into a memory bank.
+
+
+An int takes up four bytes of a memory  bank. Values can be in the range -2147483647 to 2147483647.
+
+.also
+PokeByte;PokeShort;PokeFloat
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Pint PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+
+:PokeFloat bank,offset,value
+
+.args
+bank - bank handle
+offset - offset in bytes, that the poke operation will be started at
+value - value that will be written to bank
+
+.desc
+Writes a float into a memory bank.
+
+
+A float takes up four bytes of a memory bank.
+
+.also
+PokeByte;PokeShort;PokeInt
+
+.code
+; Bank Commands Example
+; ---------------------
+
+bnkTest=CreateBank(12)
+
+PokeByte bnkTest,0,Rand(255)
+PokeShort bnkTest,1,Rand(65535)
+PokeInt bnkTest,3,Rand(-2147483648,2147483647)
+PokeFloat bnkTest,7,0.5
+
+Print PeekByte(bnkTest,0)
+Print PeekShort(bnkTest,1)
+Print PeekInt(bnkTest,3)
+Print PeekFloat(bnkTest,7)
+
+FreeBank bnkTest
+

@@ -1,0 +1,699 @@
+::Introduction
+
+This section describes the Blitz Basic language in detail. Covering all
+the commands needed to help you progress further with your own creations.
+
+Please experiment because practice is essential for you to ascertain the
+benefits from each command. As always, it is always useful to see what others
+have done with thir programs and try to learn from existing code and tutorials.
+
+
+::Reserved Keywords
+
+The following keywords are built into Blitz, and may not be used as identifiers
+(variables, function names, labels, etc.):
+
+{\tt
+After, And, Before, Case,
+Const, Data, Default, Delete, Dim, Each, Else, ElseIf, End, EndIf, Exit,
+False, Field, First, Float, For, Forever, Function, Global, Gosub, Goto,
+If, Insert, Int, Last, Local, Mod, New, Next, Not, Null, Or, Pi, Read, Repeat,
+Restore, Return, Sar, Select, Shl, Shr, Step, Str, Then, To, True, Type,
+Until, Wend, While, Xor, Include 
+}
+
+
+::Comments
+
+You can add comments to your programs using the \verb|;| character. Everything
+following the \verb|;| until the end of the line will be ignored.
+
+This
+is useful for commenting your code - so you can always look through and
+follow each line in a logical manner. 
+
+The following code shows comments
+in use:
+
+.code
+;this code adds up all the numbers from 1 to 100 and displays
+the result
+;
+;initialize sum to 0
+sum=0
+;loop from 1 to 100
+For k=1 To 100
+   ;update sum
+   sum=sum+k
+Next
+;show result
+Print sum
+.endcode
+
+
+::Identifiers
+
+Identifiers are used for constant names, variable names, array names, function
+names and custom type names.
+
+Identifiers must start with an alphabetic
+character, and may be following be any number of alphanumeric characters,
+or the underscore character.
+
+These are all valid identifiers:
+
+.code
+Hello
+
+Score 
+Player1 
+Time_To_Live
+tmp__
+.endcode
+
+Indentifiers are not case
+sensitive. For example, 'Test', 'TEST' and 'test' are all the same identifiers.
+
+However, you can use the same identifiers for variables, functions and
+custom type names. For example, you can have a variable called 'test', a
+function called 'test' and custom type name called 'test'. Blitz will be
+able to tell which one you are refering to by the context in which it is
+used. 
+
+
+::Basic Data Types
+
+There are 3 basic data types available:
+\begin{description}
+\item[Integer
+values] are numeric values with no fractional part in them. For example:
+5,-10,0 are integer values. All integer values in your program must be in
+the range -2147483648 to +2147483647. 
+\item[Floating point values] are
+numeric values that include a fractional part. For example: .5, -10.1, 0.0
+are all floating point values. 
+\item[String values] are used to contain
+text. For example: "Hello", "What's up?", "***** GAME OVER *****", ""
+\end{description}
+
+Typically, integer values are faster than floating point values, which
+are themselves faster than strings. 
+
+
+::Constants
+
+Constants are fixed values that do not change while your program runs.
+Constants may be of any basic data type - integer, floating point or string.
+\begin{description}
+\item[Integer constants] are simply base 10 numbers
+without a decimal point. For example, \verb|10|,\verb|0| and \verb|-20|
+are all integer constants.
+\item[Floating point constants] are base 10 numbers
+with a decimal point in them. For example, \verb|10.0|,\verb|0.0| and \verb|-20.0|
+are all floating point constants.
+\item[String constants] are sequence of
+characters enclosed in quotation marks. For example, \verb|"Hello"|, \verb|""|
+and \verb|"100"| are all string constants.
+\end{description}
+
+You can use
+the \verb|Const| keyword to assign an identifier to a constant . For example:
+
+.code
+Const one_hundred=100
+.endcode
+
+You can then use the identifier \verb|one_hundred|
+anywhere in your program instead of \verb|100|. A more useful example might
+be:
+
+.code
+Const width=640,height=480
+.endcode
+
+You can then use the more
+readable \verb|width| and \verb|height| throughout your program instead
+of \verb|640| and \verb|480|. Also, if you ever decide to change the width
+and height values, you only have to do so at one place in the program.
+
+There are two built-in integer constants - \verb|True| and \verb|False|.
+\verb|True| is equal to the integer value \verb|1|, and \verb|False| is
+equal to the integer value \verb|0|. There is also a built in floating point
+constant for \verb|Pi|.
+
+
+::Variables
+
+
+A variable is a 'storage location' that contains values that change while
+your program executes. Variables may be of any basic data type, or a custom
+type.
+
+A variable's type is determined by a special character that follows
+its identifier.These special characters are called 'type tags' and are:
+
+
+\verb|%| For integer variables
+
+\verb|#| For floating point variables
+
+\verb|$| For string variables
+
+\verb|.|typename For custom type variables
+
+Here are some examples of valid variables: 
+
+.code
+Score%
+Lives% 
+x_speed#
+
+y_speed# 
+name$ 
+title$ 
+ali.Alien 
+player.Player
+.endcode
+
+The type tag
+only needs to be added the first time you use a variable, after that you
+can leave the type tag off if you wish. If you don't supply a type tag the
+first time a variable is used, the variable defaults to an integer. 
+
+It
+is illegal to use the same variable name with a different type. For example,
+if you already have an integer variable called 'name\%', it is illegal to
+also have a string variable called 'name\$'
+
+The \verb|=| assignment operator
+is used to assign a value to a variable. For example:
+.code
+score=0 
+.endcode
+...assigns the value 0 to the integer variable \verb|score|.
+
+Variables
+may also be either local or global. This refers to where in a program a
+variable may be used.  Global variables can be used from anywhere in the
+program, while local variables can only be used within the function they
+are created in.
+
+The \verb|Global| keyword is used to define one or more
+global variables. For example: 
+.code
+Global Score=0,Lives=3,Player_up=1
+
+.endcode
+Similarly, \verb|Local| is used to define local variables:
+.code
+Local temp_x=x,temp_y=y 
+.endcode
+If you use a variable without defining
+it as either local or global, it defaults to being local. 
+
+
+::Arrays
+
+Arrays are created using the standard BASIC 'Dim' statement, and may be
+of any number of dimensions. For example...
+.code
+Dim arr(10)
+.endcode
+...creates
+a one dimensional array called 'arr' with 11 elements numbered 0...10.
+
+Arrays may be of any basic type, or a custom type. As with variables, the
+type of an array is specified using a type tag. For example...
+.code
+Dim
+Deltas#(100)
+.endcode
+...creates an array called 'Deltas' of 101 floating
+point elements. If the type tag is omitted, the array defaults to an integer
+array. 
+
+An array may be dimensioned at more than one point in a program,
+each time an array is dimensioned, it's previous contents are discarded.
+Arrays may be dimensioned inside functions, but a corresponding 'Dim' statement
+of the same array must also appear somewhere in the main program. For example...
+.code
+Dim test(0,0) 
+
+Function Setup( x,y ) 
+	Dim test(x,y) 
+End Function
+
+.endcode
+
+::Expressions
+
+The following operators are supported, listed in order of precedence: 
+
+\begin{tabular}{lll}
+{\bf Operator}&{\bf Meaning}&{\bf Kind}
+\hline
+\verb|New,
+First, Last| & Object operators & Unary
+\hline
+\verb|Before, After| & Object
+operators & Unary
+\hline
+\verb|Int, Float, Str| & Type conversion operators
+& Unary
+\hline
+\verb|+, -, ~| & Arithmetic posate, negate. Bitwise complement
+& Unary
+\hline
+\verb|^| & Arithmetic 'to-the-power-of' & Binary
+\hline
+\verb|*,
+/, Mod| & Arithmetic multiply, divide, remainder & Binary
+\hline
+\verb|Shl,
+Shr, Sar| & Bitwise left, right, arithmetic-right shift& Binary
+\hline
+\verb|+,
+-| & Arithmetic add, subtract & Binary
+\hline
+\verb|<, >, <=, >=, =, <>|
+& Comparison operators & Binary
+\hline
+\verb|And, Or, Xor| & Bitwise logical
+operators & Binary
+\hline
+\verb|Not| & Logical Not & Unary
+\hline
+\end{tabular}
+
+Unary operators take one operand, while binary operators take two.
+
+Arithmetic
+operators produce a result of the same type as the operands. For example,
+adding two integers produces an integer result.
+
+If the operands of a binary
+arithmetic or comparison operator are not of the same type, one of the operands
+is converted using the following rules...
+If one operand is a custom type
+object, the other must be an object of the same type, or 'Null'.
+Else if
+one operand is a string, the other is converted to a string. 
+Else if one
+operand is floating point, the other is converted to floating point.
+Else
+both operands must be integers.
+
+When floating point values are converted
+to integer, the value is rounded to the nearest integer. When integer and
+floating point values are converted to strings, an ascii representation
+of the value is produced.
+
+When strings are converted to integer or floating
+point values, the string is assumed to contain an ascii representation of
+a numeric value and converted accordingly. Conversion stops at the first
+non-numeric character in the string, or at the end of the string.
+
+The only
+arithmetic operation allowed on strings is \verb|+|, which simply concatenates
+the two operands.
+
+\verb|Int|, \verb|Float| and \verb|Str| can be used to
+convert values. They may be optionally followed by the appropriate type
+tag - ie: \verb|Int%|, \verb|Float#|, \verb|Str$|.
+
+Comparison operators
+always produce an integer result: 1 for true, 0 for false. If one of the
+operators is a custom type object, the other must be an object of the same
+type, or 'Null', and the only comparisons allowed are '=' and '<>'.
+
+The
+\verb|Not| operator returns 0 for a non-zero operand, otherwise 1. When
+an expression is used to conditionally execute code - for example, in an
+\verb|If| statement - the result is converted to an integer value. A non-zero
+result means true, a zero result means false.
+
+Bitwise operators always
+convert their operands to integers and produce an integer result.
+
+
+::Program Flow
+
+
+The following constructs are available for controlling program flow.
+
+\subsection{If statements}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb+If+ {\it
+expression} \verb+Then+ {\it statements1} \verb+Else+ {\it statements2}
+\end{tabbing}
+
+Evaluates {\it expression} and, if true, executes {\it statements1}
+otherwise executes {\it statements2}.
+ The \verb+Else+ part is optional,
+in which case nothing is executed if {\it expression} is false.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|If| expression1
+\>	statements1
+\verb|Else If| {expression2}
+\>	statements2
+\verb|Else If| {expressionN}
+\>	statementsN
+\verb|Else|
+\>	elsestatements
+\verb|EndIf|
+\end{tabbing}
+
+This form allows for more than one line of statements.
+The \verb|Else If| and \verb|Else| parts are optional. The \verb|Else| part
+is executed only if none of the \verb|If| or \verb|Else If| expressions
+were true.
+
+\subsection{While loops}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|While|
+{\it expression} 
+\>	{\it statements}
+\verb|Wend|
+\end{tabbing}
+
+A While
+loop continues executing until {expression} evaluates to false. {expression}
+is evaluated at the start of each loop, so the statements within a while
+loop may not execute at all.
+
+\subsection{For loops}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|For| {\it variable}\verb|=|{\it initalvalue} \verb|To| {\it finalvalue}
+\verb|Step| {\it stepvalue}
+\>	{\it statements}
+\verb|Next|
+\end{tabbing}
+
+A For loop first assigns {\it initialvalue} to {\it variable} and then
+starts looping. The loop continues until {\it variable} reaches {\it finalvalue}
+and then terminates. Each loop, {\it stepvalue} is added to {\it variable}.
+If a {\it stepvalue} is omitted, a default value of 1 is used.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|For| {\it variable}\verb|=Each| {\it typename} 
+  
+  {\it statements} 
+\verb|Next|
+\end{tabbing}
+
+This form of the For loop
+allows you to iterate over all objects of a custom type. 
+
+\subsection{Repeat
+loops}
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Repeat| 
+\>	{\it statements}
+
+\verb|Until| {\it expression}
+\end{tabbing}
+
+A Repeat loop continues executing
+until {\it expression} evaluates to true. {\it expression} is evaluated
+at the end of each loop so, unlike a while loop, a repeat loop will run
+at least once.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Repeat|
+\>	{\it statements}
+\verb+Forever+
+\end{tabbing}
+
+This form of a Repeat loop will simply continue
+executing {\it statements} forever!
+
+\subsection{Select blocks}
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Select|{\it selectexpression}
+\verb|Case|{\it caseexpressions1}
+\>	{\it casestatements1}
+\verb|Case|{\it caseexpressions2}
+\>	{\it casestatements2}
+\verb|Case|{\it caseexpressionsN}
+\>	{\it casestatementsN}
+\verb|Default|
+\>	{\it defaultstatements}
+\verb|End Select|
+\end{tabbing}
+
+First, {\it
+selectexpression} is evaluated. It is then compared, in program order, with
+each of the {\it caseexpressions}. If a match is found, then the appropriate
+{\it casestatements} are executed.
+
+If {\it selectexpression} matches none
+of the 'Case' expressions, then the optional {\it defaultstatements} are
+executed.
+
+\subsection{Exiting loops}
+
+The \verb+Exit+ command may be used
+to break out of any for, while or repeat loop. In fact, this is the only
+way to terminate a repeat loop.
+
+\subsection{Includes}
+
+Blitz allows you
+to include external source files into your program with the \verb+Include+
+command. These files must be valid Blitz source code. For example...
+.code
+Include "anotherfile.bb" 
+.endcode
+Include allows you to break your program
+up into smaller, more manageable chunks. 
+
+
+::Functions
+
+A function is defined using the \verb'Function' keyword: 
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb+Function+ {\it functionname} {\it typetag}\verb+(+{\it
+parameters}\verb+)+ 
+\>	{statements} 
+\verb+End Function+ 
+\end {tabbing}
+
+{\it functionname} is any valid identifier. 
+
+{\it typetag} is the type
+of value returned by the function. If {\it typetag} is omitted, the function
+returns an integer value by default. 
+
+{\it parameters} is a comma separated
+list of variables which is passed to the function when it is called, each
+parameter may be given an optional type tag. Parameters are always local.
+
+
+A function may use the \verb'Return' statement to return a result. \verb'Return'
+may optionally be followed by an expression. 
+
+If there is no Return statement,
+or a Return without any expression is used, the function returns a default
+value of 0 for numeric functions, an empty string ("") for string functions,
+or a 'Null' object for custom type functions. 
+
+
+
+::Custom Types
+
+Custom types are defined using the \verb+Type+ keyword. For example...
+
+.code
+Type MyType
+	Field x,y
+End Type
+.endcode
+
+Creates a custom type called
+'MyType' with 2 fields - x and y.
+
+Fields within a custom type may themselves
+be of any basic type or custom type. Type tags are used to determine the
+type of a field. For example: 
+
+.code
+Type MyType
+	Field x,y
+	Field description$
+	Field delta_x#,delta_y#
+End Type
+.endcode
+
+You can create variables or
+arrays of custom types using a '.' type tag followed by the type name. For
+example: 
+
+.code
+Global mine.MyType
+Dim all_mine.MyType( 100 ) 
+.endcode
+
+Before a custom type variable or array element can be used, it must be
+initialized using the 'New' operator. For example: 
+
+.code
+mine.MyType=New
+MyType
+.endcode
+
+The 'New' operator creates an 'object' of type 'MyType',
+and returns a 'pointer' to the new object. The identifier following the
+'New' operator must be a valid custom type name. 
+
+The fields within a custom
+type are accessed using the '\' character. For example: 
+
+.code
+mine\x=100
+Print mine\x
+.endcode
+
+When you've finished with an object, you should delete
+it using the 'Delete' command. For example: 
+
+.code
+Delete mine
+.endcode
+
+This releases the memory used by the object. 
+
+The special keyword 'Null'
+is used to represent non-existent objects. An object is non-existent if
+it hasn't been initialized yet using 'New', or has been released using 'Delete'.
+For example: 
+
+.code
+mine.MyType=New MyType
+If mine<>Null
+	Print "exists!"
+Else
+	Print "doesn't exist!"
+EndIf
+Delete mine
+If mine<>Null
+	Print "exists!"
+Else
+	Print "doesn't exist!"
+EndIf
+.endcode
+
+...will print the following:
+
+.code
+exists!
+doesn't exist!
+.endcode
+
+Each custom type has an associated
+list of objects known as a 'type list'. When an object is created using
+\verb+New+, it is automatically added to the type list. When an object is
+released using \verb+Delete+, it is removed from the type list. 
+
+The \verb+First+,
+\verb+Last+, \verb+After+ and \verb+Before+ operators allow you to access
+type lists. The \verb+First+ operator returns the object at the start of
+the type list. For example: 
+
+.code
+mine.MyType=First MyType
+.endcode
+
+This
+sets the 'mine.MyType' variable to the first object of custom type 'MyType'.
+
+
+Similarly, \verb+Last+ returns the object at the end of the list. 
+
+If
+the type list is empty, \verb+First+ and \verb+Last+ return \verb+Null+.
+
+
+You can use \verb+After+ to find the object after an object, and \verb+Before+
+to find the object before an object. 
+
+For example: 
+
+.code
+mine.MyType=First
+MyType	;mine=first object in the type list
+mine=After( mine )			;mine=second
+object
+mine=After( mine )			;mine=third object
+mine=Before( mine )			;mine=second
+object
+mine=Before( mine )			;mine=first again!
+.endcode
+
+\verb'After' and
+\verb'Before' return \verb'Null' if there is no such object. For example:
+
+
+.code
+mine.MyType=Last MyType	;mine=last object
+mine=After( mine )		;object
+after last does not exist!
+.endcode
+
+When an object is created using \verb+New+,
+it is placed at the end of it's type list by default. 
+However, You can
+move objects around within the type list using \verb+Insert+. For example:
+
+
+.code
+mine1.MyType=New MyType
+mine2.MyType=New MyType
+Insert mine2 Before
+mine1
+.endcode
+
+This has the effect of placing the 'mine2' object before
+the 'mine1' object in the type list.
+You can also use \verb+After+ instead
+of \verb+Before+ with \verb+Insert+.
+
+Here's an example of moving an object
+to the start of it's type list: 
+
+.code
+Insert mine Before First MyType
+.endcode
+
+A special form of For...Next allows you to easily iterate over
+all object of a custom type. For example: 
+
+.code
+For mine.MyType=Each MyType
+Next
+.endcode
+
+This will cause the variable 'mine.MyType' to loop through
+all existing objects of cutom type MyType. 
+
+Finally, the \verb+Delete Each+
+command allows you to delete all objects of a particular type. For example:
+
+
+.code
+Delete Each MyType
+.endcode
+
+

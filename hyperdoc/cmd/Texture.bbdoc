@@ -1,0 +1,1592 @@
+:CreateTexture ( width,height[,flags][,frames] )
+
+.args
+width - width of texture
+height - height of texture
+
+flags (optional) - texture flag:
+1: Color (default)
+2: Alpha
+4: Masked
+8: Mipmapped
+16: Clamp U
+32: Clamp V
+64: Spherical environment map
+128: Cubic environment map
+256: Store texture in vram
+512: Force the use of high color textures
+
+frames (optional) - no of frames texture will have. Defaults to 1.
+
+.desc
+Creates a texture and returns its handle.
+
+Width and height are the size  of the texture. Note that the actual texture size may be different from the  width and height requested, as different types of 3D hardware support different  sizes of texture. 
+
+The optional flags parameter allows you to apply certain effects to the texture.  Flags can be added to combine two or more effects, e.g. 3 (1+2) = texture with  color and alpha maps. 
+
+Here some more detailed descriptions of the flags:
+
+1: Color - colour map, what you see is what you get.
+
+2: Alpha - alpha map. If an image contains an alpha map, this will be used to  make certain areas of the texture transparent. Otherwise, the colour map will  be used as an alpha map. With alpha maps, the dark areas always equal high-transparency,  light areas equal low-transparency.
+
+4: Masked - all areas of a texture coloured 0,0,0 will not be drawn to the screen.
+
+8: Mipmapped - low detail versions of the texture will be used at high distance.  Results in a smooth, blurred look.
+
+16: Clamp u - Any part of a texture that lies outsides the U coordinates of 0-1 will not be drawn. Prevents texture-wrapping.
+
+32: Clamp v - Any part of a texture that lies outsides the v coordinates of 0-1 will not be drawn. Prevents texture-wrapping.
+
+64: Spherical environment map - a form of environment mapping. This works by taking a single image, and then applying it to a 3D mesh in such a way that the image appears to be reflected. When used with a texture that contains light sources, it can give some meshes such as a teapot a shiny appearance.
+
+128: Cubic environment map - a form of environment mapping. Cube mapping is similar to spherical mapping, except it uses six images each representing a particular 'face' of an imaginary cube, to give the appearance of an image that perfectly reflects its surroundings.
+
+When creating cubic environment maps with the CreateTexture command, cubemap textures *must* be square 'power of 2' sizes. See the @SetCubeFace command for information on how to then draw to the cubemap.
+
+When loading cubic environments maps into Blitz using LoadTexture, all six images relating to the six faces of the cube must be contained within the one texture, and be laid out in a horizontal strip in the following order - left, forward, right, backward, up, down. The images comprising the cubemap must all be power of two sizes.
+
+Please note that not some older graphics cards do not support cubic mapping. In order to find out if a user's graphics card can support it, use @GfxDriverCaps3D .
+
+256: Store texture in vram. In some circumstances, this makes for much faster dynamic textures - ie. when using CopyRect between two textures. When drawing to cube maps in real-time, it is preferable to use this flag.
+
+512: Force the use of high color textures in low bit depth graphics modes. This is useful for when you are in 16-bit color mode, and wish to create/load textures with the alpha flag - it should give better results. 
+
+Once you have created a texture, use SetBuffer TextureBuffer to draw to it. However, to display 2D graphics on a texture, it is usually quicker to draw to an image and then copy it to the texturebuffer, and to display 3D graphics on a texture, your only option is to copy from the backbuffer to the texturebuffer.
+
+.also
+LoadTexture;LoadAnimTexture
+
+.code
+; CreateTexture Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Create texture of size 256x256
+tex=CreateTexture( 256,256 )
+
+; Set buffer - texture buffer
+SetBuffer TextureBuffer( tex )
+
+; Clear texture buffer with background white color
+ClsColor 255,255,255
+Cls
+
+; Draw text on texture
+font=LoadFont( "arial",24 )
+SetFont font
+Color 0,0,0
+Text 0,0,"This texture"
+Text 0,40,"was created using" : Color 0,0,255
+Text 0,80,"CreateTexture()" : Color 0,0,0
+Text 0,120,"and drawn to using" : Color 0,0,255
+Text 0,160,"SetBuffer TextureBuffer()"
+
+; Texture cube with texture
+EntityTexture cube,tex
+
+; Set buffer - backbuffer
+SetBuffer BackBuffer()
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:LoadTexture ( file$[,flags] )
+
+.args
+file$ - filename of image file to be used as texture
+
+flags (optional) - texture flag:
+1: Color (default)
+2: Alpha
+4: Masked
+8: Mipmapped
+16: Clamp U
+32: Clamp V
+64: Spherical environment map
+128: Cubic environment map
+256: Store texture in vram
+512: Force the use of high color textures
+
+.desc
+Load a texture from an image file and returns the texture's handle.  Supported file formats include: BMP, PNG, TGA and JPG.  Only PNG and TGA support alpha.
+
+
+The optional flags parameter allows you to apply certain effects to the texture. Flags can be added to combine two or more effects, e.g. 3 (1+2) = texture with colour and alpha maps.
+
+
+See @CreateTexture for more detailed descriptions of the texture flags.
+
+
+Something to consider when applying texture flags to loaded textures is that the texture may have already had certain flags applied to it via the @TextureFilter command. The default for the @TextureFilter command is 9 (1+8), which is a coloured, mipmapped texture. This cannot be overridden via the flags parameter of the LoadTexture command - if you wish for the filters to be removed you will need to use the @ClearTextureFilters command, which must be done after setting the graphics mode (setting the graphics mode restores the default texture filters).
+
+.also
+CreateTexture;LoadAnimTexture
+
+.code
+; LoadTexture Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture cube with texture
+EntityTexture cube,tex
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:LoadAnimTexture ( file$,flags,frame_width,frame_height,first_frame,frame_count )
+
+.args
+file$ - name of image file with animation frames laid out in left-right,  top-to-bottom order
+
+flags (optional) - texture flag:
+1: Color (default)
+2: Alpha
+4: Masked
+8: Mipmapped
+16: Clamp U
+32: Clamp V
+64: Spherical reflection map
+128: Cubic environment map
+256: Store texture in vram
+512: Force the use of high color textures
+
+frame_width - width of each animation frame
+frame_height - height of each animation frame
+first_frame - the first frame to be used as an animation frame
+frame_count - the amount of frames to be used
+
+.desc
+Loads an animated texture from an image file and returns the texture's handle.
+
+The flags parameter allows you to apply certain effects to the texture. Flags  can be added to combine two or more effects, e.g. 3 (1+2) = texture with colour  and alpha maps. 
+
+See @CreateTexture for more detailed descriptions of the texture flags. 
+
+The frame_width, frame_height, first_frame and frame_count parameters determine how Blitz will separate the image file into individual animation frames.
+
+.also
+CreateTexture;LoadTexture
+
+.code
+; LoadAnimTexture Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load anim texture
+anim_tex=LoadAnimTexture( "media/boomstrip.bmp",49,64,64,0,39 )
+
+While Not KeyDown( 1 )
+
+; Cycle through anim frame values. 100 represents delay, 39 represents no. of  anim frames
+frame=MilliSecs()/100 Mod 39
+
+; Texture cube with anim texture frame
+EntityTexture cube,anim_tex,frame
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:FreeTexture texture
+
+.args
+texture - texture handle
+
+.desc
+Frees up a texture from memory.
+
+Freeing a texture means you will not be  able to use it again; however, entities already textured with it will not lose  the texture.
+
+.code
+; FreeTexture Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture cube with texture
+EntityTexture cube,tex
+
+While Not KeyDown( 1 )
+
+; If spacebar pressed then free texture
+If KeyHit( 57 )=True Then FreeTexture tex
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Press spacebar to free texture"
+Text 0,20,"As you can see this will not affect already textured entities"
+
+Flip
+
+Wend
+
+End
+
+:TextureBlend Texture, Blend
+
+.args
+Texture - Texture handle.
+Blend - Blend mode of texture.
+
+0: Do not blend
+1: No blend, or Alpha (alpha when texture loaded with alpha flag - not recommended  for multitexturing - see below)
+2: Multiply (default)
+3: Add
+4: Dot3
+5: Multiply 2
+
+.desc
+Sets the blending mode for a texture.
+
+The texture blend mode determines how the texture will blend with the texture or polygon which is 'below' it. Texture 0 will blend with the polygons of the entity it is applied to. Texture 1 will blend with texture 0. Texture 2 will blend with texture 1. And so on.
+
+Texture blending in Blitz effectively takes the highest order texture (the one with the highest index) and it blends with the texture below it, then that result to the texture directly below again, and so on until texture 0 which is blended with the polygons of the entity it is applied to and thus the world, depending on the @EntityBlend of the object.
+
+Each of the blend modes are identical to their @EntityBlend counterparts.
+
+In the case of multitexturing (more than one texture applied to an entity), it is not recommended you blend textures that have been loaded with the alpha flag, as this can cause unpredictable results on a variety of different graphics cards. 
+
+Use @EntityTexture to set the index number of a texture.
+
+.also
+EntityBlend;EntityTexture
+
+.code
+; TextureBlend Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+; Choose a background colour which isn't the same colour as anything else, to  avoid confusion
+CameraClsColor camera,255,0,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load textures
+tex0=LoadTexture( "media/b3dlogo.jpg" )
+tex1=LoadTexture( "media/chorme-2.bmp" )
+
+; Texture cube with textures
+EntityTexture cube,tex0,0,0
+EntityTexture cube,tex1,0,1
+
+tex0_blend_info$="no texture"
+tex1_blend_info$="no texture"
+
+While Not KeyDown( 1 )
+
+; Change texture 0 blending mode
+If KeyHit( 11 )=True
+tex0_blend=tex0_blend+1
+If tex0_blend=4 Then tex0_blend=0
+If tex0_blend=0 Then tex0_blend_info$="no texture"
+If tex0_blend=1 Then tex0_blend_info$="no blend"
+If tex0_blend=2 Then tex0_blend_info$="multiply"
+If tex0_blend=3 Then tex0_blend_info$="add"
+EndIf
+
+; Change texture 1 blending mode
+If KeyHit( 2 )=True
+tex1_blend=tex1_blend+1
+If tex1_blend=4 Then tex1_blend=0
+If tex1_blend=0 Then tex1_blend_info$="no texture"
+If tex1_blend=1 Then tex1_blend_info$="no blend"
+If tex1_blend=2 Then tex1_blend_info$="multiply"
+If tex1_blend=3 Then tex1_blend_info$="add"
+EndIf
+
+; Set texture blend modes
+TextureBlend tex0,tex0_blend 
+TextureBlend tex1,tex1_blend 
+
+TurnEntity cube,0.1,0.1,0.1
+
+RenderWorld
+
+Text 0,0,"Press 0 to change texture 0's blending mode"
+Text 0,20,"Press 1 to change texture 1's blending mode"
+Text 0,40,"TextureBlend tex0,"+tex0_blend+" ("+tex0_blend_info$+")"
+Text 0,60,"TextureBlend tex1,"+tex1_blend+" ("+tex1_blend_info$+")"
+
+Flip
+
+Wend
+
+End
+
+:TextureCoords texture,coords
+
+.args
+texture - name of texture
+coords -
+0: UV coordinates are from first UV set in vertices (default)
+1: UV coordinates are from second UV set in vertices
+
+.desc
+Sets the texture coordinate mode for a texture.
+
+This determines where  the UV values used to look up a texture come from.
+
+.code
+None.
+
+:ScaleTexture texture,u_scale#,v_scale#
+
+.args
+texture - name of texture
+u_scale# - u scale
+v_scale# - v scale
+
+.desc
+Scales a texture by an absolute amount.
+
+This will have an immediate  effect on all instances of the texture being used.
+
+.code
+; ScaleTexture Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture cube
+EntityTexture cube,tex
+
+; Set initial uv scale values
+u_scale#=1
+v_scale#=1
+
+While Not KeyDown( 1 )
+
+; Change uv scale values depending on key pressed
+If KeyDown( 208 )=True Then u_scale#=u_scale#-0.01 
+If KeyDown( 200 )=True Then u_scale#=u_scale#+0.01 
+If KeyDown( 203 )=True Then v_scale#=v_scale#-0.01 
+If KeyDown( 205 )=True Then v_scale#=v_scale#+0.01 
+
+; Scale texture
+ScaleTexture tex,u_scale#,v_scale# 
+
+TurnEntity cube,0.1,0.1,0.1
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to change uv scale values"
+Text 0,20,"u_scale#="+u_scale#
+Text 0,40,"v_scale#="+v_scale#
+
+Flip
+
+Wend
+
+End
+
+:PositionTexture texture,u_position#,v_position#
+
+.args
+texture - texture handle
+u_position# - u position of texture
+v_position# - v position of texture
+
+.desc
+Positions a texture at an absolute position.
+
+This will have an  immediate effect on all instances of the texture being used. 
+
+Positioning a texture is useful for performing scrolling texture effects,  such as for water etc.
+
+.code
+; PositionTexture Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture cube
+EntityTexture cube,tex
+
+; Set initial uv position values
+u_position#=1
+v_position#=1
+
+While Not KeyDown( 1 )
+
+; Change uv position values depending on key pressed
+If KeyDown( 208 )=True Then u_position#=u_position#-0.01 
+If KeyDown( 200 )=True Then u_position#=u_position#+0.01 
+If KeyDown( 203 )=True Then v_position#=v_position#-0.01 
+If KeyDown( 205 )=True Then v_position#=v_position#+0.01 
+
+; Position texture
+PositionTexture tex,u_position#,v_position# 
+
+TurnEntity cube,0.1,0.1,0.1
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to change uv position values"
+Text 0,20,"u_position#="+u_position#
+Text 0,40,"v_position#="+v_position#
+
+Flip
+
+Wend
+
+End
+
+:RotateTexture texture,angle#
+
+.args
+texture - texture handle
+angle# - absolute angle of texture rotation
+
+.desc
+Rotates a texture.
+
+This will have an immediate effect on all instances  of the texture being used. 
+
+Rotating a texture is useful for performing swirling texture effects,  such as for smoke etc.
+
+.code
+; RotateTexture Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Load texture
+tex=LoadTexture( "media/b3dlogo.jpg" )
+
+; Texture cube
+EntityTexture cube,tex
+
+; Set initial texture angle value
+angle#=1
+
+While Not KeyDown( 1 )
+
+; Change texture angle value depending on key pressed
+If KeyDown( 205 )=True Then angle#=angle#-1
+If KeyDown( 203 )=True Then angle#=angle#+1 
+
+; Rotate texture
+RotateTexture tex,angle#
+
+TurnEntity cube,0.1,0.1,0.1
+
+RenderWorld
+
+Text 0,0,"Use left and right cursor keys to change texture angle value"
+Text 0,20,"angle#="+angle#
+
+Flip
+
+Wend
+
+End
+
+:TextureWidth (texture )
+
+.args
+texture - texture handle
+
+.desc
+Returns the width of a texture.
+
+.code
+; TextureWidth and TextureHeight Example.
+; ---------------------------------------
+
+Graphics3D 640,480 
+
+; This bit of code creates 4 textures 
+; of different sizes and shapes.
+
+texture1=CreateTexture(256,256,59) 
+texture2=CreateTexture(256,128,59) 
+texture3=CreateTexture(128,256,59) 
+texture4=CreateTexture(200,200,59)
+
+; The following lines print the selected value
+; of the texture, and reports the actual texture
+; resolution.
+
+
+Print "Texture 1 was created at 256x256"
+Print "On your system the dimensions are "+TextureWidth(texture1)+"x"+TextureHeight(texture1)
+Print
+Print "Texture 2 was created at 256x128"
+Print "On your system the dimensions are "+TextureWidth(texture2)+"x"+TextureHeight(texture2)
+Print
+Print "Texture 3 was created at 128x256"
+Print "On your system the dimensions are "+TextureWidth(texture3)+"x"+TextureHeight(texture3)
+Print
+Print "Texture 4 was created at 200x200"
+Print "On your system the dimensions are "+TextureWidth(texture4)+"x"+TextureHeight(texture4)
+
+WaitKey
+
+End
+
+:TextureHeight ( texture )
+
+.args
+texture - texture handle
+
+.desc
+Returns the height of a texture.
+
+.code
+; TextureWidth and TextureHeight Example.
+; ---------------------------------------
+
+Graphics3D 640,480 
+
+; This bit of code creates 4 textures 
+; of different sizes and shapes.
+
+texture1=CreateTexture(256,256,59) 
+texture2=CreateTexture(256,128,59) 
+texture3=CreateTexture(128,256,59) 
+texture4=CreateTexture(200,200,59)
+
+; The following lines print the selected value
+; of the texture, and reports the actual texture
+; resolution.
+
+
+Print "Texture 1 was created at 256x256"
+Print "On your system the dimensions are "+TextureWidth(texture1)+"x"+TextureHeight(texture1)
+Print
+Print "Texture 2 was created at 256x128"
+Print "On your system the dimensions are "+TextureWidth(texture2)+"x"+TextureHeight(texture2)
+Print
+Print "Texture 3 was created at 128x256"
+Print "On your system the dimensions are "+TextureWidth(texture3)+"x"+TextureHeight(texture3)
+Print
+Print "Texture 4 was created at 200x200"
+Print "On your system the dimensions are "+TextureWidth(texture4)+"x"+TextureHeight(texture4)
+
+WaitKey
+
+End
+
+:TextureBuffer ( texture[,frame] )
+
+.args
+texture - texture handle
+frame (optional) - texture frame
+
+.desc
+Returns the handle of a texture's drawing buffer.
+
+This can be used  with SetBuffer to perform 2D drawing operations to  the texture,  although it's usually faster to draw to an image, and then copy the  image buffer across to the texture buffer using CopyRect. 
+
+You cannot render 3D to a texture buffer; 3D can only be rendered to the  back buffer. To display 3D graphics on a texture, use CopyRect to copy the contents of  the back buffer to a texture buffer.
+
+.code
+; TextureBuffer Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+cube=CreateCube()
+PositionEntity cube,0,0,5
+
+; Create texture of size 256x256
+tex=CreateTexture(256,256)
+
+; Set buffer - texture buffer
+SetBuffer TextureBuffer(tex)
+
+; Clear texture buffer with background white color
+ClsColor 255,255,255
+Cls
+
+; Draw text on texture
+font=LoadFont("arial",24)
+SetFont font
+Color 0,0,0
+Text 0,0,"This texture"
+Text 0,40,"was created using" : Color 0,0,255
+Text 0,80,"CreateTexture()" : Color 0,0,0
+Text 0,120,"and drawn to using" : Color 0,0,255
+Text 0,160,"SetBuffer TextureBuffer()"
+
+; Texture cube with texture
+EntityTexture cube,tex
+
+; Set buffer - backbuffer
+SetBuffer BackBuffer()
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1 
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cube,pitch#,yaw#,roll#
+
+RenderWorld
+Flip
+
+Wend
+
+End
+
+:TextureName$(texture)
+
+.args
+texture - a valid texture handle
+
+.desc
+Returns a texture's absolute filename.
+
+To find out just the name of the texture, you will need to parse the string returned by TextureName. One such function to do this is:
+
+; start of code
+Function StripPath$(file$)
+
+If Len(file$)>0
+
+For i=Len(file$) To 1 Step -1
+
+mi$=Mid$(file$,i,1)
+If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$
+
+Next
+
+EndIf
+
+Return name$
+
+End Function
+; end of code
+
+.also
+GetBrushTexture
+
+.code
+; TextureName Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load mesh
+crate=LoadMesh("media/wood-crate/wcrate1.3ds")
+PositionEntity crate,0,0,100
+
+; Get mesh surface
+surf=GetSurface(crate,1)
+
+; Get surface brush
+crate_brush=GetSurfaceBrush(surf)
+
+; Get brush texture
+crate_tex=GetBrushTexture(crate_brush,0)
+
+While Not KeyDown( 1 )
+
+	RenderWorld
+
+	; Display full texture name
+	Text 0,0,"Texture name, as returned by TextureName$():"
+	Text 0,20,TextureName$(crate_tex)
+	
+	; Display trimmed texture name
+	Text 0,40,"Texture name with path stripped:"
+	Text 0,60,StripPath$(TextureName$(crate_tex))
+
+	Flip
+
+Wend
+
+End
+
+Function StripPath$(file$) 
+
+	If Len(file$)>0 
+	
+		For i=Len(file$) To 1 Step -1 
+		
+			mi$=Mid$(file$,i,1) 
+			If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$ 
+		
+		Next 
+	
+	EndIf 
+	
+	Return name$ 
+
+End Function
+
+:GetBrushTexture(brush[,index=0])
+
+.args
+brush - brush handle
+index (optional) - index of texture applied to brush, from 0-7. Defaults to 0.
+
+.desc
+Returns the texture that is applied to the specified brush.
+
+The optional index parameter allows you to specify which particular texture you'd like returning, if there are more than one textures applied to a brush.
+
+You should release the texture returned by GetBrushTexture after use to prevent leaks! Use @FreeTexture to do this.
+
+To find out the name of the texture, use @TextureName.
+
+.also
+TextureName;FreeTexture;GetEntityBrush;GetSurfaceBrush
+
+.code
+; GetBrushTexture Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load mesh
+crate=LoadMesh("media/wood-crate/wcrate1.3ds")
+PositionEntity crate,0,0,100
+
+; Get mesh surface
+surf=GetSurface(crate,1)
+
+; Get surface brush
+crate_brush=GetSurfaceBrush(surf)
+
+; Get brush texture
+crate_tex=GetBrushTexture(crate_brush,0)
+
+While Not KeyDown( 1 )
+
+	RenderWorld
+
+	; Display full texture name
+	Text 0,0,"Texture name, as returned by TextureName$():"
+	Text 0,20,TextureName$(crate_tex)
+	
+	; Display trimmed texture name
+	Text 0,40,"Texture name with path stripped:"
+	Text 0,60,StripPath$(TextureName$(crate_tex))
+
+	Flip
+
+Wend
+
+End
+
+Function StripPath$(file$) 
+
+	If Len(file$)>0 
+	
+		For i=Len(file$) To 1 Step -1 
+		
+			mi$=Mid$(file$,i,1) 
+			If mi$="\" Or mi$="/" Then Return name$ Else name$=mi$+name$ 
+		
+		Next 
+	
+	EndIf 
+	
+	Return name$ 
+
+End Function
+
+:ClearTextureFilters
+
+.args
+None.
+
+.desc
+Clears the current texture filter list.
+
+.also
+TextureFilter;LoadTexture
+
+.code
+; ClearTextureFilters and TextureFilter Example.
+; ----------------------------------------------
+
+Const tex_color 	= 1		; Color texture
+Const tex_alpha 	= 2		; Alpha texture (Include alpha channel data)
+Const tex_mask 		= 4		; Masked texture (black is transparent)
+Const tex_mipmap 	= 8		; Create texture mipmaps
+Const tex_clampu 	= 16	; Restrict U texture coords from "bleeding over"
+Const tex_clampv	= 32	; Restrict V texture coords from "bleeding over"
+Const tex_envshpere	= 64	; Load texture as a spherical environment map
+Const tex_vram 		= 256	; Force texture graphics to vram
+Const tex_highcolor	= 512	; Forces texture graphics to be 32-bits per pixel
+
+Graphics3D 640,480 
+
+; Removes any texture filters that might apply.
+
+ClearTextureFilters
+
+; Add an alpha texture to the list of 
+; texture filters to apply to files
+; that have "_alpha" in their filenames.
+
+TextureFilter "_alpha",tex_color + tex_alpha + tex_mipmap
+
+; Set appropriate texture flags for loading
+; suitable skybox textures from files named
+; something with "_skybox".
+
+TextureFilter "_skybox", tex_color + tex_mipmap + tex_clampu + tex_clampv
+
+; Set the flags for loading a spherical refletction
+; map to apply to all "_refmap" files.
+
+TextureFilter "_refmap", tex_color + tex_mipmap + tex_envshpere
+
+; Setup a texture filter to allow faster
+; (and easier) pixel manipulation on all
+; loaded "_fastblit" files.
+
+TextureFilter "_fastblit", tex_color + tex_vram + tex_highcolor
+
+; This is where you would normally load your special
+; textures.
+
+; The next bit resets the texture filters to their
+; standard settings.
+
+ClearTextureFilters
+TextureFilter "", tex_color + tex_mipmap
+
+End
+
+:TextureFilter match_text$,flags
+
+.args
+match_text$ - text that, if found in texture filename, will activate certain  filters
+
+flags - filter texture flags: 
+1: Color
+2: Alpha 
+4: Masked 
+8: Mipmapped 
+16: Clamp U 
+32: Clamp V 
+64: Spherical environment map 
+128: Cubic environment mapping
+256: Store texture in vram 
+512: Force the use of high color textures
+
+.desc
+Adds a texture filter. Any textures loaded that contain the text specified  by match_text$ will have the provided flags added.
+
+
+This is mostly of use when loading a mesh. 
+
+
+By default, the following texture filter is used: 
+
+
+TextureFilter "",1+8 
+
+
+This means that all loaded textures will have color and be mipmapped by default.
+
+.also
+LoadTexture;ClearTextureFilters
+
+.code
+; ClearTextureFilters and TextureFilter Example.
+; ----------------------------------------------
+
+Const tex_color 	= 1		; Color texture
+Const tex_alpha 	= 2		; Alpha texture (Include alpha channel data)
+Const tex_mask 		= 4		; Masked texture (black is transparent)
+Const tex_mipmap 	= 8		; Create texture mipmaps
+Const tex_clampu 	= 16	; Restrict U texture coords from "bleeding over"
+Const tex_clampv	= 32	; Restrict V texture coords from "bleeding over"
+Const tex_envshpere	= 64	; Load texture as a spherical environment map
+Const tex_vram 		= 256	; Force texture graphics to vram
+Const tex_highcolor	= 512	; Forces texture graphics to be 32-bits per pixel
+
+Graphics3D 640,480 
+
+; Removes any texture filters that might apply.
+
+ClearTextureFilters
+
+; Add an alpha texture to the list of 
+; texture filters to apply to files
+; that have "_alpha" in their filenames.
+
+TextureFilter "_alpha",tex_color + tex_alpha + tex_mipmap
+
+; Set appropriate texture flags for loading
+; suitable skybox textures from files named
+; something with "_skybox".
+
+TextureFilter "_skybox", tex_color + tex_mipmap + tex_clampu + tex_clampv
+
+; Set the flags for loading a spherical refletction
+; map to apply to all "_refmap" files.
+
+TextureFilter "_refmap", tex_color + tex_mipmap + tex_envshpere
+
+; Setup a texture filter to allow faster
+; (and easier) pixel manipulation on all
+; loaded "_fastblit" files.
+
+TextureFilter "_fastblit", tex_color + tex_vram + tex_highcolor
+
+; This is where you would normally load your special
+; textures.
+
+; The next bit resets the texture filters to their
+; standard settings.
+
+ClearTextureFilters
+TextureFilter "", tex_color + tex_mipmap
+
+End
+
+:SetCubeFace texture,face
+
+.args
+texture - texture
+face - face of cube to select. This should be one of the following values:
+0: left (negative X) face
+1: forward (positive Z) face - this is the default.
+2: right (positive X) face
+3: backward (negative Z) face
+4: up (positive Y) face
+5: down (negative Y) face
+
+.desc
+Selects a cube face for direct rendering to a texture.
+
+This command should only be used when you wish to draw directly to a cubemap texture in real-time. Otherwise, just loading a pre-rendered cubemap with a flag of 128 will suffice.
+
+To understand how this command works exactly it is important to recognise that Blitz treats cubemap textures slightly differently to how it treats other textures. Here's how it works...
+
+A cubemap texture in Blitz actually consists of six images, each of which must be square 'power' of two size - e.g. 32, 64, 128 etc. Each corresponds to a particular cube face. These images are stored internally by Blitz, and the texture handle that is returned by LoadTexture/CreateTexture when specifying the cubemap flag, only provides access to one of these six images at once (by default the first one, or '0' face).
+
+This is why, when loading a cubemap texture into Blitz using LoadTexture, all the six cubemap images must be laid out in a specific order (0-5, as described above), in a horizontal strip. Then Blitz takes this texture and internally converts it into six separate images.
+
+So seeing as the texture handle returned by @CreateTexture / @LoadTexture only provides access to one of these images at once (no. 1 by default), how do we get access to the other five images? This is where SetCubeFace comes in. It will tell Blitz that whenever you next draw to a cubemap texture, to draw to the particular image representing the face you have specified with the face parameter.
+
+Now you have the ability to draw to a cubemap in real-time.
+
+To give you some idea of how this works in code, here's a function that updates a cubemap in real-time. It works by rendering six different views and copying them to the cubemap texture buffer, using SetCubeFace to specify which particular cubemap image should be drawn to.
+
+; Start of code
+
+Function UpdateCubeMap( tex,camera )
+
+tex_sz=TextureWidth(tex)
+
+; do left view
+SetCubeFace tex,0
+RotateEntity camera,0,90,0
+RenderWorld
+
+; copy contents of backbuffer to cubemap
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+; do forward view
+SetCubeFace tex,1
+RotateEntity camera,0,0,0
+RenderWorld
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+; do right view	
+SetCubeFace tex,2
+RotateEntity camera,0,-90,0
+RenderWorld
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+; do backward view
+SetCubeFace tex,3
+RotateEntity camera,0,180,0
+RenderWorld
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+; do up view
+SetCubeFace tex,4
+RotateEntity camera,-90,0,0
+RenderWorld
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+; do down view
+SetCubeFace tex,5
+RotateEntity camera,90,0,0
+RenderWorld
+CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+
+EndFunction
+
+; End of code
+
+All rendering to a texture buffer affects the currently selected face. Do not change the selected cube face while a buffer is locked.
+
+Finally, you may wish to combine the vram 256 flag with the cubic mapping flag when drawing to cubemap textures for faster access.
+
+.also
+CreateTexture;LoadTexture;SetCubeMode
+
+.code
+; SetCubeFace Example
+; -------------------
+
+width=640
+height=480
+depth=0
+mode=0
+
+Graphics3D width,height,depth,mode
+SetBuffer BackBuffer()
+
+; If user's graphics card does not support cubic mapping then quit example
+If GfxDriverCaps3D()<110 Then RuntimeError "Sorry, your graphics card does not support cubic environemnt maps."
+
+cam=CreateCamera()
+PositionEntity cam,0,10,-10
+
+; Create separate camera for updating cube map - this allows us to manipulate main camera and cube camera which avoids any confusion
+cube_cam=CreateCamera()
+HideEntity cube_cam
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load object we will apply cubemap to - the classic teapot
+teapot=LoadMesh("media/teapot.x")
+ScaleEntity teapot,3,3,3
+PositionEntity teapot,0,10,0
+
+; Create some scenery
+
+; ground
+ground=CreatePlane()
+EntityColor ground,168,133,55
+ground_tex=LoadTexture("media/sand.bmp")
+ScaleTexture ground_tex,10,10
+EntityTexture ground,ground_tex
+
+; sky
+sky=CreateSphere(24)
+ScaleEntity sky,500,500,500
+FlipMesh sky
+EntityFX sky,1
+sky_tex=LoadTexture("media/sky.bmp")
+EntityTexture sky,sky_tex
+
+; cactus
+cactus=LoadMesh("media/cactus2.x")
+FitMesh cactus,-5,0,-5,2,6,.5
+
+; camel
+camel=LoadMesh("media/camel.x")
+FitMesh camel,5,0,-5,6,5,4
+
+; Load ufo to give us a dynamic moving object that the cubemap will be able to reflect
+ufo_piv=CreatePivot()
+PositionEntity ufo_piv,0,15,0
+ufo=LoadMesh("media/green_ufo.x",ufo_piv)
+PositionEntity ufo,0,0,10
+
+; Create texture with color + cubic environment map + store in vram flags
+tex=CreateTexture(256,256,1+128+256)
+
+; Apply cubic environment map to teapot
+EntityTexture teapot,tex
+
+While Not KeyDown(1)
+
+	; Control camera
+	
+	; mouse look
+	
+	mxs#=mxs#+(MouseXSpeed()/5.0)
+	mys#=mys#+(MouseYSpeed()/5.0)
+
+	RotateEntity cam,mys#,-mxs#,0
+
+	MoveMouse width/2,height/2
+
+	; move camera forwards/backwards/left/right with cursor keys
+	
+	If KeyDown(200)=True Then MoveEntity cam,0,0,.2 ; move camera forward
+	If KeyDown(208)=True Then MoveEntity cam,0,0,-.2 ; move camera back
+
+	If KeyDown(205)=True Then MoveEntity cam,.2,0,0 ; move camera left
+	If KeyDown(203)=True Then MoveEntity cam,-.2,0,0 ; move camera right
+	
+	; Turn ufo pivot, causing child ufo mesh to spin around it (and teapot)
+	TurnEntity ufo_piv,0,2,0
+
+	; Hide our main camera before updating cube map - we don't need it to be rendererd every time cube_cam is rendered
+	HideEntity cam
+
+	; Update cubemap
+	UpdateCubemap(tex,cube_cam,teapot)
+
+	; Show main camera again
+	ShowEntity cam
+
+	RenderWorld
+	
+	Text 0,0,"Use mouse to look around"
+	Text 0,20,"Use cursor keys to change camera position"
+
+	Flip
+
+Wend
+
+
+Function UpdateCubemap(tex,camera,entity)
+
+	tex_sz=TextureWidth(tex)
+
+	; Show the camera we have specifically created for updating the cubemap
+	ShowEntity camera
+	
+	; Hide entity that will have cubemap applied to it. This is so we can get cubemap from its position, without it blocking the view
+	HideEntity entity
+
+	; Position camera where the entity is - this is where we will be rendering views from for cubemap
+	PositionEntity camera,EntityX#(entity),EntityY#(entity),EntityZ#(entity)
+
+	CameraClsMode camera,False,True
+	
+	; Set the camera's viewport so it is the same size as our texture - so we can fit entire screen contents into texture
+	CameraViewport camera,0,0,tex_sz,tex_sz
+
+	; Update cubemap
+
+	; do left view	
+	SetCubeFace tex,0
+	RotateEntity camera,0,90,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do forward view
+	SetCubeFace tex,1
+	RotateEntity camera,0,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do right view	
+	SetCubeFace tex,2
+	RotateEntity camera,0,-90,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do backward view
+	SetCubeFace tex,3
+	RotateEntity camera,0,180,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do up view
+	SetCubeFace tex,4
+	RotateEntity camera,-90,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do down view
+	SetCubeFace tex,5
+	RotateEntity camera,90,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; Show entity again
+	ShowEntity entity
+	
+	; Hide the cubemap camera
+	HideEntity camera
+	
+End Function
+
+:SetCubeMode texture,mode
+
+.args
+texture - a valid texture handle
+
+mode - the rendering mode of the cubemap texture:
+1: Specular (default) 
+2: Diffuse
+3: Refraction
+
+.desc
+Set the rendering mode of a cubemap texture.
+
+The available rendering modes are as follows:
+
+1: Specular (default). Use this to give your cubemapped objects a shiny effect.
+
+2: Diffuse. Use this to give your cubemapped objects a non-shiny, realistic lighting effect.
+
+3: Refraction. Good for 'cloak'-style effects.
+
+.also
+CreateTexture;LoadTexture;SetCubeFace
+
+.code
+; SetCubeMode Example
+; -------------------
+
+width=640
+height=480
+depth=0
+mode=0
+
+Graphics3D width,height,depth,mode
+SetBuffer BackBuffer()
+
+; If user's graphics card does not support cubic mapping then quit example
+If GfxDriverCaps3D()<110 Then RuntimeError "Sorry, your graphics card does not support cubic environemnt maps."
+
+cam=CreateCamera()
+PositionEntity cam,0,10,-10
+
+; Create separate camera for updating cube map - this allows us to manipulate main camera and cube camera which avoids any confusion
+cube_cam=CreateCamera()
+HideEntity cube_cam
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load object we will apply cubemap to - the classic teapot
+teapot=LoadMesh("media/teapot.x")
+ScaleEntity teapot,3,3,3
+PositionEntity teapot,0,10,0
+
+; Create some scenery
+
+; ground
+ground=CreatePlane()
+EntityColor ground,168,133,55
+ground_tex=LoadTexture("media/sand.bmp")
+ScaleTexture ground_tex,10,10
+EntityTexture ground,ground_tex
+
+; sky
+sky=CreateSphere(24)
+ScaleEntity sky,500,500,500
+FlipMesh sky
+EntityFX sky,1
+sky_tex=LoadTexture("media/sky.bmp")
+EntityTexture sky,sky_tex
+
+; cactus
+cactus=LoadMesh("media/cactus2.x")
+FitMesh cactus,-5,0,-5,2,6,.5
+
+; camel
+camel=LoadMesh("media/camel.x")
+FitMesh camel,5,0,-5,6,5,4
+
+; Load ufo to give us a dynamic moving object that the cubemap will be able to reflect
+ufo_piv=CreatePivot()
+PositionEntity ufo_piv,0,15,0
+ufo=LoadMesh("media/green_ufo.x",ufo_piv)
+PositionEntity ufo,0,0,10
+
+; Create texture with color + cubic environment map + store in vram flags
+tex=CreateTexture(256,256,1+128+256)
+
+; Apply cubic environment map to teapot
+EntityTexture teapot,tex
+
+; Set initial cube mode value
+cube_mode=1
+
+While Not KeyDown(1)
+
+	; Control camera
+	
+	; mouse look
+	
+	mxs#=mxs#+(MouseXSpeed()/5.0)
+	mys#=mys#+(MouseYSpeed()/5.0)
+
+	RotateEntity cam,mys#,-mxs#,0
+
+	MoveMouse width/2,height/2
+
+	; move camera forwards/backwards/left/right with cursor keys
+	
+	If KeyDown(200)=True Then MoveEntity cam,0,0,.2 ; move camera forward
+	If KeyDown(208)=True Then MoveEntity cam,0,0,-.2 ; move camera back
+
+	If KeyDown(205)=True Then MoveEntity cam,.2,0,0 ; move camera left
+	If KeyDown(203)=True Then MoveEntity cam,-.2,0,0 ; move camera right
+	
+	; If M key pressed then change cube mode
+	If KeyHit(50)
+		cube_mode=cube_mode+1
+		If cube_mode=4 Then cube_mode=1
+		SetCubeMode tex,cube_mode
+	EndIf
+	
+	; Turn ufo pivot, causing child ufo mesh to spin around it (and teapot)
+	TurnEntity ufo_piv,0,2,0
+
+	; Hide our main camera before updating cube map - we don't need it to be rendererd every time cube_cam is rendered
+	HideEntity cam
+
+	; Update cubemap
+	UpdateCubemap(tex,cube_cam,teapot)
+
+	; Show main camera again
+	ShowEntity cam
+
+	RenderWorld
+	
+	Text 0,0,"Use mouse to look around"
+	Text 0,20,"Use cursor keys to change camera position"
+	Text 0,40,"Press M to change cube mode"
+	Text 0,60,"SetCubeMode tex,"+cube_mode
+	
+	Flip
+
+Wend
+
+
+Function UpdateCubemap(tex,camera,entity)
+
+	tex_sz=TextureWidth(tex)
+
+	; Show the camera we have specifically created for updating the cubemap
+	ShowEntity camera
+	
+	; Hide entity that will have cubemap applied to it. This is so we can get cubemap from its position, without it blocking the view
+	HideEntity entity
+
+	; Position camera where the entity is - this is where we will be rendering views from for cubemap
+	PositionEntity camera,EntityX#(entity),EntityY#(entity),EntityZ#(entity)
+
+	CameraClsMode camera,False,True
+	
+	; Set the camera's viewport so it is the same size as our texture - so we can fit entire screen contents into texture
+	CameraViewport camera,0,0,tex_sz,tex_sz
+
+	; Update cubemap
+
+	; do left view	
+	SetCubeFace tex,0
+	RotateEntity camera,0,90,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do forward view
+	SetCubeFace tex,1
+	RotateEntity camera,0,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do right view	
+	SetCubeFace tex,2
+	RotateEntity camera,0,-90,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do backward view
+	SetCubeFace tex,3
+	RotateEntity camera,0,180,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do up view
+	SetCubeFace tex,4
+	RotateEntity camera,-90,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; do down view
+	SetCubeFace tex,5
+	RotateEntity camera,90,0,0
+	RenderWorld
+	CopyRect 0,0,tex_sz,tex_sz,0,0,BackBuffer(),TextureBuffer(tex)
+	
+	; Show entity again
+	ShowEntity entity
+	
+	; Hide the cubemap camera
+	HideEntity camera
+	
+End Function
+

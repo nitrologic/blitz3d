@@ -1,0 +1,139 @@
+Custom types are defined using the \verb+Type+ keyword. For example...
+
+.code
+Type MyType
+	Field x,y
+End Type
+.endcode
+
+Creates a custom type called 'MyType' with 2 fields - x and y.
+
+Fields within a custom type may themselves be of any basic type or custom type. Type tags are used to determine the type of a field. For example: 
+
+.code
+Type MyType
+	Field x,y
+	Field description$
+	Field delta_x#,delta_y#
+End Type
+.endcode
+
+You can create variables or arrays of custom types using a '.' type tag followed by the type name. For example: 
+
+.code
+Global mine.MyType
+Dim all_mine.MyType( 100 ) 
+.endcode
+
+Before a custom type variable or array element can be used, it must be initialized using the 'New' operator. For example: 
+
+.code
+mine.MyType=New MyType
+.endcode
+
+The 'New' operator creates an 'object' of type 'MyType', and returns a 'pointer' to the new object. The identifier following the 'New' operator must be a valid custom type name. 
+
+The fields within a custom type are accessed using the '\' character. For example: 
+
+.code
+mine\x=100
+Print mine\x
+.endcode
+
+When you've finished with an object, you should delete it using the 'Delete' command. For example: 
+
+.code
+Delete mine
+.endcode
+
+This releases the memory used by the object. 
+
+The special keyword 'Null' is used to represent non-existent objects. An object is non-existent if it hasn't been initialized yet using 'New', or has been released using 'Delete'. For example: 
+
+.code
+mine.MyType=New MyType
+If mine<>Null
+	Print "exists!"
+Else
+	Print "doesn't exist!"
+EndIf
+Delete mine
+If mine<>Null
+	Print "exists!"
+Else
+	Print "doesn't exist!"
+EndIf
+.endcode
+
+...will print the following:
+
+.code
+exists!
+doesn't exist!
+.endcode
+
+Each custom type has an associated list of objects known as a 'type list'. When an object is created using \verb+New+, it is automatically added to the type list. When an object is released using \verb+Delete+, it is removed from the type list. 
+
+The \verb+First+, \verb+Last+, \verb+After+ and \verb+Before+ operators allow you to access type lists. The \verb+First+ operator returns the object at the start of the type list. For example: 
+
+.code
+mine.MyType=First MyType
+.endcode
+
+This sets the 'mine.MyType' variable to the first object of custom type 'MyType'. 
+
+Similarly, \verb+Last+ returns the object at the end of the list. 
+
+If the type list is empty, \verb+First+ and \verb+Last+ return \verb+Null+. 
+
+You can use \verb+After+ to find the object after an object, and \verb+Before+ to find the object before an object. 
+
+For example: 
+
+.code
+mine.MyType=First MyType	;mine=first object in the type list
+mine=After( mine )			;mine=second object
+mine=After( mine )			;mine=third object
+mine=Before( mine )			;mine=second object
+mine=Before( mine )			;mine=first again!
+.endcode
+
+\verb'After' and \verb'Before' return \verb'Null' if there is no such object. For example: 
+
+.code
+mine.MyType=Last MyType	;mine=last object
+mine=After( mine )		;object after last does not exist!
+.endcode
+
+When an object is created using \verb+New+, it is placed at the end of it's type list by default. 
+However, You can move objects around within the type list using \verb+Insert+. For example: 
+
+.code
+mine1.MyType=New MyType
+mine2.MyType=New MyType
+Insert mine2 Before mine1
+.endcode
+
+This has the effect of placing the 'mine2' object before the 'mine1' object in the type list.
+You can also use \verb+After+ instead of \verb+Before+ with \verb+Insert+.
+
+Here's an example of moving an object to the start of it's type list: 
+
+.code
+Insert mine Before First MyType
+.endcode
+
+A special form of For...Next allows you to easily iterate over all object of a custom type. For example: 
+
+.code
+For mine.MyType=Each MyType
+Next
+.endcode
+
+This will cause the variable 'mine.MyType' to loop through all existing objects of cutom type MyType. 
+
+Finally, the \verb+Delete Each+ command allows you to delete all objects of a particular type. For example: 
+
+.code
+Delete Each MyType
+.endcode

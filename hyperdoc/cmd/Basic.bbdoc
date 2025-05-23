@@ -1,0 +1,1636 @@
+:If
+
+.args
+None.
+
+.desc
+Use this to check the value of a variable or to see if a condition is true  or false. The code between IF and END IF (or ENDIF) is executed if the condition  is true. Using NOT, you can also act if the condition is NOT true - or use ELSE  to perform a different set of commands than if the condition is met. Lastly,  you can use 'nested' or multiple IFs through the use of ELSE IF (or ELSEIF)  to do LOTS of condition checking. If you get too deep in condition checking,  consider using SELECT structures instead.
+
+.also
+Then;Else;ElseIf;EndIf;True;False;Select
+
+.code
+; IF THEN Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+
+	Print "You are recognized, Shane! Welcome!"
+
+Else
+
+	Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+End If
+
+:Then
+
+.args
+None.
+
+.desc
+Used in an IF statement to denote the end of the conditional  to be checked. Famous for its participation in the IF ... THEN structure.
+
+.also
+If;Else;ElseIf;EndIf;Select
+
+.code
+; IF THEN Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+
+	Print "You are recognized, Shane! Welcome!"
+
+Else
+
+	Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+End If
+
+:Else
+
+.args
+None.
+
+.desc
+There are times during an IF ...  THEN conditional that you will want code to execute in the event that the  conditional is NOT met. The ELSE command begins that block of code, and is terminated  by the END IF command.
+
+.also
+If;Then;ElseIf;EndIf;Select
+
+.code
+; ELSE example 
+
+name$=Input$("What is your name?") 
+
+If name$="Shane" then 
+	Print "Hello Shane!" 
+Else 
+	Print "I have NO clue who you are!" 
+End If
+
+:ElseIf
+
+.args
+None
+
+.desc
+During a standard IF ... THEN  conditional structure, you may wish to check another condition if the original  condition fails. This 'nested IF' situation can get WAY out of hand, and once  you have more than two nested conditionals, you should consider aSELECT/CASE structure.
+
+.also
+If;Then;Else;ElseIf;EndIf;Select
+
+.code
+; ELSEIF Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+	Print "You are recognized, Shane! Welcome!"
+
+ElseIf name$="Ron" Then
+	Print "You are recognized too, Ron! Welcome!"
+
+Else
+	Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+End If
+
+:Else If
+
+.args
+None.
+
+.desc
+During a standard IF ... THEN conditional structure, you may wish to check another condition if the original condition fails. This 'nested IF' situation can get WAY out of hand, and once you have more than two nested conditionals, you should consider a SELECT/CASE structure.
+
+.also
+ElseIf
+
+.code
+; ELSEIF Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+	Print "You are recognized, Shane! Welcome!"
+
+ElseIf name$="Ron" Then
+	Print "You are recognized too, Ron! Welcome!"
+
+Else
+	Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+End If
+
+:EndIf
+
+.args
+None.
+
+.desc
+Terminates an IF ... THEN condition  structure. See END IF for more information.
+
+.also
+If;Then;Else;ElseIf;Select
+
+.code
+; IF THEN Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+
+	Print "You are recognized, Shane! Welcome!"
+
+Else
+
+	Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+EndIf
+
+:End If
+
+.args
+None.
+
+.desc
+END IF signals the end of an IF THEN condition check. See IF for more information. You can also use ENDIF as a single  word command - it functions identically.
+
+.code
+; IF THEN Example
+
+; Input the user's name
+name$=Input$("What is your name? ")
+
+; Doesn't the person's name equal SHANE?
+If name$ = "Shane" Then
+
+Print "You are recognized, Shane! Welcome!"
+
+Else
+
+Print "Sorry, you don't belong here!"
+
+; End of the condition checking
+End If
+
+
+:Select variable
+
+.args
+variable - any valid variable
+
+.desc
+This command allows you to set up a selection structure that, based on the  value of the variable you feed it, will execute different commands in different CASEs. You can also specify a DEFAULT  set of commands to happen if NONE of the CASEs are met. The selection structure  is ended with an END SELECT command.
+
+
+This selection structure removes the need for large nested IF/THEN condition  checking.
+
+.also
+Case;Default;True;False;If
+
+.code
+; SELECT/CASE/DEFAULT/END SELECT Example
+
+; Assign a random number 1-10
+mission=Rnd(1,10)
+
+; Start the selection process based on the value of 'mission' variable
+Select mission
+
+; Is mission = 1?
+Case 1
+Print "Your mission is to get the plutonium and get out alive!"
+
+; Is mission = 2?
+Case 2
+Print "Your mission is to destroy all enemies!"
+
+; Is mission = 3?
+Case 3 
+Print "Your mission is to steal the enemy building plans!"
+
+; What do do if none of the cases match the value of mission
+Default 
+Print "Missions 4-10 are not available yet!"
+
+; End the selection process
+End Select
+
+:Case value [,value [,value ... ] ]
+
+.args
+value = any valid value of the SELECT variable
+
+.desc
+When using a SELECT structure, the CASE command defines the starting point of command execution if the SELECT value matches  the CASE value. If the SELECT value doesn't match the CASE value, the commands following it are ignored until the next CASE, DEFAULT, or END SELECT command is encountered. 
+
+If multiple values should result in the same outcome, a single CASE statement can be used with each value separated by commas.
+.also
+Select;Default;End Select
+
+.code
+; Advanced SELECT/CASE/DEFAULT/END SELECT Example
+; Assign a random number 1-10
+mission=Rnd(1,10)
+
+; Start the selection process based on the value of 'mission' variable
+Select True
+
+; Is mission = 1?
+Case mission=1
+Print "Your mission is to get the plutonium and get out alive!"
+
+; Is mission = 2?
+Case mission=2
+Print "Your mission is to destroy all enemies!"
+
+; Is mission = 3 to 5
+Case mission>=3 And mission<=5
+Print "Your mission is to steal the enemy building plans!"
+
+; What do do if none of the cases match the value of mission
+Default 
+Print "Missions 6-10 are not available yet!"
+
+; End the selection process
+End Select
+
+:Default
+
+.args
+None.
+
+.desc
+In a SELECT structure, you may wish to execute  code if none of the cases you specify are met. All code after DEFAULT to END SELECT will be executed if no case is met.
+
+.also
+Select;Case;End Select
+
+.code
+; SELECT/CASE/DEFAULT/END SELECT Example
+; Assign a random number 1-10
+mission=Rnd(1,10)
+
+; Start the selection process based on the value of 'mission' variable
+Select mission
+
+; Is mission = 1?
+Case 1
+Print "Your mission is to get the plutonium and get out alive!"
+
+; Is mission = 2?
+Case 2
+Print "Your mission is to destroy all enemies!"
+
+; Is mission = 3?
+Case 3 
+Print "Your mission is to steal the enemy building plans!"
+
+; What do do if none of the cases match the value of mission
+Default 
+Print "Missions 4-10 are not available yet!"
+
+; End the selection process
+End Select
+
+:End Select
+
+.args
+None.
+
+.desc
+This command ends the SELECT structure. If you  are using DEFAULT commands, this is the ending point  of that command set's execution. See SELECT, CASE, and DEFAULT for more  information.
+
+.code
+; SELECT/CASE/DEFAULT/END SELECT Example
+; Assign a random number 1-10
+mission=Rnd(1,10)
+
+; Start the selection process based on the value of 'mission' variable
+Select mission
+
+; Is mission = 1?
+Case 1
+Print "Your mission is to get the plutonium and get out alive!"
+
+; Is mission = 2?
+Case 2
+Print "Your mission is to destroy all enemies!"
+
+; Is mission = 3?
+Case 3 
+Print "Your mission is to steal the enemy building plans!"
+
+; What do do if none of the cases match the value of mission
+Default 
+Print "Missions 4-10 are not available yet!"
+
+; End the selection process
+End Select
+
+
+:And
+
+.args
+None.
+
+.desc
+AND is a logical operator for doing conditional checks of multiple values  and/or expressions. Use this to ensure that two or more conditions are true,  usually in an IF ... THEN conditional.
+
+.also
+Or;Not;Xor
+
+.code
+; AND example
+
+name$=Input$("Enter your name:")
+pw$=Input$("Password:")
+
+if name$="Shane" and pw$="bluedog" then
+print "Access granted! Welcome!"
+else
+print "Your name or password was not recognized"
+end if
+
+:Or
+
+.args
+None
+
+.desc
+A logical expression to return a boolean TRUE or FALSE comparison of expressions  or values. Use this to check two expressions or more and act upon its return  value.
+
+.also
+And;Not;Xor
+
+.code
+; OR Example
+
+myNum1=Rnd(0,10)
+myNum2=Rnd(0,10)
+
+If myNum1 = 0 OR myNum2 = 0 then
+print "One of my numbers is a Zero"
+end if
+
+:Not
+
+.args
+None.
+
+.desc
+The NOT operator is used to determine if a condition is FALSE instead of TRUE. This is  frequently used in WHILE loops and  IF statements to check for the NON-EXISTANCE of an event or value.
+
+.also
+And;Or;Xor
+
+.code
+; NOT example
+
+; Loop until they press ESC
+While Not KeyHit(1) ; As long as ESC isn't pressed ...
+Print "Press ESC to quit!"
+Wend
+
+:Repeat
+
+.args
+None
+
+.desc
+The REPEAT ... UNTIL loop allows you to perform  a series of commands until a specific condition has been met. This lets the  conditional appear after the commands have been executed before checking,  not before like the WHILE ... WEND  loop does. In general, use REPEAT ... UNTIL if you know you will have the commands  enclosed between them execute at least once.
+
+.also
+Until;Forever;Exit;While;For
+
+.code
+; Repeat until user hits ESC key
+
+Repeat
+print "Press ESC to quit this!"
+Until KeyHit(1)
+
+:Until condition
+
+.args
+condition = any valid expression
+
+.desc
+This portion of the REPEAT ... UNTIL loop dictates  what condition must be met before the loop stops execution. All commands between  the two commands will be executed endlessly until the UNTIL condition is met.
+
+.also
+Repeat;Forever;Exit;While;For
+
+.code
+; Repeat until user hits ESC key
+
+Repeat
+print "Press ESC to quit this!"
+Until KeyHit(1)
+
+:Forever
+
+.args
+None.
+
+.desc
+Replace the UNTIL command in aREPEAT ... UNTIL loop to make the loop run forever.  Remember, the program execution will continue indefinately until either you  break out of it programmatically! This is often known as 'the infinate loop'.  Once more for the cheap seats: "Make sure you provide a means for breaking out  of the loop". Use EXIT (to leave the loop) or END to quit the program.
+
+.also
+Repeat;Until;Exit;While;For
+
+.code
+; FOREVER Example
+
+Repeat
+If KeyHit(1) Then Exit
+Print "You are trapped in an infinate loop! Press ESC!"
+Forever
+
+Print "The infinate loop has ended!"
+
+:While condition
+
+.args
+condition = any valid conditional statement
+
+.desc
+The WHILE/WEND loop is used when you wish to execute a series of commands  multiple times based on whether a condition is true or not. This is similar  to the REPEAT/UNTIL loop, except the condition checking is at the beginning  of the loop, instead of at the end. Usually you'll use WHILE/WEND when you aren't  sure whether or not the looped commands will even need to be executed once,  since you can actually stop the loop before any commands are executed if the  condition check fails. If you need to execute the commands in the loop at least  once before checking a condition, use REPEAT/UNTIL.
+
+.also
+Wend;Exit;Repeat;For
+
+.code
+; While/Wend Example
+
+; The loop condition is at the TOP of the loop
+While Not KeyHit(1) ; As long as the user hasn't hit ESC yet ...
+Print "Press Esc to end this mess!" ; Print this
+Wend ; Go back to the start of the WHILE loop
+
+:Wend
+
+.args
+None.
+
+.desc
+This is the command that tells program execution to branch to the beginning  of the WHILE/WEND loop at the WHILE command. See the WHILE  command for complete details.
+
+.also
+While;Exit;Repeat;For
+
+.code
+; While/Wend Example
+
+; The loop condition is at the TOP of the loop
+While Not KeyHit(1) ; As long as the user hasn't hit ESC yet ...
+Print "Press Esc to end this mess!" ; Print this
+Wend ; Go back to the start of the WHILE loop
+
+:For variable
+
+.args
+variable = any valid variable name
+
+.desc
+The first command of the FOR ... NEXT loop, this command is used to assign  a variable to a range of numbers in sequence and execute a set of code that  many times. Using the STEP command allows you to skip a certain value between each loop of the code.  Note that the STEP amount cannot be a variable.
+
+This is frequently used when a specific pattern of numbers is needed to perform  an evolution (moving something from point A to point B, adding a value to a  score incrementally, etc). This allows you to assign a variable with the current  value of the loop.
+
+Note: Unlike many BASIC languages, the NEXT command does  NOT use the FOR command's variable as an identifier. If you have nested FOR  ... NEXT commands, the language will automatically match the NEXT with the nearest  FOR command.
+
+.also
+To;Step;Each;Next;Exit;While;Repeat
+
+.code
+; Print the values 1 through 10
+For t = 1 To 10
+Print t
+Next
+
+; Print the values 1,3,5,7,9
+For t = 1 To 10 Step 2
+Print t
+Next
+
+:To
+
+.args
+None.
+
+.desc
+Use the TO command to tell your FOR ... NEXT loop which numbers the variable should be assign  to during the loop. If you count down instead of up, you must use a negative STEP value.
+
+.also
+For;To;Step;Each;Next;Exit;While;Repeat
+
+.code
+; Print numbers 10 to 1
+
+For t = 10 to 1 Step -1
+Print t
+Next
+
+:Step
+
+.args
+None.
+
+.desc
+Use this to tell your FOR ... NEXT  loop to increment a certain value each pass through the loop. STEP 1 is assumed  and need not be declared. STEP 2 would skip every other value, STEP 3 would  skip every third value, etc.
+
+.also
+For;To;Each;Next;Exit;While;Repeat
+
+.code
+; Print 1 through 100, by tens
+
+For t = 1 To 100 Step 10
+Print t
+Next
+
+:Next
+
+.args
+None
+
+.desc
+This command closes the FOR ... NEXT loop, causing program execution to  start again at the FOR command unless the loop condition has been met (the last  value has been met). Note: Do NOT use the FOR  command's variable as a parameter (i.e. NEXT T) as you would in most BASIC languages.  Blitz will automatically match it with the nearest FOR command.
+
+.also
+For;To;Step;Each;Exit;While;Repeat
+
+.code
+; Print the values 1 through 10
+For t = 1 To 10
+Print t
+Next
+; Print the values 1,3,5,7,9
+For t = 1 To 10 Step 2
+Print t
+Next
+
+:Exit
+
+.args
+None
+
+.desc
+This command will allow you to leave a For .. Next loop as well as many other types of loops prematurely  (assuming a condition was met or other planned event). It exits the IMMEDIATE  loop - you'll need one for each 'nest' of loops you want to exit from.
+
+.also
+For;While;Repeat
+
+.code
+; EXIT Command sample
+
+For t = 1 To 100
+Print t
+If t = 50 Then Exit
+Next
+
+:Goto label
+
+.args
+label = any valid exisiting label
+
+.desc
+This branches the flow of the program to a designated label. With the use  of Functions inside of Blitz, it isn't very practical to use Gotos, but you  may still find it useful. If you require the need to return execution back to  the calling statement, you may use Gosub instead.
+
+.also
+Gosub;Function
+
+.code
+Print "The program starts ..."
+Goto label1
+Print "This line never gets printed .."
+End
+
+.label1
+Print "We just jumped here!"
+
+; wait for ESC key before ending
+While Not KeyHit(1) 
+Wend
+
+:Gosub label
+
+.args
+label = any valid exisiting label
+
+.desc
+This branches the flow of the program to a designated label, with the understanding  that there will be a Return later on in the called code to resume execution  of the program where the Gosub was called. With the use of Functions inside  of Blitz, it isn't very practical to use Gosubs, but you may still find it useful.  If you do not require the need to return execution back to the Gosub statement,  you may use Goto instead.
+
+.also
+Return;Goto;Function
+
+.code
+Print "The program starts ..."
+Gosub label1
+Print "The Program ends ..."
+
+; wait for ESC key before ending
+While Not KeyHit(1) 
+Wend
+
+End
+
+.label1
+Print "We could do all sorts of things in this part of the program..."
+Print "But, we'll just go back to the original code, instead ..."
+Return
+
+:Return value
+
+.args
+Return can pass a value back to the calling function of the type declared in the function name.
+
+No value can be returned when used with Gosub.
+
+.desc
+When called inside a FUNCTION structure, the  RETURN command immediately returns from the function back to the calling code.  An optional value may be returned. See FUNCTION for  more information. Remember, after a Return, the remaining code of the Function  is not executed. It also returns execution from a subroutine called  with the Gosub command.
+
+.also
+Function;Gosub;Goto
+
+.code
+; RETURN example
+
+; Set result to the return value of the function 'testme'
+result=testme(Rnd(0,10));
+
+; The program effectively ends here.
+
+; The actual function
+Function testme(test);
+
+; If the random number passed = 0 
+If test=0 Then
+Print "Value was 0"
+Return False ; The Function ends immediately
+Else
+Print "The value was greater than 0"
+Return True ; The Function ends immediately
+End If
+Print "This line never gets printed!"
+End Function
+
+:Function name
+
+.args
+name = any valid name text that is not a keyword of Blitz.
+
+.desc
+A function is a routine of commands you may choose to call frequently within  your program. Functions are considered 'proper' practice in this situation,  instead of using GOSUB commands.
+
+
+Functions are independant of your 'main code' and will only execute if they  are called. They have their own namespace, and variables created outside a function  are NOT available within the function (this goes for TYPE  structures as well) unless you declare the variable or Type structure as GLOBAL.
+
+
+You can pass variables into functions, as well as RETURN  values back to the calling code. To return floats or strings from a function ensure your function name has a # (to return a Float) or $ (to return a String) suffix. 
+
+
+The practical use of functions is to help seperate your code into managable  chunks for subsequent perfection of a routine. You may put all your screen updates  into a single function, for example. Or perhaps your scoring system where you  pass it what alien has been destroyed and it updates the player's score. 
+
+
+Once the function reaches the END FUNCTION command, it returns program execution to the point immediately following the function call.  
+
+
+Functions can be a bit daunting until you realize they really are their own  little programs within your program.
+
+Note that if you want to be really clever, you can replace Blitz functions with your own function.  This can be useful if you wish to add some error handling or additional processing around every instance of a Blitz function.  Note that once you have replaced a Blitz function, you cannot call the real function - for example you cannot wrap a LoadImage command within a LoadImage function as it will recursively call itself!
+
+.also
+Return;Gosub;Local;Global
+
+.code
+; Function Example
+
+; Get the user's name
+name$=Input$("Enter Your Name:")
+
+; Call a function to print how many letters the name has
+numletters(name$);
+
+; Let's get something BACK from the function
+thefirst$=firstletter(name$)
+
+; Now print results
+Print "Was the first letter an 'S'? (1=True/0=False)" + thefirst$
+
+;The program basically ends here, because functions don't run unless called.
+
+; The actual function
+Function numletters(passedname$)
+Print "Your name has " + Len(passedname$) + " letters in it."
+End Function
+
+; Function to see if the first letter is S
+Function firstletter(passedname$)
+
+; If the first letter is an 'S' then return from the function a true value
+If Left$(passedname$,1) = "S" Then
+Return True
+
+; Otherwise, return false
+Else
+
+Return False 
+
+End If 
+End Function
+
+:End Function
+
+.args
+None.
+
+.desc
+This line terminates a FUNCTION structure. Upon  reaching this line, Blitz will branch program execution to the next command  following the original call to the function. See the  FUNCTION command for more information.
+
+.code
+; End Function Example
+
+; Get the user's name
+name$=Input$("Enter Your Name:")
+
+; Call a function to print how many letters the name has
+numletters(name$);
+
+;The program basically ends here, because functions don't run unless called.
+
+; The actual function
+Function numletters(passedname$)
+Print "Your name has " + Len(passedname$) + " letters in it."
+End Function
+
+
+:Const variablename
+
+.args
+variablename - any valid variable name and its assignment
+
+.desc
+This declares a variable as a constant (a variable whose value will never  change and cannot be changed) and assigns the value to it.
+
+Assign constants to values you know will not change in your game (screen width,  height - scoring values - etc). This reduces the load of the variable memory,  since Blitz knows it will never change size unlike other variables which can  grow and shrink in size based on what value it holds.
+
+.also
+Global;Local;Dim
+
+.code
+; CONST Example
+
+Const scrWidth=640
+Const scrHeight=480
+Const alienscore=100
+
+Graphics scrWidth,scrHeight
+
+Print "The point value for shooting any alien is always " + alienscore
+
+:Global variable
+
+.args
+variable = any valid variable/TYPE name
+
+.desc
+There are two types of variables in Blitz Basic; local variables and global variables. Global variables can be utilized anywhere in your program (i.e. the main program look and all functions. Use global variables when you need to track a value across your entire program (player score, lives, etc). You can also define TYPEs as global as well.
+
+.also
+Local;Dim;Const;Function
+
+.code
+Global player1score ; Declare player's score as global
+Global graph.Cursor ; Declare the Cursor TYPE as global
+
+:Local variable
+
+.args
+variable = any valid variable name
+
+.desc
+This command is probably just here for compatibility with other BASIC languages.  LOCAL will let you specify that the variable you are defining is available ONLY  to the program or Function you are assigning it in.  In order to get a variable to be accessible anywhere in your program, you need  to make it GLOBAL. I say it is only here for compatibility  because whenever you assign a variable that isn't Global, it is automatically  assigned as a LOCAL variable. You can optionally assign a value to the variable  at the time of declaration.
+
+.also
+Global;Const;Dim;Function
+
+.code
+; Local example
+
+; set lives to 5 for the main program loop
+Local lives=5
+
+; Call a function
+while not keyhit(1)
+showlives()
+Wend
+
+Function showlives()
+; For this function, lives will be 10!
+Local lives=10
+Print lives
+End Function
+
+:Dim array_name(index1[,index2][,index3][,...])
+
+.args
+array_name - array name
+index1 - index number of last variable to be created within that particular  index-range
+index2 (optional) - index number of last variable to be created within that  particular index-range
+index3 (optional) - index number of last variable to be created within that  particular index-range
+... (optional) - and so on
+
+.desc
+Creates an array of the specified type. For example, Dim tiles(10) creates  an integer array, Dim tiles#(10) creates a float array and Dim tile$(10) creates  a string array.
+
+
+The contents of an array can be accessed using the index notation:  0 - indexn, giving indexn+1 number of elements for that particular index range. You should not attempt to access a non-existent element of the array.  In debug mode this will cause an error stating 'index out of bounds'.  With debug off however, you may get 'illegal memory access' errors, or worse no immediate errors at all. 
+
+Arrays are global, and must be defined in the main program. 
+
+Arrays can be re-dimmed by using the Dim statement again with the same array  name, but the contents of the array will be lost.
+
+-----------------------------------------------------------
+
+*NEW* BLITZ ARRAYS *NEW*
+
+Since a recent Blitz update you can now do what are called 'blitz arrays'.  These are very different to a Dim'd array, in the following ways:
+
+They use square brackets [] instead of the normal round ones ().
+
+You declare them like you do Local or Global variables, example: Local myArray[10]
+
+They cannot be multi-dimensional, and cannot be resized.
+
+They can be stored in Type objects.
+
+They can be passed to functions.
+
+-----------------------------------------------------------
+
+.also
+Global;Local
+
+.code
+; Dim Example
+; Create a collection of 100 random numbers
+
+; Create array
+Dim nums(99)
+
+; Fill each element with a random number
+For i = 0 to 99
+nums(i) = Rand(1,1000)
+Next
+
+:Type variable
+
+.args
+variable = any legal variable name
+
+.desc
+If you know C programming, a TYPE is basically a STRUCT in Blitz Basic. If  you don't know C, read on!
+
+TYPE is your best friend. It is used to create a 'collection' of objects  that share the same parameters and need to be interated through quickly and  easily. 
+
+Think about SPACE INVADERS. There are many aliens on the screen at one time.  Each of these aliens have a few variables that they all need: x and y coordinates  plus a variable to control which graphic to display (legs out or legs in). Now,  we could make hundreds of variables like invader1x, invader1y, invader2x, invader2y,  etc. to control all the aliens, but that wouldn't make much sense would it?  You could use an array to track them; invader(number,x,y,graphic), and the loop  through them with a FOR ... NEXT  loop but that is a lot of work! The TYPE variable collection was created to  handle just this sort of need. 
+
+TYPE defines an object collection. Each object in that collection inherits  its own copy of the variables defined by the TYPE's FIELD  command. Each variable of each object in the collection can be read individually  and can be easily iterated through quickly. Use the FIELD command to assign  the variables you want between the TYPE and END  TYPE commands.
+
+If it helps, think of a TYPE collection as a database. Each object is a record  of the database, and every variable is a field of the record. Using commands  like BEFORE, AFTER, and FOR  ... EACH, you can move change the pointer of the 'database'  to point to a different record and retrieve/set the variable 'field' values. 
+
+Not a database guru? Need another example? Okay. Let's say you are setting  up an auditorium for a speech or event and you are putting up hundreds of chairs  for the spectators. The chairs have to be in a certain place on the floor, and  some will need to be raised up a bit higher than others (visiting dignitaries,  the mayor is coming, etc.). So being the computer genius you are, you start  figuring out how you can layout the chairs with the least amount of effort.  You realize that the floor is checkered, so its really a huge grid! This will  make it easy! You just need to number the floor on a piece of graph paper and  put into the grid how high each chair should be, based on where the boss told  you the important people are to sit. So, for each chair, you will have a row  and column on the graph paper (x and y location) and a level to adjust the chair  to (height). Good, we are organized. Now, even though we have it all on paper,  we still have to do the work of placing all the chairs. After you are done,  let's say your boss walks up to you and says "they aren't centered right ..  move'em all over 1 square". Oh no! You have them all perfect, and even though  it is a simple thing to move a chair one square to the right (after all, their  order and height won't change) - you still have to move each and every chair!  Sure would be nice if you could just wave your hand and say "For each chair  in the room, add 1 square to its x location" and have it just magically happen.  Alas, in the real world, get busy - you've got a lot of chairs to move! 
+
+In Blitz, you could have set up a TYPE called CHAIR, set the TYPE's FIELDS  as X, Y, and HEIGHT. You would then create as many chairs as you need with the NEW command (each time you call NEW, it makes a new chair,  with its OWN X, Y, and HEIGHT variables) and assign them the X, Y, and HEIGHT  values you decide upon. In our example above, when the boss told you to move  the chairs over 1 box, you probably groaned inside. That's a lot of work! In  Blitz, we could use four lines of code to adjust all our CHAIR objects to the  new position (using FOR ... EACH commands). 
+
+Still lost? Its okay - TYPEs are hard to get a grasp on. Look at the example  and we'll try to show you how types work in a practical environment. I recommend  looking at other people's code too, to help you get a handle on them. Once you  do, you will know why C people are crazy for STRUCTs and why almost all Blitz  programs use them.
+
+A cunning trick for debug purposes, or for saving data from types to a file, is to use the Str$ command.  Print Str$(<Type Variable>) will print the values of each field of the type in turn, comma separated, within square brackets, e.g. [15,42,"Fluffy",500].
+
+Advanced programmers might like to know that Types are stored in a "doubly linked list".
+
+.also
+Field;New;Null;First;Last;Before;After;Insert;Before
+
+.code
+; Define the CHAIR Type
+
+Type CHAIR
+Field X
+Field Y
+Field HEIGHT
+End Type
+
+; Create 100 new chairs using FOR ... NEXT using the collection name of ROOM 
+
+For tempx = 1 to 10
+For tempy = 1 to 10
+room.chair = New Chair
+room\x = tempx
+room\y = tempy
+room\height = Rnd(0,10) ; set a random height 0 to 10
+Next
+Next 
+
+; Move them all over 1 (like the description example) 
+
+For room.chair = Each chair
+room\x = room\x + 1
+Next
+
+:Field variable
+
+.args
+variable = any legal variable
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+When you define a custom Type, you need to assign some variables to track  within in. Using the Field command within the Type .. End Type commands, you set a variable that  can be used for EACH object created with the NEW command.
+
+.also
+Type;End Type
+
+.code
+; Define the CHAIR Type
+
+Type CHAIR
+Field X
+Field Y
+Field HEIGHT
+End Type
+
+; Create 100 new chairs using FOR ... NEXT using the collection name of ROOM 
+
+For tempx = 1 to 10
+For tempy = 1 to 10
+room.chair = New Chair
+room\x = tempx
+room\y = tempy
+room\height = Rnd(0,10) ; set a random height 0 to 10
+Next
+Next 
+
+; Move them all over 1 (like the description example from TYPE command) 
+
+For room.chair = Each chair
+room\x = room\x + 1
+Next
+
+:End Type
+
+.args
+None
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+After assigning all the Field variables in your Type  object, use this to finish the creation of the Type.
+
+.code
+; Define the CHAIR Type
+
+Type CHAIR
+Field X
+Field Y
+Field HEIGHT
+End Type
+
+
+:New type_variable
+
+.args
+type_variable = the actual Type name, not the custom Type name
+
+.desc
+If you aren't familiar with the TYPE command, please refer to that before  reading about this command.
+
+Creates a NEW object in a Type collection. Each call to this command automatically  inserts a new object into the specified Type collection. 
+
+.also
+Type;Before;After;First;Last;Each;Insert;Delete
+
+.code
+; Define the CHAIR Type
+
+Type CHAIR
+Field X
+Field Y
+Field HEIGHT
+End Type
+
+; Create 100 new chairs using FOR ... NEXT using the collection name of ROOM
+
+For tempx = 1 to 10
+For tempy = 1 to 10
+room.chair = New Chair
+room\x = tempx
+room\y = tempy
+room\height = Rnd(0,10) ; set a random height 0 to 10
+Next
+Next
+
+:Each type_variable
+
+.args
+type_variable = A previously declared TYPE object
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+The For .. Each loop allows you to walk through each object in the Type collection.  This is perfect for updating a large group of objects (such as a group of alien  invaders). Do look over the Type command.
+
+.also
+Type;New;Before;After;First;Last;Insert;Delete
+
+.code
+; Move them all over 1 (like the description example from TYPE command)
+
+For room.chair = Each chair
+room\x = room\x + 1
+Next
+
+:First type_variable
+
+.args
+type_variable = the actual Type name, not the custom Type name
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+Use this to assign a custom Type object to the first object in the collection.
+
+.also
+Type;New;Before;After;Last;Each;Insert;Delete
+
+.code
+; Define a crafts Type
+
+Type crafts
+Field x
+Field y
+Field dead
+Field graphic
+End Type 
+
+; Create 100 crafts, with the unique name of alien
+For t = 1 To 100 
+alien.crafts = New crafts
+alien\x = Rnd(0,640)
+alien\y = Rnd(0,480)
+alien\dead = 0
+alien\graphic = 1
+Next 
+
+; Move to the first object
+alien.crafts = First crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the next alien object
+alien = After alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the last alien object
+alien.crafts = Last crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the second to the last alien object
+alien = Before alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic
+
+:Last type_variable
+
+.args
+type_variable = the actual Type name, not the custom Type name
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+Use this to assign a custom Type object to the last object in the collection.
+
+.also
+Type;New;Before;After;First;Each;Insert;Delete
+
+.code
+; Define a crafts Type
+
+Type crafts
+Field x
+Field y
+Field dead
+Field graphic
+End Type 
+
+; Create 100 crafts, with the unique name of alien
+For t = 1 To 100 
+alien.crafts = New crafts
+alien\x = Rnd(0,640)
+alien\y = Rnd(0,480)
+alien\dead = 0
+alien\graphic = 1
+Next 
+
+; Move to the first object
+alien.crafts = First crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the next alien object
+alien = After alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the last alien object
+alien.crafts = Last crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the second to the last alien object
+alien = Before alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic
+
+:Before custom_type_variable
+
+.args
+custom_type_variable = not the Type name, but the custom Type name
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+Use this to assign a custom Type object to the previous object in the collection.
+
+.also
+Type;New;After;First;Last;Each;Insert;Delete
+
+.code
+; Define a crafts Type
+
+Type crafts
+Field x
+Field y
+Field dead
+Field graphic
+End Type 
+
+; Create 100 crafts, with the unique name of alien
+For t = 1 To 100 
+alien.crafts = New crafts
+alien\x = Rnd(0,640)
+alien\y = Rnd(0,480)
+alien\dead = 0
+alien\graphic = 1
+Next 
+
+; Move to the first object
+alien.crafts = First crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the next alien object
+alien = After alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the last alien object
+alien.crafts = Last crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the second to the last alien object
+alien = Before alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic
+
+:After custom_type_variable
+
+.args
+custom_type_variable = not the Type name, but the custom Type name
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+Use this to assign a custom Type object to the next object in the collection.
+
+.also
+Type;New;Before;First;Last;Each;Insert;Delete
+
+.code
+; Define a crafts Type
+
+Type crafts
+Field x
+Field y
+Field dead
+Field graphic
+End Type 
+
+; Create 100 crafts, with the unique name of alien
+For t = 1 To 100 
+alien.crafts = New crafts
+alien\x = Rnd(0,640)
+alien\y = Rnd(0,480)
+alien\dead = 0
+alien\graphic = 1
+Next 
+
+; Move to the first object
+alien.crafts = First crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the next alien object
+alien = After alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the last alien object
+alien.crafts = Last crafts 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic 
+
+; move to the second to the last alien object
+alien = Before alien 
+
+Print alien\x
+Print alien\y
+Print alien\dead
+Print alien\graphic
+
+:Insert
+
+.args
+None.
+
+.desc
+I'm not sure the practical usage of this command, but basically, you can  control where you INSERT the current TYPE object into  the TYPE collection. When you create a new Type object with the NEW command, it is automatically appended to the END of  the collection. Using INSERT along with BEFORE and AFTER (and electively FIRST  and LAST) to put the Type object exactly where you want  it. Sounds confusing - and chances are likely you'll never need this ability.  But its here if you need it.
+
+.also
+Type;New;Before;After;First;Last;Each;Delete
+
+.code
+; INSERT example
+
+; Define a CHAIR type with a created field to track what order it was created  in.
+Type CHAIR
+Field created
+End Type 
+
+; Create 10 chairs, setting created field to the order of creation
+For t = 1 To 10
+room.chair= New Chair
+room\created = t
+Next
+
+; Make a NEW chair (the 11th) 
+room.chair= New Chair
+
+; Set its created value to 11
+room\created=11
+
+; Now, let's insert this chair BEFORE the first one in the collection
+Insert room Before First Chair
+
+; Let's iterate through all the chairs, and show their creation order
+For room.chair = Each chair
+Print room\created
+Next
+
+:Delete custom_type_name
+
+.args
+custom_type_name = the custom name of an existing object
+
+.desc
+If you haven't read up on the TYPE command, you might  want to do so before continuing.
+
+Use the Delete command to remove an object from the Type collection. Use  the commands FIRST, LAST, BEFORE, and NEXT to move the object pointer to the  object you want to delete, then issue the Delete command with the custom Type  name.   If you wish to delete all objects of a certain type, you can use DELETE EACH <TYPE>.
+
+This is often used in a FOR ... EACH loop when a collision happens and you  wish to remove the object (an alien ship object for example) from the collection.
+
+.also
+Type;New;Before;After;First;Last;Each;Insert
+
+.code
+; Move them all over 1 (like the description example from TYPE command)
+; If the chair isn't on the screen anymore, delete that chair object from the
+; collection.
+
+For room.chair = Each chair
+room\x = room\x + 1
+if room\x > 640 then
+Delete room
+Next
+
+:True
+
+.args
+None.
+
+.desc
+TRUE is a keyword to denote a positive result in a conditional statement.  Often times, TRUE is implied and doesn't need to be directly referenced. TRUE  can also be used as a RETURN value from aFUNCTION.
+
+.also
+False;If;Select;While;Repeat
+
+.code
+; TRUE example
+
+; Assign test a random number of 0 or 1
+test= Rnd(0,1)
+
+; TRUE is implied; This statement REALLY means: if test=1 is TRUE then proceed
+If test=1 Then
+Print "Test was valued at 1"
+End If
+
+; Let's set test to be true
+test=True
+
+; Pointlessly test it
+If test=True Then
+Print "Test is true"
+End If
+
+:False
+
+.args
+None.
+
+.desc
+FALSE is a keyword to denote a negative result in a conditional statement.  Often times, FALSE is implied and doesn't need to be directly referenced - or  a NOT command is used in the comparison. FALSE can also  be used as a RETURN value from aFUNCTION. Also see the TRUE  command.
+
+.also
+True;If;Select;While;Repeat
+
+.code
+; FALSE example
+
+; Assign test a random number of 0 or 1
+test= Rnd(0,1)
+
+; FALSE is implied because of the NOT
+If not test=1 Then
+Print "Test was valued at 0"
+End If
+
+; Let's set test to be false
+test=False
+
+; Pointlessly test it
+If test=False Then
+Print "Test is false"
+else
+print "Test is true"
+End If
+
+:Null
+
+.args
+None
+
+.desc
+Designates a Null Type object. Useful for making a Type variable point to nothing or checking if a Type object exists.  Also, useful for checking that there are still objects left on the end of a Type list using the After command.
+
+
+Can used for testing and setting.
+
+.also
+Type;New;Delete;After;Before;First;Last
+
+.code
+; Null example
+
+Type Alien
+Field x,y
+End Type
+
+a.Alien = New Alien
+If a <> Null Then Print "Alien exists!"
+Delete a
+if a = Null Then Print "Alien gone!"
+
+:Data list_of_values
+
+.args
+list_of_values = a list of comma delimited values (strings must be inside  quotes)
+
+.desc
+Data is used to create neat, comma delimited lists of values of a constant  nature that you will be reading (and probably reusing) during the execution  of your game. You may store level information (number of enemies, stars, etc)  there or just about anything you can think of! You can easily mix datatypes  (strings, integers, floats) in your Data statements, as long as they are read  properly with the Read command later. You will need to  use the Restore command to point to the .Label that begins your Data statements.
+
+.also
+Read;Restore
+
+.code
+Print "Here we go!"
+
+; Restore to the start of the Data statements
+Restore startData
+
+; Get the first number which is the total number of users
+Read Users
+
+; Print them all!
+For T = 1 To Users
+Read firstname$
+Read age
+Read accuracy#
+Read lastname$
+Print firstname$ + " " + lastname$ + " is " + age + " years old with " + accuracy#  + " accuracy!"
+Next 
+
+While Not KeyHit(1)
+Wend
+End
+
+.startData
+Data 3
+Data "Shane", 31, 33.3333, "Monroe"
+Data "Bob", 28, 12.25, "Smith"
+Data "Roger", 54, 66.66, "Rabbit"
+
+:Read variable
+
+.args
+variable = valid variable to match the data type you are reading (integer,  string, etc)
+
+.desc
+This reads the next value in a set of Data statements. This allows you to  store large blocks of constant information (the structure of tile blocks for  a game level for example) into easy to maintain Data statements, then retrieve  them for redrawing, etc.
+
+
+Unlike most BASIC languages, Data statments do not have to be linear and sequential.  Through the use of Labels (aka 'dot variable') you can create 'banks' of Data  statments with the unique ability to 'Restore the Data pointer' to any one of  these labels. Each level could have its own label (.level1, .level2, etc). See  the Data statement, Restore  command, or .Label command for more information.
+
+
+Note: You can read multiple values at one time; Read X,Y,Z for example.
+
+.also
+Data;Restore
+
+.code
+; Sample of read/restore/data/label commands
+
+; Let's put the data pointer to the second data set
+Restore seconddata
+
+; Let's print them all to the screen
+For t = 1 To 10
+Read num ; Get the next data value in the data stack
+Print num
+Next
+
+; Now for the first set of data
+Restore firstdata
+
+; Let's print them all to the screen
+For t = 1 To 10
+Read num ; Get the next data value in the data stack
+Print num
+Next
+
+; this is the first set of data
+.firstdata
+Data 1,2,3,4,5,6,7,8,9,10
+
+; this is the second set of data
+.seconddata
+Data 11,12,13,14,15,16,17,18,19,20
+
+:Restore label
+
+.args
+label = any valid and exisiting label
+
+.desc
+When using Data statements to store large blocks  of constants for use with the Read command, it is necessary  to denote the start of the Data with a .Label. The Restore  command moves the 'pointer' to the first Data statement's value following the  designated label. You MUST use the Restore label command prior to using  the Read command. This method allows you to store groups of Data statements  non-sequentially. Its different (if you are used to other BASIC languages) but  you will find it most flexible.
+
+.also
+Read;Data
+
+.code
+; Sample of read/restore/data/label commands
+
+; Let's put the data pointer to the second data set
+Restore seconddata
+
+; Let's print them all to the screen
+For t = 1 To 10
+Read num ; Get the next data value in the data stack
+Print num
+Next
+
+; Now for the first set of data
+Restore firstdata
+
+; Let's print them all to the screen
+For t = 1 To 10
+Read num ; Get the next data value in the data stack
+Print num
+Next
+
+; this is the first set of data
+.firstdata
+Data 1,2,3,4,5,6,7,8,9,10
+
+; this is the second set of data
+.seconddata
+Data 11,12,13,14,15,16,17,18,19,20
+
+:Include filename$
+
+.args
+filename$ - name of .bb file to be 'Include(d)' in quotes.
+
+.desc
+Includes the contents of the specified .bb file in the current source code file.
+
+Useful for when you're code gets too big, or you just want to organise functions that you've finalised and functions that you're working on.
+
+The Include command effectively "cuts and pastes" the contents of the .bb file to be included into the current file at the point of the Include function call, temporarily, before being passed to the compiler to Execute.
+
+Note that each .bb file can only be included once.
+
+.code
+; Include Example
+; ---------------
+
+;include finished code files
+Include "include_globals.bb"
+Include "include_menu.bb"
+Include "include_game.bb"
+Include "include_music.bb"
+Include "include_sound.bb"
+Include "include_ai.bb"
+
+;Main program loop here
+;End program
+

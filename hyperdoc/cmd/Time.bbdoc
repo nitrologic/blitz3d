@@ -1,0 +1,125 @@
+:Millisecs()
+
+.args
+None
+
+.desc
+This command will return to you the system timer value in milliseconds.
+
+This is incredibly useful for precision timing of events. By reading this value  into a variable, and checking it against the CURRENT time in milliseconds, you  can perform 'waits' or check time lapses with a high degree of accuracy. A common  use of this command is to seed the random number generator with the SeedRnd command.
+
+.code
+; This prints STILL WAITING! for three seconds then ends.
+oldTime=MilliSecs()
+While MilliSecs() < oldTime + 3000
+Print "Still waiting!"
+Wend
+
+
+:Delay milliseconds
+
+.args
+milliseconds = the amount of milliseconds to delay. 1000=1 second
+
+.desc
+This command stops all program execution for the designated time period.  All execution stops. If you need program execution to continue, consider trapping  time elapsed with a custom timer function using Millisecs().
+
+.code
+; Delay for 5 seconds
+
+Delay 5000
+
+
+:CurrentDate$()
+
+.args
+None
+
+.desc
+Returns the current date in the format: DD MON YYYY (i.e. 10 DEC 2000).
+
+.code
+; Print the current date to the screen
+
+Print "The date is:" + CurrentDate$()
+
+
+:CurrentTime$()
+
+.args
+None
+
+.desc
+Returns the current time in the format: HH:MM:SS (i.e. 14:31:57).
+
+.code
+; Print the current time to the screen
+
+Print "The Time is:" + CurrentTime$()
+
+
+:CreateTimer (frequency)
+
+.args
+frequency = usually a framerate like 50 or 60
+
+.desc
+Use this command in conjunction with the WaitTimer command to control the  speed of program execution (fps). You will use this in your main screen redraw  loop to control the playback speed to match the proper speed. This will prevent  your games from playing back too fast on computers faster than yours. Use of  this system is VERY GOOD practice, as your game will be played on a variety  of computers.
+
+.code
+; Create the timer to track speed
+frameTimer=CreateTimer(60)
+
+; Your main screen draw loop
+While Not KeyHit(1)
+WaitTimer(frameTimer) ; Pause until the timer reaches 60
+Cls
+; Draw your screen stuff
+Flip
+Wend
+
+
+:FreeTimer (timer_variable)
+
+.args
+timer = any valid timer variable created with the CreateTimer command.
+
+.desc
+This command will destroy a timer variable created with the with the CreateTimer command and free the memory it was  using. It is a good practice to destroy elements in your game you are no longer  using.
+
+.code
+; Create the timer to track speed
+frameTimer=CreateTimer(60)
+
+; Your main screen draw loop
+While Not KeyHit(1)
+WaitTimer(frameTimer) ; Pause until the timer reaches 60
+Cls
+; Draw your screen stuff
+Flip
+Wend
+
+; Kill the timer
+FreeTimer(frameTimer)
+
+
+:WaitTimer (timer_variable)
+
+.args
+timer = any valid timer variable created with the CreateTimer command.
+
+.desc
+Use this in conjunction with the CreateTimer  command. This command will halt execution until the timer reaches its value.  This is useful to control the execution speed of your program. Check out the CreateTimer command for more.
+
+.code
+; Create the timer to track speed
+frameTimer=CreateTimer(60)
+
+; Your main screen draw loop
+While Not KeyHit(1)
+WaitTimer(frameTimer) ; Pause until the timer reaches 60
+Cls
+; Draw your screen stuff
+Flip
+Wend
+

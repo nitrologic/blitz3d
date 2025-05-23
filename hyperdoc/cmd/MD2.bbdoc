@@ -1,0 +1,253 @@
+:LoadMD2 ( md2_file$[,parent] )
+
+.args
+md2_file$ - filename of md2
+parent (optional) - parent entity of md2
+
+.desc
+Loads an md2 entity and returns its handle.
+
+An md2's texture has to be  loaded and applied to the md2 separately, otherwise the md2 will appear untextured. 
+
+Md2's have their own set of animation commands, and will not work with normal  animation commands.  
+
+The optional parent parameter allows you to specify a parent entity for the  md2 so that when the parent is moved the child md2 will move with it. However,  this relationship is one way; applying movement commands to the child will not  affect the parent. 
+
+Specifying a parent entity will still result in the md2 being created at  position 0,0,0 rather than at the parent entity's position. 
+
+.code
+; LoadMD2 Example
+; ---------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load md2
+gargoyle=LoadMD2( "media/gargoyle/gargoyle.md2" )
+
+; Load md2 texture
+garg_tex=LoadTexture( "media/gargoyle/gargoyle.bmp" )
+
+; Apply md2 texture to md2
+EntityTexture gargoyle,garg_tex
+
+PositionEntity gargoyle,0,-45,100
+RotateEntity gargoyle,0,180,0
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:AnimateMD2 md2[,mode][,speed#][,first_frame][,last_frame][,transition#]
+
+.args
+md2 - md2 handle
+
+mode (optional) - mode of animation
+0: stop animation
+1: loop animation (default)
+2: ping-pong animation
+3: one-shot animation
+
+speed# (optional) - speed of animation. Defaults to  1.
+first_frame (optional) - first frame of animation. Defaults to 1.
+last_frame# (optional) - last frame of animation. Defaults to last frame of  all md2 animations.
+transition# (optional) - smoothness of transition between last frame shown of  previous animation and first frame of next animation. Defaults to 0. 
+
+.desc
+Animates an md2 entity.
+
+The md2 will actually move from one frame to the  next when UpdateWorld is called. 
+
+.code
+; AnimateMD2 Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load md2
+gargoyle=LoadMD2( "media/gargoyle/gargoyle.md2" )
+
+; Load md2 texture
+garg_tex=LoadTexture( "media/gargoyle/gargoyle.bmp" )
+
+; Apply md2 texture to md2
+EntityTexture gargoyle,garg_tex
+
+; Animate md2
+AnimateMD2 gargoyle,1,0.1,32,46
+
+PositionEntity gargoyle,0,-45,100
+RotateEntity gargoyle,0,180,0
+
+While Not KeyDown( 1 )
+UpdateWorld
+RenderWorld
+Flip
+Wend
+
+End
+
+:MD2AnimTime ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns the animation time of an md2 model.
+
+The animation time is the  exact moment that the md2 is at with regards its frames of animation. For example,  if the md2 at a certain moment in time is moving between the third and fourth  frames, then MD2AnimTime will return a number in the region 3-4. 
+
+.code
+; MD2AnimTime Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load md2
+gargoyle=LoadMD2( "media/gargoyle/gargoyle.md2")
+
+; Load md2 texture
+garg_tex=LoadTexture( "media/gargoyle/gargoyle.bmp" )
+
+; Apply md2 texture to md2
+EntityTexture gargoyle,garg_tex
+
+; Animate md2
+AnimateMD2 gargoyle,1,0.1,32,46
+
+PositionEntity gargoyle,0,-45,100
+RotateEntity gargoyle,0,180,0
+
+While Not KeyDown( 1 )
+
+UpdateWorld
+RenderWorld
+
+; Output current animation frame to screen
+Text 0,0,"MD2AnimTime: "+MD2AnimTime( gargoyle )
+
+Flip
+
+Wend
+
+End
+
+:MD2AnimLength ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns the animation length of an md2 model.
+
+The animation length is  the total amount of animation frames that consist within the md2 file. 
+
+.code
+; MD2AnimLength Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load md2
+gargoyle=LoadMD2( "media/gargoyle/gargoyle.md2")
+
+; Load md2 texture
+garg_tex=LoadTexture( "media/gargoyle/gargoyle.bmp" )
+
+; Apply md2 texture to md2
+EntityTexture gargoyle,garg_tex
+
+PositionEntity gargoyle,0,-45,100
+RotateEntity gargoyle,0,180,0
+
+While Not KeyDown( 1 )
+
+RenderWorld
+
+; Output animation length to screen
+Text 0,0,"MD2AnimLength: "+MD2AnimLength( gargoyle )
+
+Flip
+
+Wend
+
+End
+
+:MD2Animating ( md2 )
+
+.args
+md2 - md2 handle
+
+.desc
+Returns 1 (True) if md2 is currently animating, 0 (False) if not.
+
+.code
+; MD2Animating Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Load md2
+gargoyle=LoadMD2( "media/gargoyle/gargoyle.md2")
+
+; Load md2 texture
+garg_tex=LoadTexture( "media/gargoyle/gargoyle.bmp" )
+
+; Apply md2 texture to md2
+EntityTexture gargoyle,garg_tex
+
+PositionEntity gargoyle,0,-45,100
+RotateEntity gargoyle,0,180,0
+
+While Not KeyDown( 1 )
+
+; Toggle animation stop/start when spacebar pressed
+If KeyHit( 57 )=True start=1-start : AnimateMD2 gargoyle,start,0.1,32,46
+
+UpdateWorld
+RenderWorld
+
+Text 0,0,"Press spacebar to stop/start md2 animation"
+
+; Output current md2 animation status to screen
+Text 0,20,"MD2Animating: "+MD2Animating( gargoyle )
+
+Flip
+
+Wend
+
+End
+

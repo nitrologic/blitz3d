@@ -1,0 +1,1656 @@
+:CreateCamera ( [parent] )
+
+.args
+parent (optional) - parent entity of camera
+
+.desc
+Creates a camera entity and returns its handle.
+
+Without  at least one camera, you won't be able to see anything in your 3D world. With more than one camera, you will be to achieve effects such as  split-screen modes and rear-view mirrors. 
+
+A camera can only render to the backbuffer. If you wish to display 3D  graphics on an image or a texture then copy the contents of the backbuffer  to the appropriate buffer. 
+
+The optional parent parameter allow you to specify a parent entity for  the camera so that when the parent is moved the child camera will move with  it. However, this relationship is one way; applying movement commands to the  child will not affect the parent. 
+
+Specifying a parent entity will still result in the camera being created  at position 0,0,0 rather than at the parent entity's position.
+
+.code
+; CreateCamera Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+; Create camera
+camera=CreateCamera()
+
+light=CreateLight()
+
+cone=CreateCone()
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:CameraProjMode camera,mode
+
+.args
+camera - camera handle
+mode - projection mode:
+0: no projection - disables camera (faster than HideEntity)
+1: perspective projection (default)
+2: orthographic projection
+
+.desc
+Sets the camera projection mode.
+
+The projection mode is the the technique  used by Blitz to display 3D graphics on the screen. Using projection mode 0,  nothing is displayed on the screen, and this is the fastest method of hiding  a camera. Using camera projection mode 1, the graphics are displayed in their  'correct' form - and this is the default mode for a camera. Camera projection  mode 2 is a special type of projection, used for displaying 3D graphics on screen,  but in a 2D form - that is, no sense of perspective will be given to the graphics.  Two identical objects at varying distances from the camera will both appear  to be the same size. Orthographic projection is useful for 3D editors, where  a sense of perspective is unimportant, and also certain games. 
+
+Use 'CameraZoom' to control the scale of graphics rendered with orthographic  projection. As a general rule, using orthographic projection with the default  camera zoom setting of 1 will result in graphics that are too 'zoomed-in' -  changing the camera zoom to 0.1 should fix this. 
+
+One thing to note with using camera project mode 2, is that terrains will  not be displayed correctly - this is because the level of detail algorithm used  by terrains relies on perspective in order to work properly. 
+
+.code
+; CameraProjMode Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,0,-10
+
+light=CreateLight()
+RotateEntity light,0,0,0
+
+; Create cube 1, near to camera
+cube1=CreateCube()
+EntityColor cube1,255,0,0
+PositionEntity cube1,0,0,0
+
+; Create cube 2, same size as cube 1 but further away
+cube2=CreateCube()
+EntityColor cube2,0,255,0
+PositionEntity cube2,5,5,5
+
+While Not KeyDown( 1 )
+
+; If spacebar pressed then change mode value
+If KeyHit(57)=True Then mode=mode+1 : If mode=3 Then mode=0
+
+; If mode value = 2 (orthagraphic), then reduce zoom value to 0.1
+If mode=2 Then zoom#=0.1 Else zoom#=1
+
+; Set camera projection mode using mode value
+CameraProjMode camera,mode
+
+; Set camera zoom using zoom value
+CameraZoom camera,zoom#
+
+RenderWorld
+
+Text 0,0,"Press spacebar to change the camera project mode"
+Text 0,20,"CameraProjMode camera,"+mode
+Text 0,40,"CameraZoom camera,"+zoom#
+
+Flip
+
+Cls
+
+Wend
+
+End
+
+:CameraFogMode camera,mode
+
+.args
+camera - camera handle
+mode -
+0: no fog (default)
+1: linear fog
+
+.desc
+Sets the camera fog mode.
+
+This will enable/disable fogging, a technique  used to gradually fade out graphics the further they are away from the camera.  This can be used to avoid 'pop-up', the moment at which 3D objects suddenly  appear on the horizon. 
+
+The default fog colour is black and the default fog range is 1-1000, although  these can be changed by using CameraFogColor  and CameraFogRange respectively. 
+
+Each camera can have its own fog mode, for multiple on-screen fog effects.
+
+.code
+; CameraFogMode Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+CameraFogRange camera,1,10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture plane,grass_tex
+
+While Not KeyDown( 1 )
+
+; Toggle camera fog mode between 0 and 1 when spacebar is pressed
+If KeyHit( 57 )=True Then fog_mode=1-fog_mode : CameraFogMode camera,fog_mode
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the infinite plane"
+Text 0,20,"Press spacebar to toggle between CameraFogMode 0/1"
+If fog_mode=False Then Text 0,40,"CameraFogMode 0" Else Text 0,40,"CameraFogMode  1"
+
+Flip
+
+Wend
+
+End
+
+:CameraFogRange camera,near#,far#
+
+.args
+camera - camera handle
+near# - distance in front of camera that fog starts
+far# - distance in front of camera that fog ends
+
+.desc
+Sets camera fog range.
+
+The near parameter specifies at what distance  in front of the camera that the fogging effect will start; all 3D object  before this point will not be faded. 
+
+The far parameter specifies at what distance in front of the camera that  the fogging effect will end; all 3D objects beyond this point will be  completely faded out.
+
+.code
+; CameraFogRange Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture plane,grass_tex
+
+; Set camera fog to 1 (linear fog)
+CameraFogMode camera,1
+
+; Set intial fog range value
+fog_range=10
+
+While Not KeyDown( 1 )
+
+; If square brackets keys pressed then change fog range value
+If KeyDown( 26 )=True Then fog_range=fog_range-1
+If KeyDown( 27 )=True Then fog_range=fog_range+1
+
+; Set camera fog range
+CameraFogRange camera,1,fog_range
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the infinite plane"
+Text 0,20,"Press [ or ] to change CameraFogRange value"
+Text 0,40,"CameraFogRange camera,1,"+fog_range
+
+Flip
+
+Wend
+
+End
+
+:CameraFogColor camera,red#,green#,blue#
+
+.args
+camera - camera handle
+red# - red value of value
+green# - green value of fog
+blue# - blue value of fog
+
+.desc
+Sets camera fog color.
+
+.code
+; CameraFogColor Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture plane,grass_tex
+
+; Set camera fog to 1 (linear fog)
+CameraFogMode camera,1
+
+; Set camera fog range
+CameraFogRange camera,1,10
+
+; Set initial fog colour values
+red#=0
+green#=0
+blue#=0
+
+While Not KeyDown( 1 )
+
+; Change red, green, blue values depending on key pressed
+If KeyDown( 2 )=True And red#>0 Then red#=red#-1
+If KeyDown( 3 )=True And red#<255 Then red#=red#+1
+If KeyDown( 4 )=True And green#>0 Then green#=green#-1
+If KeyDown( 5 )=True And green#<255 Then green#=green#+1
+If KeyDown( 6 )=True And blue#>0 Then blue#=blue#-1
+If KeyDown( 7 )=True And blue#<255 Then blue#=blue#+1
+
+; Set camera fog color using red, green, blue values
+CameraFogColor camera,red#,green#,blue#
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the infinite plane"
+Text 0,20,"Press keys 1-6 to change CameraFogColor red#,green#,blue# values
+Text 0,40,"Fog Red: "+red#
+Text 0,60,"Fog Green: "+green#
+Text 0,80,"Fog Blue: "+blue#
+
+Flip
+
+Wend
+
+End
+
+:CameraViewport camera,x,y,width,height
+
+.args
+camera - camera handle
+x - x coordinate of top left hand corner of viewport
+y - y coordinate of top left hand corner of viewport
+width - width of viewport
+height - height of viewport
+
+.desc
+Sets the camera viewport position and size.
+
+The camera viewport is the  area of the 2D screen that the 3D graphics as viewed by the camera are  displayed in. 
+
+Setting the camera viewport allows you to achieve spilt-screen and  rear-view mirror effects.
+
+.code
+; CameraViewport Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+; Create first camera
+cam1=CreateCamera()
+
+; Set the first camera's viewport so that it fills the top half of the  camera
+CameraViewport cam1,0,0,GraphicsWidth(),GraphicsHeight()/2
+
+; Create second camera
+cam2=CreateCamera()
+
+; Set the second camera's viewport so that it fills the bottom half of the  camera
+CameraViewport cam2,0,GraphicsHeight()/2,GraphicsWidth(),GraphicsHeight()/2
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+EntityTexture plane,grass_tex
+PositionEntity plane,0,-1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity cam1,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity cam1,0,1,0
+If KeyDown( 208 )=True Then MoveEntity cam1,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity cam1,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move the first camera about the infinite plane"
+
+Flip
+
+Wend
+
+End
+
+:CameraClsMode camera,cls_color,cls_zbuffer
+
+.args
+camera - camera handle
+cls_color - true to clear the color buffer, false not to
+cls_zbuffer - true to clear the z-buffer, false not to
+
+.desc
+Sets camera clear mode.
+
+.code
+; CameraClsMode Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/MossyGround.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+PositionEntity cube,0,1,0
+
+; Load 2D background image
+background=LoadImage("media/sky.bmp")
+
+; Use red ink color so we can see text on top of black or light blue background
+Color 255,0,0
+
+While Not KeyDown(1)
+
+If KeyDown(205)=True Then TurnEntity camera,0,-1,0
+If KeyDown(203)=True Then TurnEntity camera,0,1,0
+If KeyDown(208)=True Then MoveEntity camera,0,0,-0.05
+If KeyDown(200)=True Then MoveEntity camera,0,0,0.05
+
+; Toggle cls_color value between 0 and 1 when spacebar is pressed
+If KeyHit(57)=True Then cls_color=1-cls_color
+
+; Set the camera clear mode, using the cls_color value
+CameraClsMode camera,cls_color,1
+
+; Draw a 2D background. When cls_color is set to 0, the 2D graphics will show  behind the 3D graphics.
+TileBlock background,0,0 
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press space bar to enable/disable colour clearing"
+Text 0,40,"CameraClsMode camera,"+cls_color+","+1
+
+Flip
+
+Wend
+
+End
+
+:CameraClsColor camera,red#,green#,blue#
+
+.args
+camera - camera handle
+red# - red value of camera background color
+green# - green value of camera background color
+blue# - blue value of camera background color
+
+.desc
+Sets camera background color. Defaults to 0,0,0.
+
+.code
+; CameraClsColor Example
+; ----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,0,0,5
+
+While Not KeyDown(1)
+
+; Change red, green, blue values depending on key pressed
+If KeyDown(2)=True And red#>0 Then red#=red#-1
+If KeyDown(3)=True And red#<255 Then red#=red#+1
+If KeyDown(4)=True And green#>0 Then green#=green#-1
+If KeyDown(5)=True And green#<255 Then green#=green#+1
+If KeyDown(6)=True And blue#>0 Then blue#=blue#-1
+If KeyDown(7)=True And blue#<255 Then blue#=blue#+1
+
+; Set camera clear color using red, green, blue values
+CameraClsColor camera,red#,green#,blue#
+
+RenderWorld
+
+Text 0,0,"Press keys 1-6 to change CameraClsColor red#,green#,blue# values
+Text 0,20,"Red: "+red#
+Text 0,40,"Green: "+green#
+Text 0,60,"Blue: "+blue#
+
+Flip
+
+Wend
+
+End
+
+:CameraRange camera,near#,far#
+
+.args
+camera - camera handle
+near - distance in front of camera that 3D objects start being drawn
+far - distance in front of camera that 3D object stop being drawn
+
+.desc
+Sets camera range. Defaults to 1,1000.
+
+
+Try and keep the ratio of far/near as small as possible  for optimal z-buffer performance and to avoid flickering triangles/objects. Keeping the near parameter as large as possible is particularly critical. 
+
+More information about z-buffer here:
+http://www.sjbaker.org/steve/omniv/love_your_z_buffer.html
+
+.code
+; CameraRange Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+grass_tex=LoadTexture("media/mossyground.bmp")
+EntityTexture plane,grass_tex
+
+; Set intial camera range value
+cam_range=10
+
+While Not KeyDown( 1 )
+
+; If square brackets keys pressed then change camera range value
+If KeyDown(26)=True Then cam_range=cam_range-1
+If KeyDown(27)=True Then cam_range=cam_range+1
+
+; Set camera range
+CameraRange camera,1,cam_range
+
+If KeyDown(205)=True Then TurnEntity camera,0,-1,0
+If KeyDown(203)=True Then TurnEntity camera,0,1,0
+If KeyDown(208)=True Then MoveEntity camera,0,0,-0.05
+If KeyDown(200)=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the infinite plane"
+Text 0,20,"Press [ or ] to change CameraRange value"
+Text 0,40,"CameraRange camera,1,"+cam_range
+
+Flip
+
+Wend
+
+End
+
+:CameraZoom camera,zoom#
+
+.args
+camera - camera handle
+zoom# - zoom factor of camera
+
+.desc
+Sets zoom factor for a camera. Defaults to 1.
+
+.code
+; CreateZoom Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+ground=CreatePlane()
+sand_tex=LoadTexture("media/sand.bmp")
+ScaleTexture sand_tex,10,10
+EntityTexture ground,sand_tex
+EntityColor ground,168,133,55
+
+cactus1=LoadMesh("media/CACTUS2.x")
+cactus2=LoadMesh("media/CACTUS2.x")
+camel=LoadMesh("media/camel.x")
+PositionEntity cactus1,-1,2,10
+PositionEntity cactus2,1,2,10
+PositionEntity camel,0,1,1000
+
+; Set initial zoom value
+zoom#=1
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+
+; Change zoom value depending on key pressed
+If KeyDown( 208 )=True Then zoom#=zoom#-0.1
+If KeyDown( 200 )=True Then zoom#=zoom#+0.1
+
+; Put a minimum and maximum cap on zoom value
+If zoom#<1 Then zoom#=1
+If zoom#>100 Then zoom#=100
+
+; Set camera zoom
+CameraZoom camera,zoom#
+
+RenderWorld
+
+Text 0,0,"Use left and right cursor keys to turn around"
+Text 0,20,"Use up and down cursor keys to change camera zoom"
+Text 0,40,"There is a camel on the horizon, inbetween the cacti. Zoom in to  see it."
+Text 0,60,"CameraZoom camera,"+zoom#
+
+Flip
+
+Wend
+
+End
+
+:CameraPick ( camera,viewport_x#,viewport_y# )
+
+.args
+camera - camera handle
+viewport_x# - 2D viewport coordinate
+viewport_z# - 2D viewport coordinate
+
+.desc
+Picks the entity positioned at the specified viewport coordinates.
+
+Returns  the entity picked, or 0 if none there. 
+
+An entity must have its EntityPickMode set  to a non-0 value value to be 'pickable'.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+.code
+; CameraPick Example
+; ------------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedX# ( )
+
+.args
+None.
+
+.desc
+Returns the world x coordinate of the most recently executed Pick command.  This might have been CameraPick, EntityPick or LinePick.
+
+The coordinate represents the exact point of where something was picked. 
+
+.also
+PickedY, PickedZ. 
+
+.code
+; PickedX Example
+; ---------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedY# ( )
+
+.args
+None.
+
+.desc
+Returns the world y coordinate of the most recently executed Pick command.  This might have been CameraPick, EntityPick or LinePick.
+
+The coordinate represents the exact point of where something was picked. 
+
+.also
+PickedX, PickedZ. 
+
+.code
+; PickedY Example
+; ---------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedZ# ( )
+
+.args
+None.
+
+.desc
+Returns the world z coordinate of the most recently executed Pick command.  This might have been CameraPick, EntityPick or LinePick.
+
+The coordinate represents the exact point of where something was picked. 
+
+.also
+PickedX, PickedY. 
+
+.code
+; PickedZ Example
+; ---------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedNX ( )
+
+.args
+None.
+
+.desc
+Returns the x component of the normal of the most recently executed Pick  command. This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedNX Example
+; ----------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedNY ( )
+
+.args
+None.
+
+.desc
+Returns the y component of the normal of the most recently executed Pick  command. This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedNY Example
+; ----------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedNZ ( )
+
+.args
+None.
+
+.desc
+Returns the z component of the normal of the most recently executed Pick  command. This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedNZ Example
+; ----------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedTime ( )
+
+.args
+None.
+
+.desc
+Returns the time taken to calculate the most recently executed Pick command.  This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedTime Example
+; ------------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedEntity ( )
+
+.args
+None.
+
+.desc
+Returns the entity 'picked' by the most recently executed Pick command.  This might have been CameraPick, EntityPick or LinePick.
+
+Returns 0 if no entity was picked.
+
+.code
+; PickedEntity Example
+; --------------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedSurface ( )
+
+.args
+None.
+
+.desc
+Returns the handle of the surface that was 'picked' by the most recently  executed Pick command. This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedSurface Example
+; ---------------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:PickedTriangle ( )
+
+.args
+None.
+
+.desc
+Returns the index number of the triangle that was 'picked' by the most recently  executed Pick command. This might have been CameraPick, EntityPick or LinePick.
+
+.code
+; PickedTriangle Example
+; ----------------------
+
+Graphics3D 640,480,0,2
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+EntityPickMode plane,2 ; Make the plane entity 'pickable'. Use pick_geometry  mode no.2 for polygon collision.
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+EntityPickMode cube,2 ; Make the cube entity 'pickable'. Use pick_geometry mode  no.2 for polygon collision.
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; If left mouse button hit then use CameraPick with mouse coordinates
+; In this example, only three things can be picked: the plane, the cube, or  nothing
+If MouseHit(1)=True Then CameraPick(camera,MouseX(),MouseY())
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"Press left mouse button to use CameraPick with mouse coordinates"
+Text 0,40,"PickedX: "+PickedX#()
+Text 0,60,"PickedY: "+PickedY#()
+Text 0,80,"PickedZ: "+PickedZ#()
+Text 0,100,"PickedNX: "+PickedNX#()
+Text 0,120,"PickedNY: "+PickedNY#()
+Text 0,140,"PickedNZ: "+PickedNZ#()
+Text 0,160,"PickedTime: "+PickedTime#()
+Text 0,180,"PickedEntity: "+PickedEntity()
+Text 0,200,"PickedSurface: "+PickedSurface()
+Text 0,220,"PickedTriangle: "+PickedTriangle()
+
+Flip
+
+Wend
+
+End
+
+:CameraProject camera,x#,y#,z#
+
+.args
+camera - camera handle
+x# - world coordinate x
+y# - world coordinate y
+z# - world coordinate z
+
+.desc
+Projects the world coordinates x,y,z on to the 2D screen.
+
+.code
+; CameraProject Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; Use camera project to get 2D coordinates from 3D coordinates of cube
+CameraProject(camera,EntityX(cube),EntityY(cube),EntityZ(cube))
+
+RenderWorld
+
+; If cube is in view then draw text, if not then draw nothing otherwise text  will be drawn at 0,0
+If EntityInView(cube,camera)=True
+
+; Use ProjectedX() and ProjectedY() to get 2D coordinates from when CameraProject  was used.
+; Use these coordinates to draw text at a 2D position, on top of a 3D scene.
+Text ProjectedX#(),ProjectedY#(),"Cube" 
+
+EndIf
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"ProjectedX: "+ProjectedX#()
+Text 0,40,"ProjectedY: "+ProjectedY#()
+Text 0,60,"ProjectedZ: "+ProjectedZ#()
+Text 0,80,"EntityInView: "+EntityInView(cube,camera)
+
+Flip
+
+Wend
+
+End
+
+:ProjectedX# ( )
+
+.args
+None.
+
+.desc
+Returns the viewport x coordinate of the most recently executed CameraProject.
+
+.code
+; ProjectedX Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; Use camera project to get 2D coordinates from 3D coordinates of cube
+CameraProject(camera,EntityX(cube),EntityY(cube),EntityZ(cube))
+
+RenderWorld
+
+; If cube is in view then draw text, if not then draw nothing otherwise text  will be drawn at 0,0
+If EntityInView(cube,camera)=True
+
+; Use ProjectedX() and ProjectedY() to get 2D coordinates from when CameraProject  was used.
+; Use these coordinates to draw text at a 2D position, on top of a 3D scene.
+Text ProjectedX#(),ProjectedY#(),"Cube" 
+
+EndIf
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"ProjectedX: "+ProjectedX#()
+Text 0,40,"ProjectedY: "+ProjectedY#()
+Text 0,60,"ProjectedZ: "+ProjectedZ#()
+Text 0,80,"EntityInView: "+EntityInView(cube,camera)
+
+Flip
+
+Wend
+
+End
+
+:ProjectedY# ( )
+
+.args
+None.
+
+.desc
+Returns the viewport y coordinate of the most recently executed CameraProject.
+
+.code
+; ProjectedY Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; Use camera project to get 2D coordinates from 3D coordinates of cube
+CameraProject(camera,EntityX(cube),EntityY(cube),EntityZ(cube))
+
+RenderWorld
+
+; If cube is in view then draw text, if not then draw nothing otherwise text  will be drawn at 0,0
+If EntityInView(cube,camera)=True
+
+; Use ProjectedX() and ProjectedY() to get 2D coordinates from when CameraProject  was used.
+; Use these coordinates to draw text at a 2D position, on top of a 3D scene.
+Text ProjectedX#(),ProjectedY#(),"Cube" 
+
+EndIf
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"ProjectedX: "+ProjectedX#()
+Text 0,40,"ProjectedY: "+ProjectedY#()
+Text 0,60,"ProjectedZ: "+ProjectedZ#()
+Text 0,80,"EntityInView: "+EntityInView(cube,camera)
+
+Flip
+
+Wend
+
+End
+
+:ProjectedZ# ( )
+
+.args
+None.
+
+.desc
+Returns the viewport z coordinate of the most recently executed CameraProject.
+
+.code
+; ProjectedZ Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; Use camera project to get 2D coordinates from 3D coordinates of cube
+CameraProject(camera,EntityX(cube),EntityY(cube),EntityZ(cube))
+
+RenderWorld
+
+; If cube is in view then draw text, if not then draw nothing otherwise text  will be drawn at 0,0
+If EntityInView(cube,camera)=True
+
+; Use ProjectedX() and ProjectedY() to get 2D coordinates from when CameraProject  was used.
+; Use these coordinates to draw text at a 2D position, on top of a 3D scene.
+Text ProjectedX#(),ProjectedY#(),"Cube" 
+
+EndIf
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"ProjectedX: "+ProjectedX#()
+Text 0,40,"ProjectedY: "+ProjectedY#()
+Text 0,60,"ProjectedZ: "+ProjectedZ#()
+Text 0,80,"EntityInView: "+EntityInView(cube,camera)
+
+Flip
+
+Wend
+
+End
+
+:EntityInView ( entity,camera )
+
+.args
+entity - entity handle
+camera - camera handle
+
+.desc
+Returns true if the specified entity is visible to the specified camera.
+
+If the entity is a mesh, its bounding box will be checked for visibility. 
+
+For all other types of entities, only their centre position will be checked. 
+
+.code
+; EntityInView Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,2,-10
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+plane=CreatePlane()
+ground_tex=LoadTexture("media/Chorme-2.bmp")
+EntityTexture plane,ground_tex
+
+cube=CreateCube()
+cube_tex=LoadTexture("media/b3dlogo.jpg")
+EntityTexture cube,cube_tex
+PositionEntity cube,0,1,0
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+; Use camera project to get 2D coordinates from 3D coordinates of cube
+CameraProject(camera,EntityX(cube),EntityY(cube),EntityZ(cube))
+
+RenderWorld
+
+; If cube is in view then draw text, if not then draw nothing otherwise text  will be drawn at 0,0
+If EntityInView(cube,camera)=True
+
+; Use ProjectedX() and ProjectedY() to get 2D coordinates from when CameraProject  was used.
+; Use these coordinates to draw text at a 2D position, on top of a 3D scene.
+Text ProjectedX#(),ProjectedY#(),"Cube" 
+
+EndIf
+
+Text 0,0,"Use cursor keys to move about"
+Text 0,20,"ProjectedX: "+ProjectedX#()
+Text 0,40,"ProjectedY: "+ProjectedY#()
+Text 0,60,"ProjectedZ: "+ProjectedZ#()
+Text 0,80,"EntityInView: "+EntityInView(cube,camera)
+
+Flip
+
+Wend
+
+End
+

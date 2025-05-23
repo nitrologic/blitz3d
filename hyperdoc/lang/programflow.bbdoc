@@ -1,0 +1,107 @@
+
+The following constructs are available for controlling program flow.
+
+\subsection{If statements}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb+If+ {\it expression} \verb+Then+ {\it statements1} \verb+Else+ {\it statements2}
+\end{tabbing}
+
+Evaluates {\it expression} and, if true, executes {\it statements1} otherwise executes {\it statements2}.
+ The \verb+Else+ part is optional, in which case nothing is executed if {\it expression} is false.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|If| expression1
+\>	statements1
+\verb|Else If| {expression2}
+\>	statements2
+\verb|Else If| {expressionN}
+\>	statementsN
+\verb|Else|
+\>	elsestatements
+\verb|EndIf|
+\end{tabbing}
+
+This form allows for more than one line of statements. The \verb|Else If| and \verb|Else| parts are optional. The \verb|Else| part is executed only if none of the \verb|If| or \verb|Else If| expressions were true.
+
+\subsection{While loops}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|While| {\it expression} 
+\>	{\it statements}
+\verb|Wend|
+\end{tabbing}
+
+A While loop continues executing until {expression} evaluates to false. {expression} is evaluated at the start of each loop, so the statements within a while loop may not execute at all.
+
+\subsection{For loops}
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|For| {\it variable}\verb|=|{\it initalvalue} \verb|To| {\it finalvalue} \verb|Step| {\it stepvalue}
+\>	{\it statements}
+\verb|Next|
+\end{tabbing}
+
+A For loop first assigns {\it initialvalue} to {\it variable} and then starts looping. The loop continues until {\it variable} reaches {\it finalvalue} and then terminates. Each loop, {\it stepvalue} is added to {\it variable}. If a {\it stepvalue} is omitted, a default value of 1 is used.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|For| {\it variable}\verb|=Each| {\it typename} 
+     {\it statements} 
+\verb|Next|
+\end{tabbing}
+
+This form of the For loop allows you to iterate over all objects of a custom type. 
+
+\subsection{Repeat loops}
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Repeat| 
+\>	{\it statements} 
+\verb|Until| {\it expression}
+\end{tabbing}
+
+A Repeat loop continues executing until {\it expression} evaluates to true. {\it expression} is evaluated at the end of each loop so, unlike a while loop, a repeat loop will run at least once.
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Repeat|
+\>	{\it statements}
+\verb+Forever+
+\end{tabbing}
+
+This form of a Repeat loop will simply continue executing {\it statements} forever!
+
+\subsection{Select blocks}
+
+\begin{tabbing}
+\hspace{8pt}\=
+\verb|Select|{\it selectexpression}
+\verb|Case|{\it caseexpressions1}
+\>	{\it casestatements1}
+\verb|Case|{\it caseexpressions2}
+\>	{\it casestatements2}
+\verb|Case|{\it caseexpressionsN}
+\>	{\it casestatementsN}
+\verb|Default|
+\>	{\it defaultstatements}
+\verb|End Select|
+\end{tabbing}
+
+First, {\it selectexpression} is evaluated. It is then compared, in program order, with each of the {\it caseexpressions}. If a match is found, then the appropriate {\it casestatements} are executed.
+
+If {\it selectexpression} matches none of the 'Case' expressions, then the optional {\it defaultstatements} are executed.
+
+\subsection{Exiting loops}
+
+The \verb+Exit+ command may be used to break out of any for, while or repeat loop. In fact, this is the only way to terminate a repeat loop.
+
+\subsection{Includes}
+
+Blitz allows you to include external source files into your program with the \verb+Include+ command. These files must be valid Blitz source code. For example...
+.code
+Include "anotherfile.bb" 
+.endcode
+Include allows you to break your program up into smaller, more manageable chunks. 

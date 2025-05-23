@@ -1,0 +1,104 @@
+div.divpage{
+	width: 800px;
+	background: #e0ffe0;
+}
+
+div.leftheader{
+	page-break-before:always;
+	text-align:left;
+	background: #e0e0e0;
+	padding-bottom:40px;
+}
+div.rightheader{
+	page-break-before:always;
+	text-align:right;
+	background: #e0e0e0;
+	padding-bottom:40px;
+}
+span.rightsection{
+	padding-right:80px;
+	padding-left:80px;
+}
+span.rightpagenumber{
+	font-weight: bold;
+}
+span.leftsection{
+	padding-right:80px;
+	padding-left:80px;
+}
+span.leftpagenumber{
+	width: 100px;
+	font-weight: bold;
+}
+
+
+
+body{
+	color: #000000;
+	background: #ffffff;
+	font: 11pt Helvetica;
+}
+a{
+	color: #000088;
+	text-decoration: none;
+}
+
+td.argname{
+	color: #000088;
+}
+
+div.warning{
+	background: #eebbcc;
+}	
+div.hint{
+	background: #eeffcc;
+}	
+td.doctop{
+	font: 12pt Helvetica;
+	padding: 10px;
+	background: #ccddee;
+	border-bottom: 1px solid #bbccdd;
+	vertical-align: text-top; 
+	font-weight: bold;
+}
+td.docleft{
+	font: 10pt Helvetica;
+	padding:10px;
+	background: #ccddee;
+	border-bottom: 1px solid #bbccdd;
+	vertical-align: top; 
+}
+td.docright{
+	font: 11pt Helvetica;
+	padding:10px;
+	background: #ddeeff;
+	border-bottom: 1px solid #ccddee;
+	vertical-align: text-top; 
+	width: 90%;
+}
+
+table.data{
+	border-collapse: collapse;
+}
+
+th.data{
+	border: 2px solid;
+	text-align: left;
+}
+td.data{
+	border: 2px solid;
+}
+
+
+pre{
+	font: 10pt courier;
+	background: #eef8ff;
+	padding: 8px;
+}
+font.token{
+	font-weight: bold;
+}
+font.syntax{
+	color: #005555;
+}
+

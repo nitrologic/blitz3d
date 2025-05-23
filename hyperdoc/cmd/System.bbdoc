@@ -1,0 +1,284 @@
+:ShowPointer
+
+.args
+None.
+
+.desc
+ShowPointer is for use in windowed display modes, and simply shows the Windows  pointer after it's been hidden (via HidePointer).  It has no effect in full-screen modes.
+
+.also
+HidePointer
+
+.code
+; HidePointer / ShoPointer Example
+
+; draw a simple screen, cut in half by a white line
+Graphics 800,600,0,2
+Color 255,255,255
+Line 400,0,400,600
+Text 200,300,"ShowPointer",True,True
+Text 600,300,"HidePointer",True,True
+
+; and a simple loop in which we hide / show the pointer dependent on 
+; which side of the screen the mouse is on!
+Repeat
+	If MouseX()<400 Then 
+		ShowPointer
+	Else
+		HidePointer
+	End If
+	If KeyHit(1) Then Exit ; ESCAPE to exit
+Forever
+
+End ; bye!
+
+:HidePointer
+
+.args
+None.
+
+.desc
+HidePointer is for use in windowed display modes, and simply hides the Windows  pointer when it is moved over your game's window. You can bring it back via ShowPointer. It has no effect in full-screen modes.
+
+.also
+ShowPointer
+
+.code
+; HidePointer / ShoPointer Example
+
+; draw a simple screen, cut in half by a white line
+Graphics 800,600,0,2
+Color 255,255,255
+Line 400,0,400,600
+Text 200,300,"ShowPointer",True,True
+Text 600,300,"HidePointer",True,True
+
+; and a simple loop in which we hide / show the pointer dependent on 
+; which side of the screen the mouse is on!
+Repeat
+	If MouseX()<400 Then 
+		ShowPointer
+	Else
+		HidePointer
+	End If
+	If KeyHit(1) Then Exit ; ESCAPE to exit
+Forever
+
+End ; bye!
+
+:AppTitle title$[,close_prompt$]
+
+.args
+title$ - the text that will be displayed in the title bar of the program  window
+close_prompt$ (optional) - the text that will be displayed in a message box  with 'OK/Cancel' options when a user clicks on the close button. If nothing  is specified, the message box will not be displayed and the program will close  immediately.
+
+.desc
+Allows you to set the text of the program's title bar, and 'close program?'  message box.
+
+.code
+; Set the title bar
+
+AppTitle "Super Invaders V1.0", "Are you sure?"
+
+:CommandLine$()
+
+.args
+None.
+
+.desc
+If you are writing an application or game that allows starting with special  parameters on the command line, you can use this command to retrieve the parameters.
+
+For example, you might want to start the program with a debug variable set so  you can track stuff during execution. So, you could offer the ability to run  the executatble with a /debug parameter. If they execute the program with the  parameter, then you can set a flag inside your game.
+
+To simulate the command line passing in the editor, select PROGRAM->PROGRAM  COMMAND LINE from the pulldowns and enter a value to be passed at runtime. 
+
+See the example.
+
+.code
+; CommandLine$() Example
+; Be sure to use PROGRAM->PROGRAM COMMAND LINE from the
+; pull down and put /debug in there to test with.
+
+a$=CommandLine$()
+
+If a$="/debug" Then 
+Print "Debug mode is on!"
+debug=1
+Else
+Print "No debugging activated."
+debug=0
+End If
+
+:SystemProperty (property$)
+
+.args
+property$ - system property information required (valid strings listed below)
+
+.desc
+SystemProperty is used to 'find out' certain system-specific things that are external to the currently running program.
+
+There are broadly two different uses for SystemProperty, one for finding out the location of certain folders on the Windows OS, and one for finding out the handles/objects being used by the Win32/DX APIs to run Blitz programs. These objects and handles can then be used via third party DLLs to add extra functionality to Blitz, although this is recommended for advanced users only.
+
+Properties - folders: 
+
+systemdir - System folder
+windowsdir - Windows folder
+tempdir - Temp folder
+appdir - Program Files folder
+
+Properties - objects/handles:
+
+Direct3D7
+Direct3DDevice7
+DirectDraw7
+DirectInput7
+AppHWND
+AppHINSTANCE
+
+.code
+Print "System folder location: " + SystemProperty ("systemdir")
+Print "Windows folder location: " + SystemProperty ("windowsdir")
+Print "Temp folder: " + SystemProperty ("tempdir")
+Print "Program was run from " + SystemProperty ("appdir")
+
+:SetEnv env_var$,value$
+
+.args
+env_var$ - the name of the environment variable
+value$ - the value of the environment variable
+
+.desc
+Sets an environment variable.
+
+However, it should be noted that the command does not set a Windows environment variable. It only sets an environment variable which is local to a single Blitz program - i.e. from the moment the SetEnv command is used, it will only exist for the duration of time the source code file is open in the Blitz IDE, or the program EXE is running.
+
+.also
+GetEnv
+
+.code
+; SetEnv Example
+; --------------
+
+SetEnv "mypath","c:\program files\my game\"
+
+Print GetEnv$("mypath")
+
+WaitKey()
+
+:GetEnv$ ( env_var$ )
+
+.args
+env_var$ - the name of the environment variable to 'get'
+
+.desc
+Returns the value of the specified environment variable.
+
+Unlike the SetEnv command, which is only capable of setting environment variables local to Blitz, the GetEnv command is capable of getting Windows environment variables.
+
+Windows environment variables tell your computer what kind of machine it is, and where to install programs.
+
+If you're curious to find out what environment variables are set on your Windows install, then you can find out in WindowsXP by running 'cmd', and then typing 'set'.
+
+.also
+SetEnv
+
+.code
+; GetEnv Example
+; --------------
+
+Print "PROCESSOR_ARCHITECTURE: "+GetEnv$("PROCESSOR_ARCHITECTURE")
+Print "ProgramFiles: "+GetEnv$("ProgramFiles")
+Print "SystemDrive: "+GetEnv$("SystemDrive")
+Print "TEMP: "+GetEnv$("TEMP")
+
+WaitKey()
+
+:CallDLL( dll_name$, proc_name$[,in_bank,out_bank] )
+
+.args
+dll_name$ - name of dll
+proc_name$ - name of procedure
+in_bank (optional) - handle of bank that is made available from Blitz to DLL  procedure
+out_bank (optional) - handle of bank that is made available from DLL procedure  to Blitz
+
+.desc
+The DLL is called with pointers to and sizes of bank memory. Dll function prototypes  should like something like this (Visual C++) example:
+
+extern "C"{
+_declspec(dllexport) int _cdecl my_dll_func( const void *in,int in_size,void  *out,int out_sz );
+}
+
+The 'extern "C"' bit prevents C++ 'name-mangling', and the _cdecl bit prevents  name decoration. You could call this function using something like:
+
+in_bank=CreateBank(...)
+out_bank=CreateBank(...)
+
+;poke input parameters into in_bank
+result=CallDLL( "mydll","my_dll_func",bank1,bank2 )
+;peek output results from out_bank
+
+.code
+None.
+
+:ExecFile( file$ )
+
+.args
+file$ - the file to be executed
+
+.desc
+The usefulness of this command is really mostly for calling some system level command, launching a browser, etc. 
+
+Note: This command uses ShellExecute to allow you to 'open' any file (like a  .doc or .txt) file with its default associated program.
+
+Also: if the filename path has spaces in it you may will need to chenge the call like so:
+
+ExecFile (Chr$(34)+"example file name.exe"+Chr$(34))
+
+This adds the " (quotation mark) character to the beginning and end of the text string.
+
+.code
+; ExecFile sample - RUN THIS WINDOWED!
+Graphics 320,240,0,2
+
+filename$ = Chr$(34) + "calc.exe" + Chr$(34)
+
+Text 5,5, "press any key to run CALC.EXE!"
+Flip
+WaitKey
+
+ExecFile(filename$)
+
+Text 5,25, "Press any key to quit."
+Flip
+WaitKey
+End
+
+:RuntimeError message$
+
+.args
+message$ = Any valid string
+
+.desc
+When doing your own error trapping, use this command to pop up a fatal error  and close the program. You can specify the error message that is displayed.
+
+.code
+;There was a problem - raise an error and quit
+
+RuntimeError "Installation corrupted. Please reinstall."
+
+:End
+
+.args
+None
+
+.desc
+Use this command to stop your program running. You will be returned to the editor if running from there, or the program will completely exit if running  a compiled EXE version.
+
+.also
+Stop
+
+.code
+; If the game is over, then quit
+
+if gameOver=1 then End
+

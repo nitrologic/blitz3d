@@ -1,0 +1,57 @@
+:CreatePlane ( [sub_divs][,parent] )
+
+.args
+sub_divs (optional) - sub divisions of plane. Should be in the range 1-16.  The default value is 1.
+parent (optional) - parent entity of plane
+
+.desc
+Creates a plane entity and returns its handle.
+
+A plane entity is basically  a flat, infinite 'ground'. It is useful for outdoor games where you never want  the player to see/reach the edge of the game world. 
+
+The optional sub_divs parameter determines how many sub divisions of polygons  the plane will have. Although a plane is flat and so adding extra polygons will  not make it smoother, adding more polygons will allow more vertices to be lit  for more detailed lighting effects. 
+
+The optional parent parameter allows you to specify a parent  entity for the plane so that when the parent is moved the child plane will move  with it. However, this relationship is one way; applying movement commands to  the child will not affect the parent. 
+
+Specifying a parent entity will still result in the plane being created at  position 0,0,0 rather than at the parent entity's position. 
+
+.also
+CreateMirror. 
+
+.code
+; CreatePlane Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,1,0
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create plane
+plane=CreatePlane()
+
+grass_tex=LoadTexture( "media/mossyground.bmp" )
+
+EntityTexture plane,grass_tex
+
+While Not KeyDown( 1 )
+
+If KeyDown( 205 )=True Then TurnEntity camera,0,-1,0
+If KeyDown( 203 )=True Then TurnEntity camera,0,1,0
+If KeyDown( 208 )=True Then MoveEntity camera,0,0,-0.05
+If KeyDown( 200 )=True Then MoveEntity camera,0,0,0.05
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move about the infinite plane"
+
+Flip
+
+Wend
+
+End
+

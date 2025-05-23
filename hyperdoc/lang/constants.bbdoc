@@ -1,0 +1,22 @@
+Constants are fixed values that do not change while your program runs. Constants may be of any basic data type - integer, floating point or string.
+\begin{description}
+\item[Integer constants] are simply base 10 numbers without a decimal point. For example, \verb|10|,\verb|0| and \verb|-20| are all integer constants.
+\item[Floating point constants] are base 10 numbers with a decimal point in them. For example, \verb|10.0|,\verb|0.0| and \verb|-20.0| are all floating point constants.
+\item[String constants] are sequence of characters enclosed in quotation marks. For example, \verb|"Hello"|, \verb|""| and \verb|"100"| are all string constants.
+\end{description}
+
+You can use the \verb|Const| keyword to assign an identifier to a constant . For example:
+
+.code
+Const one_hundred=100
+.endcode
+
+You can then use the identifier \verb|one_hundred| anywhere in your program instead of \verb|100|. A more useful example might be:
+
+.code
+Const width=640,height=480
+.endcode
+
+You can then use the more readable \verb|width| and \verb|height| throughout your program instead of \verb|640| and \verb|480|. Also, if you ever decide to change the width and height values, you only have to do so at one place in the program.
+
+There are two built-in integer constants - \verb|True| and \verb|False|. \verb|True| is equal to the integer value \verb|1|, and \verb|False| is equal to the integer value \verb|0|. There is also a built in floating point constant for \verb|Pi|.

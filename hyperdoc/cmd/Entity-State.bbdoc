@@ -1,0 +1,1114 @@
+:EntityX# ( entity[,global] )
+
+.args
+entity = handle of Loaded or Created Entity
+global = True for Global coordinates,  False for Local. Optional, defaults to False.
+
+.desc
+The X-coordinate of the entity.
+If the global flag is set to False then the parent's local coordinate system is used.
+
+NOTE: If the entity has no parent then local and global coordinates are the same.
+In this case you can think of the 3d world as the parent.
+
+Global coordinates refer to the 3d world. Blitz 3D uses a left-handed system:
+
+X+ is to the right
+Y+ is up
+Z+ is forward ( into the screen )
+
+Every entity also has its own Local coordinate system.
+
+The global system never changes. 
+But the local system is carried along as an entity moves and turns.
+
+This same concept is used in the entity movement commands:
+
+MoveEntity entity, 0,0,1
+
+No matter what the orientation this moves one unit forward.
+
+.code
+; EntityX / EntityY / EntityZ example.
+
+; Escape quits, other keys move or pause the display.
+
+Const width = 640, height = 480
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics3D 640, 480
+AmbientLight 50, 50, 50
+
+Global isMoving = False     ; used to pause/resume movement 
+Global count                ; how many updates have been done
+
+
+; Set up a camera, light and three entities...
+
+cam = CreateCamera()
+PositionEntity cam, 0, 2, -50
+CameraZoom cam, 4
+
+lt = CreateLight() : TurnEntity lt, 30, 40, 0
+
+
+Global oSphere, pCone, cSphere
+
+oSphere = CreateSphere()
+EntityColor oSphere, 250, 50, 0        ; Orange = Origin, parent of cone
+
+pCone = CreateCone( 8, True, oSphere)  ;  will be a parent of small sphere
+ScaleEntity pCone, .8, 2.0, .8
+PositionEntity pCone, 8, 0, 0
+EntityColor pCone, 255, 255, 0
+
+cSphere = CreateSphere( 8, pCone )         ; child of the cone
+EntityColor cSphere, 150, 150, 0
+ScaleEntity cSphere, .4/.8, .4/2.0, .4/.8  ; try commenting out this line
+PositionEntity cSphere, 0, 2, 0            ; above parent
+
+; ... and we are ready run.
+
+While Not KeyDown( KEY_ESC )
+
+UpdateEverything	
+RenderWorld
+ShowInfo
+
+Flip
+
+Wend
+
+End
+
+
+
+Function UpdateEverything( )
+
+; Nothing moves relative to its parent, so local coordinates are constant.
+; Try uncommenting the PositionEntity command to change this.
+
+
+If GetKey() Then isMoving = Not isMoving
+
+If isMoving
+TurnEntity oSphere, 0, .5, 0
+TurnEntity pCone,  .2,  0, 0		
+
+count = count + 1
+a# = count Mod 360
+;	PositionEntity cSphere, 0, 2 + Sin( a ), 0 ; experiment with this 
+
+End If 
+
+End Function
+
+Function ShowInfo( )   ; global and local coordinates for all entities
+Local x$, y$, z$
+
+Color 255, 255, 255
+Text 185, 20, "Global"
+Text 495, 20, "Local"
+
+Color 250, 50, 0 
+Text  20, 50, "oSphere: " + XYZ( oSphere, True )
+Text 400, 50, XYZ( oSphere, False )
+
+Color 255, 255, 0 
+Text  20, 75, "  pCone: " + XYZ( pCone, True )
+Text 400, 75, XYZ( pCone, False )
+
+Color 150, 150, 0 
+Text  20, 100, "cSphere: " + XYZ( cSphere, True )
+Text 400, 100, XYZ( cSphere, False )
+
+End Function
+
+; ******************************************************************
+
+; These two functions just format the text display.
+; Without them there are too many numbers crowding the screen.
+
+Function Round#( x#, m# )		; returns x rounded to multiple of m
+If m < 0.0 Then m = -m
+s# = Sgn( x )
+If x < 0.0 Then x = -x
+diff# = x Mod m
+If diff < .5 * m 
+Return ( x - diff ) * s
+Else
+Return ( m + x - diff ) * s
+End If
+End Function
+
+
+Function XYZ$( entity, globalFlag )
+
+ex# = Round( EntityX( entity, globalFlag ), .001 )
+ey# = Round( EntityY( entity, globalFlag ), .001 )
+ez# = Round( EntityZ( entity, globalFlag ), .001 )
+
+Return RSet( ex, 8 ) + RSet( ey, 8 ) + RSet( ez, 8 )
+
+End Function
+
+:EntityY# ( entity[,global] )
+
+.args
+entity = handle of Loaded or Created Entity
+global = True for Global coordinates,  False for Local. Optional, defaults to False.
+
+.desc
+The Y-coordinate of the entity.
+If the global flag is set to False then the parent's local coordinate system is used.
+
+See EntityX() for an overview of Local and Global coordinates.
+
+.code
+; EntityX / EntityY / EntityZ example.
+
+; Escape quits, other keys move or pause the display.
+
+Const width = 640, height = 480
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics3D 640, 480
+AmbientLight 50, 50, 50
+
+Global isMoving = False     ; used to pause/resume movement 
+Global count                ; how many updates have been done
+
+
+; Set up a camera, light and three entities...
+
+cam = CreateCamera()
+PositionEntity cam, 0, 2, -50
+CameraZoom cam, 4
+
+lt = CreateLight() : TurnEntity lt, 30, 40, 0
+
+
+Global oSphere, pCone, cSphere
+
+oSphere = CreateSphere()
+EntityColor oSphere, 250, 50, 0        ; Orange = Origin, parent of cone
+
+pCone = CreateCone( 8, True, oSphere)  ;  will be a parent of small sphere
+ScaleEntity pCone, .8, 2.0, .8
+PositionEntity pCone, 8, 0, 0
+EntityColor pCone, 255, 255, 0
+
+cSphere = CreateSphere( 8, pCone )         ; child of the cone
+EntityColor cSphere, 150, 150, 0
+ScaleEntity cSphere, .4/.8, .4/2.0, .4/.8  ; try commenting out this line
+PositionEntity cSphere, 0, 2, 0            ; above parent
+
+; ... and we are ready run.
+
+While Not KeyDown( KEY_ESC )
+
+UpdateEverything	
+RenderWorld
+ShowInfo
+
+Flip
+
+Wend
+
+End
+
+
+
+Function UpdateEverything( )
+
+; Nothing moves relative to its parent, so local coordinates are constant.
+; Try uncommenting the PositionEntity command to change this.
+
+
+If GetKey() Then isMoving = Not isMoving
+
+If isMoving
+TurnEntity oSphere, 0, .5, 0
+TurnEntity pCone,  .2,  0, 0		
+
+count = count + 1
+a# = count Mod 360
+;	PositionEntity cSphere, 0, 2 + Sin( a ), 0 ; experiment with this 
+
+End If 
+
+End Function
+
+Function ShowInfo( )   ; global and local coordinates for all entities
+Local x$, y$, z$
+
+Color 255, 255, 255
+Text 185, 20, "Global"
+Text 495, 20, "Local"
+
+Color 250, 50, 0 
+Text  20, 50, "oSphere: " + XYZ( oSphere, True )
+Text 400, 50, XYZ( oSphere, False )
+
+Color 255, 255, 0 
+Text  20, 75, "  pCone: " + XYZ( pCone, True )
+Text 400, 75, XYZ( pCone, False )
+
+Color 150, 150, 0 
+Text  20, 100, "cSphere: " + XYZ( cSphere, True )
+Text 400, 100, XYZ( cSphere, False )
+
+End Function
+
+; ******************************************************************
+
+; These two functions just format the text display.
+; Without them there are too many numbers crowding the screen.
+
+Function Round#( x#, m# )		; returns x rounded to multiple of m
+If m < 0.0 Then m = -m
+s# = Sgn( x )
+If x < 0.0 Then x = -x
+diff# = x Mod m
+If diff < .5 * m 
+Return ( x - diff ) * s
+Else
+Return ( m + x - diff ) * s
+End If
+End Function
+
+
+Function XYZ$( entity, globalFlag )
+
+ex# = Round( EntityX( entity, globalFlag ), .001 )
+ey# = Round( EntityY( entity, globalFlag ), .001 )
+ez# = Round( EntityZ( entity, globalFlag ), .001 )
+
+Return RSet( ex, 8 ) + RSet( ey, 8 ) + RSet( ez, 8 )
+
+End Function
+
+:EntityZ# ( entity[,global] )
+
+.args
+entity = handle of Loaded or Created Entity
+global = True for Global coordinates,  False for Local. Optional, defaults to False.
+
+.desc
+The Z-coordinate of the entity.
+If the global flag is set to False then the parent's local coordinate system is used.
+
+See EntityX() for an overview of Local and Global coordinates.
+
+.code
+; EntityX / EntityY / EntityZ example.
+
+; Escape quits, other keys move or pause the display.
+
+Const width = 640, height = 480
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics3D 640, 480
+AmbientLight 50, 50, 50
+
+Global isMoving = False     ; used to pause/resume movement 
+Global count                ; how many updates have been done
+
+
+; Set up a camera, light and three entities...
+
+cam = CreateCamera()
+PositionEntity cam, 0, 2, -50
+CameraZoom cam, 4
+
+lt = CreateLight() : TurnEntity lt, 30, 40, 0
+
+
+Global oSphere, pCone, cSphere
+
+oSphere = CreateSphere()
+EntityColor oSphere, 250, 50, 0        ; Orange = Origin, parent of cone
+
+pCone = CreateCone( 8, True, oSphere)  ;  will be a parent of small sphere
+ScaleEntity pCone, .8, 2.0, .8
+PositionEntity pCone, 8, 0, 0
+EntityColor pCone, 255, 255, 0
+
+cSphere = CreateSphere( 8, pCone )         ; child of the cone
+EntityColor cSphere, 150, 150, 0
+ScaleEntity cSphere, .4/.8, .4/2.0, .4/.8  ; try commenting out this line
+PositionEntity cSphere, 0, 2, 0            ; above parent
+
+; ... and we are ready run.
+
+While Not KeyDown( KEY_ESC )
+
+UpdateEverything	
+RenderWorld
+ShowInfo
+
+Flip
+
+Wend
+
+End
+
+
+
+Function UpdateEverything( )
+
+; Nothing moves relative to its parent, so local coordinates are constant.
+; Try uncommenting the PositionEntity command to change this.
+
+
+If GetKey() Then isMoving = Not isMoving
+
+If isMoving
+TurnEntity oSphere, 0, .5, 0
+TurnEntity pCone,  .2,  0, 0		
+
+count = count + 1
+a# = count Mod 360
+;	PositionEntity cSphere, 0, 2 + Sin( a ), 0 ; experiment with this 
+
+End If 
+
+End Function
+
+Function ShowInfo( )   ; global and local coordinates for all entities
+Local x$, y$, z$
+
+Color 255, 255, 255
+Text 185, 20, "Global"
+Text 495, 20, "Local"
+
+Color 250, 50, 0 
+Text  20, 50, "oSphere: " + XYZ( oSphere, True )
+Text 400, 50, XYZ( oSphere, False )
+
+Color 255, 255, 0 
+Text  20, 75, "  pCone: " + XYZ( pCone, True )
+Text 400, 75, XYZ( pCone, False )
+
+Color 150, 150, 0 
+Text  20, 100, "cSphere: " + XYZ( cSphere, True )
+Text 400, 100, XYZ( cSphere, False )
+
+End Function
+
+; ******************************************************************
+
+; These two functions just format the text display.
+; Without them there are too many numbers crowding the screen.
+
+Function Round#( x#, m# )		; returns x rounded to multiple of m
+If m < 0.0 Then m = -m
+s# = Sgn( x )
+If x < 0.0 Then x = -x
+diff# = x Mod m
+If diff < .5 * m 
+Return ( x - diff ) * s
+Else
+Return ( m + x - diff ) * s
+End If
+End Function
+
+
+Function XYZ$( entity, globalFlag )
+
+ex# = Round( EntityX( entity, globalFlag ), .001 )
+ey# = Round( EntityY( entity, globalFlag ), .001 )
+ez# = Round( EntityZ( entity, globalFlag ), .001 )
+
+Return RSet( ex, 8 ) + RSet( ey, 8 ) + RSet( ez, 8 )
+
+End Function
+
+:EntityRoll# ( entity[,global] )
+
+.args
+entity - name of entity that will have roll angle returned
+global (optional) - true if the roll angle returned should be relative to 0 rather than a parent entity's  roll angle. False by default.
+
+.desc
+Returns the roll angle of an entity.
+
+The roll angle is also the z angle of an entity.
+
+.code
+; EntityRoll Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cone,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Use cursor/Z/X keys to turn cone"
+
+; Return entity roll angle of cone
+Text 0,20,"Roll: "+EntityRoll#( cone )
+
+Flip
+
+Wend
+
+End
+
+:EntityYaw# ( entity[,global] )
+
+.args
+entity - name of entity that will have yaw angle returned
+global (optional) - true if the yaw angle returned should be relative to 0 rather than a parent entity's  yaw angle. False by default.
+
+.desc
+Returns the yaw angle of an entity.
+
+The yaw angle is also the y angle of an entity.
+
+.code
+; EntityYaw Example
+; -----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cone,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Use cursor/Z/X keys to turn cone"
+
+; Return entity yaw angle of cone
+Text 0,20,"Yaw: "+EntityYaw#( cone )
+
+Flip
+
+Wend
+
+End
+
+:EntityPitch# ( entity[,global] )
+
+.args
+entity - name of entity that will have pitch angle returned
+global (optional) - true if the pitch angle returned should be relative to 0 rather than a parent entity's pitch angle. False by default.
+
+.desc
+Returns the pitch angle of an entity.
+
+The pitch angle is also the x angle of an entity.
+
+.code
+; EntityPitch Example
+; -------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+
+pitch#=0
+yaw#=0
+roll#=0
+
+If KeyDown( 208 )=True Then pitch#=-1
+If KeyDown( 200 )=True Then pitch#=1
+If KeyDown( 203 )=True Then yaw#=-1
+If KeyDown( 205 )=True Then yaw#=1
+If KeyDown( 45 )=True Then roll#=-1
+If KeyDown( 44 )=True Then roll#=1
+
+TurnEntity cone,pitch#,yaw#,roll#
+
+RenderWorld
+
+Text 0,0,"Use cursor/Z/X keys to turn cone"
+
+; Return entity pitch angle of cone
+Text 0,20,"Pitch: "+EntityPitch#( cone )
+
+Flip
+
+Wend
+
+End
+
+:EntityClass$( entity )
+
+.args
+entity - a valid entity handle
+
+.desc
+Returns a string containing the class of the specified entity.
+
+Possible return values are:
+
+Pivot
+Light
+Camera
+Mirror
+Listener
+Sprite
+Terrain
+Plane
+Mesh
+MD2
+BSP
+
+Note that the command will fail if a valid entity handle is not supplied, and will not just return an empty string.
+
+.code
+; EntityClass Example
+; -------------------
+
+Graphics3D 640,480,16
+SetBuffer BackBuffer()
+
+SeedRnd MilliSecs()
+
+; Select a random number between 0 and 7 then create a certain class of entity depending on the number selected
+i=Rand(0,7)
+Select i
+	Case 0 ent=CreatePivot()
+	Case 1 ent=CreateLight()
+	Case 2 ent=CreateCamera()
+	Case 3 ent=CreateMirror()
+	Case 4 ent=CreateSprite()
+	Case 5 ent=CreateTerrain(32)
+	Case 6 ent=CreatePlane()
+	Case 7 ent=CreateMesh()
+	;Case 8 ent=CreateListener(parent)
+	;Case 9 ent=LoadMD2(md2_file$)
+	;Case 10 ent=LoadBSP(bsp_file$)
+End Select
+
+; Get the class of the entity
+class$=EntityClass$(ent)
+
+; Output the class to the screen
+Text 0,0,"A "+class$+" was created."
+
+Text 0,20,"Press a key."
+
+WaitKey()
+
+End
+
+:EntityName$ ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the name of an entity. An entity's name may be set in a modelling  program, or manually set using NameEntity.
+
+.also
+NameEntity
+
+.code
+None.
+
+:CountChildren ( entity )
+
+.args
+entity - entity handle
+
+.desc
+Returns the number of children of an entity.
+
+.code
+If CountChildren(entity) > 0
+For childcount = 1 to CountChildren(entity)
+child = GetChild(entity,childcount)
+Next
+Endif
+
+:GetChild (entity,index)
+
+.args
+entity - entity handle
+index - index of child entity. Should be in the range 1...CountChildren(  entity ) inclusive.
+
+.desc
+Returns a child of an entity.
+
+.code
+None.
+
+:FindChild ( entity,child_name$ )
+
+.args
+entity - entity handle
+child_name$ - child name to find within entity
+
+.desc
+Returns the first child of the specified entity with name matching child_name$.
+
+.code
+None.
+
+:EntityPick ( entity,range# )
+
+.args
+entity - entity handle
+range# - range of pick area around entity
+
+.desc
+Returns the nearest entity 'ahead' of the specified entity. An entity must  have a non-zero EntityPickMode to be pickable.
+
+NB. the scale of the 'range' parameter is affected by the scale of the entity.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+.code
+None.
+
+:LinePick ( x#,y#,z#,dx#,dy#,dz#[,radius#] )
+
+.args
+x# - x coordinate of start of line pick
+y# - y coordinate of start of line pick
+z# - z coordinate of start of line pick
+dx# - distance x of line pick
+dy# - distance y of line pick
+dz# - distance z of line pick
+radius (optional) - radius of line pick
+
+.desc
+Returns the first entity between x,y,z to x+dx,y+dy,z+dz.
+
+.also
+EntityPick;LinePick;CameraPick;EntityPickMode
+
+.code
+None.
+
+:EntityVisible ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns true if src_entity and dest_entity can 'see' each other.
+
+.code
+None.
+
+:EntityDistance# ( src_entity,dest_entity)
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the distance between src_entity and dest_entity.
+
+.code
+None.
+
+:DeltaYaw# ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the yaw angle, that src_entity should be rotated by in order to face dest_entity.
+
+
+This command can be used to be point one entity at another, rotating on the y axis only.
+
+.also
+DeltaPitch
+
+.code
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+; Make camera orthagraphic for flat, 2D view
+CameraProjMode camera,2
+
+; Position and rotate camera so we have overhead (top-down) view
+PositionEntity camera,0,5,0
+RotateEntity camera,90,0,0
+
+; Create red cone (the arrow)
+arrow=CreateCone()
+RotateMesh arrow,90,180,0
+ScaleMesh arrow,.1,.1,.2
+EntityColor arrow,255,0,0
+
+; Create blue sphere (the spot)
+spot=CreateSphere()
+ScaleMesh spot,.1,.1,.1
+EntityColor spot,0,0,255
+
+While Not KeyDown(1)
+
+	; If w,a,s,d pressed then move spot
+	If KeyDown(17)=True Then MoveEntity spot,0,0,0.01 ; w - up
+	If KeyDown(30)=True Then MoveEntity spot,-0.01,0,0 ; a - left
+	If KeyDown(31)=True Then MoveEntity spot,0,0,-0.01 ; s - down
+	If KeyDown(32)=True Then MoveEntity spot,0.01,0,0 ; d - right
+
+	; Rotate arrow using delta yaw value. Arrow will point at spot.
+	RotateEntity arrow,0,DeltaYaw#(spot,arrow),0
+
+	RenderWorld
+
+	Text 0,0,"Note: Camera view is overhead. The arrow will y-rotate using DeltaYaw value."
+	Text 0,20,"Use w,a,s,d to move spot."
+	Text 0,40,"Delta yaw: "+DeltaYaw#(spot,arrow)
+
+	Flip
+	Wend
+
+End
+
+:DeltaPitch# ( src_entity,dest_entity )
+
+.args
+src_entity - source entity handle
+dest_entity - destination entity handle
+
+.desc
+Returns the pitch angle, that src_entity should be rotated by in order to face dest_entity.
+
+This command can be used to be point one entity at another, rotating on the x axis only.
+
+.also
+DeltaYaw
+
+:TFormPoint x#, y#, z#, source_entity, dest_entity
+
+.args
+x#, y#, z# = coordinates of a point in 3d space
+
+source_entity = handle of source entity, or 0 for 3d world
+dest_entity = handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems. After using TFormPoint the new
+
+coordinates can be read with TFormedX(), TFormedY() and TFormedZ(). 
+
+
+
+See EntityX() for details about local coordinates. 
+
+
+Consider a sphere built with CreateSphere(). The 'north pole' is at (0,1,0).
+
+At first, local and global coordinates are the same. As the sphere is moved, 
+
+turned and scaled the global coordinates of the point change.
+
+
+But it is always at (0,1,0) in the sphere's local space.
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormVector;TFormNormal
+
+.code
+; TFormPoint example
+
+Graphics3D 640, 480
+
+s = CreateSphere()       ; center at (0,0,0)  north pole at (0,1,0)
+
+MoveEntity s, 1,2,3      ; center at (1,2,3)  north pole at (1,2+1,3)  
+ScaleEntity s, 10,10,10  ; center at (1,2,3)  north pole at (1,2+10,3)
+
+; Now verify that the north pole is at (1,12,3) in the 3d world
+
+TFormPoint 0,1,0, s,0    ; north pole transformed from sphere to world
+
+message$ = "North pole is at ( "
+message = message + TFormedX() + ",  " + TFormedY() + ",  " + TFormedZ() + " )"
+
+Text 180, 200, message
+
+Flip
+
+WaitKey()
+End
+
+:TFormVector x#, y#, z#, source_entity, dest_entity
+
+.args
+x#, y#, z# = components of a vector in 3d space
+
+source_entity = handle of source entity, or 0 for 3d world
+dest_entity = handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems. After using TFormVector the new
+
+components can be read with TFormedX(), TFormedY() and TFormedZ(). 
+
+
+
+See EntityX() for details about local coordinates.
+
+
+
+Similar to TFormPoint, but operates on a vector. A vector can be thought of
+
+as 'displacement relative to current location'.
+
+
+For example, vector (1,2,3) means one step to the right, two steps up 
+
+and three steps forward. 
+
+
+This is analogous to PositionEntity and MoveEntity:
+
+
+PositionEntity entity, x,y,z   ; put entity at point (x,y,z)
+
+
+MoveEntity entity, x,y,z       ; add vector (x,y,z) to current position
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormPoint;TFormNormal
+
+.code
+; TFormVector example
+
+Graphics3D 640, 480
+
+p = CreatePivot()
+
+PositionEntity p, 10, 20, 30   ; easy to visualize
+TurnEntity p, -5, -15, 25      ; hard to visualize
+
+; Question: what would happen if we took one step 'forward'?
+; The local vector corresponding to one step forward is (0,0,1)
+; in the pivot's local space. We need the global version.
+
+TFormVector 0,0,1, p,0    ;  transform from pivot to world
+
+message$ = "'One step forward' vector is  ( "
+message = message + TFormedX() + ",  " + TFormedY() + ",  " + TFormedZ() + " )"
+
+Text 70, 180, message
+
+; Now actually take the step. The new location should be
+; (10,20,30) plus the vector we just computed.
+
+MoveEntity p, 0,0,1
+
+message$ = "New location of pivot is  ( "
+message = message + EntityX(p) + ",  "
+message = message + EntityY(p) + ",  " + EntityZ(p) + " )"
+
+Text 100, 210, message
+
+Flip
+
+WaitKey()
+End
+
+:TFormNormal x#, y#, z#, source_entity, dest_entity
+
+.args
+x#, y#, z# = components of a vector in 3d space
+
+source_entity = handle of source entity, or 0 for 3d world
+dest_entity = handle of destination entity, or 0 for 3d world
+
+.desc
+Transforms between coordinate systems. After using TFormNormal the new
+
+components can be read with TFormedX(), TFormedY() and TFormedZ().
+
+
+This is exactly the same as TFormVector but with one added feature.
+
+After the transformation the new vector is 'normalized', meaning it
+
+is scaled to have length 1.
+
+
+For example, suppose the result of TFormVector is (1,2,2).
+
+This vector has length Sqr( 1*1 + 2*2 + 2*2 ) = Sqr( 9 ) = 3.
+
+
+This means TFormNormal would produce ( 1/3, 2/3, 2/3 ).
+
+.also
+TFormedX;TFormedY;TFormedZ;TFormPoint;TFormVector
+
+.code
+; TFormNormal example
+
+Graphics3D 640, 480
+
+; Just a quick demonstration of the 'normalization' feature.
+
+TFormNormal 1,2,2, 0,0    ;  transform from world to world
+
+; The transformation from world to world does nothing.
+; But afterward the vector (1,2,2) is divided by the length 3.
+
+message$ = "The normalized vector is  ( "
+message = message + TFormedX() + ",  " + TFormedY() + ",  " + TFormedZ() + " )"
+
+Text 70, 180, message
+
+Flip
+
+WaitKey()
+End
+
+:TFormedX()
+
+.args
+None.
+
+.desc
+Returns the X component of the last TFormPoint, TFormVector or TFormNormal  operation.
+
+
+See those commands for examples.
+
+.also
+TFormedY;TFormedZ;TFormPoint;TFormVector;TFormNormal
+
+.code
+None.
+
+:TFormedY()
+
+.args
+None.
+
+.desc
+Returns the Y component of the last TFormPoint, TFormVector or TFormNormal  operation.
+
+
+See those commands for examples.
+
+.also
+TFormedX;TFormedZ;TFormPoint;TFormVector;TFormNormal
+
+.code
+None.
+
+:TFormedZ()
+
+.args
+None.
+
+.desc
+Returns the Z component of the last TFormPoint,  TFormVector or TFormNormal operation. 
+
+
+See those commands for examples.
+
+.also
+TFormedX;TFormedY;TFormPoint;TFormVector;TFormNormal
+
+.code
+None.
+
+:GetMatElement# ( entity,row,column )
+
+.args
+entity - entity handle
+row - matrix row index
+column - matrix column index
+
+.desc
+Returns the value of an element from within an entity's transformation matrix.
+
+The transformation matrix is what is used by Blitz internally to position, scale and rotate entities.
+
+GetMatElement is intended for use by advanced users only.
+
+.code
+; GetMatElement Example
+; ---------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,0,-5
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+; Create sphere
+sphere=CreateSphere()
+
+; Position, scale, rotate entity - try messing with these values to change GetMatElement value
+PositionEntity sphere,0,0,0
+ScaleEntity sphere,1,2,3
+RotateEntity sphere,0,0,0
+
+While Not KeyDown(1)
+
+	RenderWorld
+	
+	Text 0,0,GetMatElement#(sphere,1,1)
+	
+	Flip
+
+Wend
+
+End
+

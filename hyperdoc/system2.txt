@@ -1,0 +1,34 @@
+:::System Commands
+
+
+::Keyboard Input
+
+
+:GetKey ()
+
+.desc
+Returns an ascii code corresponding to the key last typed by the
+user or 0 if all keyboard events have been reported.
+
+The @GetKey function is useful for situations when the user is
+expected to type some text.
+
+The @KeyDown function is more apropriate when the player is 
+expected to hold down certain key combinations in a more 
+action oriented game environment.
+
+.also
+KeyDown;WaitKey
+
+
+:WaitKey ()
+
+.desc
+Returns an ascii code corresponding to the key combination typed
+by the user.
+
+@WaitKey is similar in behavior to the @GetKey function but pauses 
+program execution until a keystroke is made by the user.
+
+.also
+GetKey

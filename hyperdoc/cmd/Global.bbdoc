@@ -1,0 +1,699 @@
+:Graphics3D
+
+.args
+width - width of screen resolution
+height - height of screen resolution
+depth (optional) - colour depth of screen. Defaults to highest colour depth  available.
+mode (optional) - mode of display. Defaults to 0.
+
+.desc
+Sets 3D Graphics mode. This command must be executed before any other 3D command, otherwise programs will return an error.
+Width and height set the resolution of the screen and common values are 640,480  and 800,600. The resolution must be compatible with the 3D card and monitor  being used.
+Depth sets the colour mode of the screen. If this value is omitted or set to 0, then the highest available colour depth available will be used. Other values  usually available are 16, 24 and 32. 16-bit colour mode displays the least amount  of colours, 65536. 24-bit and 32-bit colour modes display over 16 million colours and as a result offer a better quality picture, although may result in slower programs than 16-bit.
+
+The mode parameter should be one of the following:
+
+0: windowed in debug mode, fullscreen in non-debug mode
+
+1: fullscreen always
+
+2: windowed always
+
+3: windowed/scaled always
+
+.also
+Graphics;EndGraphics
+
+.code
+; Graphics3D Example
+; ------------------
+
+; Set 3D graphics mode
+Graphics3D 640,480,16,0
+
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+cone=CreateCone( 32 )
+PositionEntity cone,0,0,5
+
+While Not KeyDown( 1 )
+RenderWorld
+Flip
+Wend
+
+End
+
+:Dither enable
+
+.args
+enable - True to enable dithering, False to disable. Default is true.
+
+.desc
+Enables or disables hardware dithering.
+Hardware dithering is useful when running games in 16-bit colour mode. Due to  the fact that 16-bit mode offers less colours than the human eye can detect,  separate bands of colour are often noticeable on shaded objects. However, hardware  dithering will dither the entire screen to give the impression that more colours  are being used than is actually the case.
+Due to the fact that 24-bit and 32-bit offer more colours than the human eye  can detect, hardware dithering is made pretty much redundant in those modes.
+
+.code
+; Dither Example
+; --------------
+
+Graphics3D 640,480,16
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+; Rotate light so that it creates maximum shading effect on sphere
+RotateEntity light,90,0,0
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,0,0,2
+
+While Not KeyDown( 1 )
+
+; Toggle dither enable value between true and false when spacebar is pressed
+If KeyHit( 57 )=True Then enable=1-enable
+
+; Enable/disable hardware dithering
+Dither enable
+
+RenderWorld
+
+Text 0,0,"Press spacebar to toggle between Dither True/False"
+If enable=True Then Text 0,20,"Dither True" Else Text 0,20,"Dither False"
+
+Flip
+
+Wend
+
+End
+
+:WBuffer enable
+
+.args
+enable - True to enable w-buffering rendering, False to disable. Defaults to true for 16 bit color mode, false for 24 and 32 bit color modes.
+
+.desc
+Enables or disables w-buffering.
+W-buffering is a technique used to draw 3D object in order of their depth -  i.e. the ones furthest away from the camera first, then the ones closer to the  camera, and so on. 
+Normally, z-buffering is used to perform such a technique, but a z-buffer can  be slightly inaccurate in 16-bit colour mode, for which the level of precision  is less than in 24-bit or 32-bit colour modes. This means that in some situations,  objects will appear to overlap each other when they shouldn't and so on.
+To compensate for this, you can use w-buffering. This is a slightly more accurate  technique than z-buffering, although it may be less compatible on some set-ups  than z-buffering.
+
+.code
+None.
+
+:AntiAlias
+
+.args
+enable - True to enable fullscreen antialiasing, False to disable. Default is False.
+
+.desc
+Enables or disables fullscreen antialiasing.
+Fullscreen antialiasing is a technique used to smooth out the entire screen,  so that jagged lines are made less noticeable.
+Some 3D cards have built-in support for fullscreen antialiasing, which should  allow you to enable the effect without much slowdown. However, for cards without  built-in support for fullscreen antialiasing, enabling the effect may cause  severe slowdown.
+
+.code
+; AntiAlias Example
+; -----------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+sphere=CreateSphere()
+PositionEntity sphere,0,0,2
+
+While Not KeyDown( 1 )
+
+; Toggle antialias enable value between true and false when spacebar is pressed
+If KeyHit( 57 )=True Then enable=1-enable
+
+; Enable/disable antialiasing
+AntiAlias enable
+
+RenderWorld
+
+Text 0,0,"Press spacebar to toggle between AntiAlias True/False"
+If enable=True Then Text 0,20,"AntiAlias True" Else Text 0,20,"AntiAlias False"
+
+Flip
+
+Wend
+
+End
+
+:Wireframe enable
+
+.args
+enable - True to enable wireframe rendering, False to disable. Default is false.
+
+.desc
+Enables or disables wireframe rendering.
+This will show the outline of  each polygon on the screen, with no shaded-in areas.
+Wireframe mode should only be used for debugging purposes, as driver support is patchy. For the same reason, no support is offered for the wireframe rendering  of individual polygon entities. 
+
+.code
+; Wireframe Example
+; -----------------
+
+Graphics3D 640,480,16
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,0,0,2
+
+While Not KeyDown( 1 )
+
+; Toggle wireframe enable value between true and false when spacebar is pressed
+If KeyHit( 57 )=True Then enable=1-enable
+
+; Enable/disable wireframe rendering
+WireFrame enable
+
+RenderWorld
+
+Text 0,0,"Press spacebar to toggle between Wireframe True/False"
+If enable=True Then Text 0,20,"Wireframe True" Else Text 0,20,"Wireframe False"
+
+Flip
+
+Wend
+
+End
+
+:HWMultiTex enable
+
+.args
+enable - True to enable hardware multitexturing, False to disable. Default is true.
+
+.desc
+Enables or disables hardware multitexturing.
+Multitexturing is a technique used to display more than one texture on an object  at once. Sometimes, 3D hardware has built-in support for this, so that using  two textures or more per object will not be any slower than using just one.
+However, some cards have problems dealing with hardware multitexturing, and  for these situations you have the option of disabling it.
+When hardware texturing isn't being used, Blitz3D will use its own software  technique, which involves duplicating objects that just have one texture each.
+
+.code
+None.
+
+:AmbientLight red#,green#,blue#
+
+.args
+red# - red ambient light value
+green# - green ambient light value
+blue# - blue ambient light value
+
+.desc
+Sets the ambient lighting colour.
+The green, red and blue values should be in the range 0-255. The default ambient light colour is 127,127,127.
+
+Ambient light is a light source that affects all points on a 3D object equally.  So with ambient light only, all 3D objects will appear flat, as there will be  no shading.
+Ambient light is useful for providing a certain level of light, before adding  other lights to provide a realistic lighting effect.
+An ambient light level of 0,0,0 will result in no ambient light being displayed.
+
+.also
+CreateLight
+
+.code
+; AmbientLight Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,-2,0,5
+
+cone=CreateCone( 32 )
+PositionEntity cone,2,0,5
+
+; Set initial ambient light colour values
+red#=127
+green#=127
+blue#=127
+
+While Not KeyDown( 1 )
+
+; Change red, green, blue values depending on key pressed
+If KeyDown( 2 )=True And red#>0 Then red#=red#-1
+If KeyDown( 3 )=True And red#<255 Then red#=red#+1
+If KeyDown( 4 )=True And green#>0 Then green#=green#-1
+If KeyDown( 5 )=True And green#<255 Then green#=green#+1
+If KeyDown( 6 )=True And blue#>0 Then blue#=blue#-1
+If KeyDown( 7 )=True And blue#<255 Then blue#=blue#+1
+
+; Set ambient light color using red, green, blue values
+AmbientLight red#,green#,blue#
+
+RenderWorld
+
+Text 0,0,"Press keys 1-6 to change AmbientLight red#,green#,blue# values
+Text 0,20,"Ambient Red: "+red#
+Text 0,40,"Ambient Green: "+green#
+Text 0,60,"Ambient Blue: "+blue#
+
+Flip
+
+Wend
+
+End
+
+:ClearCollisions
+
+.args
+None.
+
+.desc
+Clears the collision information list.
+Whenever you use the Collisions command to enable collisions between  two different entity types, information is added to the collision list. This  command clears that list, so that no collisions will be detected until the Collisions  command is used again. 
+The command will not clear entity collision information. For example, entity  radius, type etc. 
+
+.code
+; ClearCollisions Example
+; -----------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+light=CreateLight()
+
+sphere=CreateSphere( 32 )
+PositionEntity sphere,-2,0,5
+
+cone=CreateCone( 32 )
+EntityType cone,type_cone
+PositionEntity cone,2,0,5
+
+; Set collision type values
+type_sphere=1
+type_cone=2
+
+; Set up sphere collision data
+EntityRadius sphere,1
+EntityType sphere,type_sphere
+
+; Set up cone collision data
+EntityType cone,type_cone
+
+; Enable collisions between type_sphere and type_cone, with sphere->polygon  method and slide response
+Collisions type_sphere,type_cone,2,2
+
+While Not KeyDown( 1 )
+
+x#=0
+y#=0
+z#=0
+
+If KeyDown( 203 )=True Then x#=-0.1
+If KeyDown( 205 )=True Then x#=0.1
+If KeyDown( 208 )=True Then y#=-0.1
+If KeyDown( 200 )=True Then y#=0.1
+If KeyDown( 44 )=True Then z#=-0.1
+If KeyDown( 30 )=True Then z#=0.1
+
+MoveEntity sphere,x#,y#,z#
+
+; If spacebar pressed then clear collisions 
+If KeyHit( 57 )=True Then ClearCollisions
+
+; Perform collision checking
+UpdateWorld
+
+RenderWorld
+
+Text 0,0,"Use cursor/A/Z keys to move sphere"
+Text 0,20,"Press spacebar to use ClearCollisions command"
+
+Flip
+
+Wend
+
+End
+
+:Collisions src_type,dest_type,method,response
+
+.args
+src_type - entity type to be checked for collisions.
+dest_type - entity type to be collided with.
+method - collision detection method.
+response - what the source entity does when a collision occurs.
+
+.desc
+Enables collisions between two different entity types.
+
+Entity types are just numbers you assign to an entity using EntityType. Blitz then uses the entity types to check for collisions between all the entities that have those entity types. 
+
+Blitz has many ways of checking for collisions, as denoted by the method parameter. However, collision checking is always ellipsoid to something. In order for Blitz to know what size a source entity is, you must first assign an entity radius to all source entities using EntityRadius. 
+
+In the case of collision detection method 1 being selected (ellipsoid-to-ellipsoid), then the destination entities concerned will need to have an EntityRadius assigned to them too. In the case of method 3 being selected (ellipsoid-to-box), then the destination entities  will need to have an EntityBox assigned to them. Method 2 (ellipsoid-to-polygon) requires nothing to be assigned to the destination entities. 
+
+Not only does Blitz check for collisions, but it acts upon them when it detects them too, as denoted by the response parameter. You have three options in this situation. You can either choose to make the source entity stop, slide or only slide upwards. 
+
+All collision checking occurs, and collision responses are acted out, when UpdateWorld is called.
+
+Finally, every time the Collision command is used, collision information is added to the collision information list. This can be cleared at any time using the ClearCollisions command.
+
+The method parameter can be one of the following:
+
+1: ellipsoid-to-ellipsoid collisions
+
+2: ellipsoid-to-polygon collisions
+
+3: ellipsoid-to-box collisions
+
+
+The response parameter can be one of the following:
+
+1: stop
+
+2: slide1 - full sliding collision
+
+3: slide2 - prevent entities from sliding down slopes
+
+
+.also
+EntityBox;EntityRadius;Collisions;EntityType;ResetEntity
+
+.code
+; Collisions Example
+; ------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+; Set collision type values
+type_ground=1
+type_character=2
+type_scenery=3
+
+camera=CreateCamera()
+RotateEntity camera,45,0,0
+PositionEntity camera,0,15,-10
+
+light=CreateLight()
+RotateEntity light,45,0,0
+
+; Create cube 'ground'
+cube=CreateCube()
+ScaleEntity cube,10,10,10
+EntityColor cube,0,127,0
+EntityType cube,type_ground
+PositionEntity cube,0,-5,0
+
+; Create sphere 'character'
+sphere=CreateSphere( 32 )
+EntityColor sphere,127,0,0
+EntityRadius sphere,1
+EntityType sphere,type_character
+PositionEntity sphere,0,7,0
+
+; Enable collisions between type_character and type_ground
+Collisions type_character,type_ground,2,2
+
+; Create cylinder 'scenery'
+cylinder=CreateCylinder( 32 )
+ScaleEntity cylinder,2,2,2
+EntityColor cylinder,0,0,255
+EntityRadius cylinder,2
+EntityBox cylinder,-2,-2,-2,4,4,4
+EntityType cylinder,type_scenery
+PositionEntity cylinder,-4,7,-4
+
+; Create cone 'scenery'
+cone=CreateCone( 32 )
+ScaleEntity cone,2,2,2
+EntityColor cone,0,0,255
+EntityRadius cone,2
+EntityBox cone,-2,-2,-2,4,4,4
+EntityType cone,type_scenery
+PositionEntity cone,4,7,-4
+
+; Create prism 'scenery'
+prism=CreateCylinder( 3 )
+ScaleEntity prism,2,2,2
+EntityColor prism,0,0,255
+EntityRadius prism,2
+EntityBox prism,-2,-2,-2,4,4,4
+EntityType prism,type_scenery
+PositionEntity prism,-4,7,4
+RotateEntity prism,0,180,0
+
+; Create pyramid 'scenery'
+pyramid=CreateCone( 4 )
+ScaleEntity pyramid,2,2,2
+EntityColor pyramid,0,0,255
+EntityRadius pyramid,2
+EntityBox pyramid,-2,-2,-2,4,4,4
+EntityType pyramid,type_scenery
+RotateEntity pyramid,0,45,0
+PositionEntity pyramid,4,7,4
+
+; Set collision method and response values
+method=2
+response=2
+
+method_info$="ellipsoid-to-polygon"
+response_info$="slide1"
+
+While Not KeyDown( 1 )
+
+x#=0
+y#=0
+z#=0
+
+If KeyDown( 203 )=True Then x#=-0.1
+If KeyDown( 205 )=True Then x#=0.1
+If KeyDown( 208 )=True Then z#=-0.1
+If KeyDown( 200 )=True Then z#=0.1
+
+MoveEntity sphere,x#,y#,z#
+MoveEntity sphere,0,-0.02,0 ; gravity
+
+; Change collision method
+If KeyHit( 50 )=True
+method=method+1
+If method=4 Then method=1
+If method=1 Then method_info$="ellipsoid-to-sphere"
+If method=2 Then method_info$="ellipsoid-to-polygon"
+If method=3 Then method_info$="ellipsoid-to-box"
+EndIf
+
+; Change collision response
+If KeyHit( 19 )=True
+response=response+1
+If response=4 Then response=1
+If response=1 Then response_info$="stop"
+If response=2 Then response_info$="slide1"
+If response=3 Then response_info$="slide2"
+EndIf
+
+; Enable collisions between type_character and type_scenery
+Collisions type_character,type_scenery,method,response
+
+; Perform collision checking
+UpdateWorld
+
+RenderWorld
+
+Text 0,0,"Use cursor keys to move sphere"
+Text 0,20,"Press M to change collision Method (currently: "+method_info$+")"
+Text 0,40,"Press R to change collision Response (currently: "+response_info$+")"
+Text 0,60,"Collisions type_character,type_scenery,"+method+","+response
+
+Flip
+
+Wend
+
+End
+
+:UpdateWorld [anim_speed#]
+
+.args
+anim_speed# (optional) - a master control for animation speed. Defaults to 1.
+
+.desc
+Animates all entities in the world, and performs collision checking.
+The  optional anim_speed# parameter allows you affect the animation speed of all  entities at once. A value of 1 will animate entities at their usual animation  speed, a value of 2 will animate entities at double their animation speed, and  so on.  
+For best results use this command once per main loop, just before calling RenderWorld. 
+
+.code
+None.
+
+:CaptureWorld
+
+.args
+None.
+
+.desc
+CaptureWorld 'captures' the properties (position, rotation, scale, alpha etc) of each entity in the 3D world.
+This is then used in conjunction with the @RenderWorld tween parameter in order to render an interpolated frame between the captured state of each entity and the current state of each entity. See the @RenderWorld docs for a full explanation of render tweening.
+
+.also
+RenderWorld
+
+.code
+; CaptureWorld and RenderWorld with tween.
+
+; Left/Right arrow keys change tween. Escape quits.
+
+Const width = 640, height = 480
+Const KEY_ESC = 1, KEY_LEFT = 203, KEY_RIGHT = 205 
+
+Graphics3D 640, 480
+AmbientLight 50, 50, 50
+
+c1 = CreateCone( )
+PositionEntity c1, -5, 0, 0		; on the left side of the screen
+ScaleEntity c1, 1, 3, 1
+EntityColor c1, 255, 0, 0
+
+cam = CreateCamera()
+PositionEntity cam, 0, 0, -50
+CameraZoom cam, 4
+
+lt = CreateLight() : TurnEntity lt, 30, 40, 0
+
+
+c2 = CopyEntity( c1 )
+
+CaptureWorld	; with c1 and c2 identically placed
+
+MoveEntity c2, 8, 0, 0		; to the right side of the screen
+TurnEntity c2, 0, 0, 90		; and tilted
+
+tw# = 100		; 100 * tween
+
+; Interpolate between the pre-CaptureWorld ( tween = 0 )
+; arrangement and the current one ( tween = 1 ).
+
+While Not KeyDown( KEY_ESC )
+
+If KeyDown( KEY_LEFT  ) Then tw = tw - 1
+If KeyDown( KEY_RIGHT ) Then tw = tw + 1
+RenderWorld tw / 100
+Text 250, 100, "tween = " + ( tw / 100 )
+Flip
+
+Wend
+
+End
+
+:RenderWorld [tween#]
+
+.args
+tween# (optional) - defaults to 1.
+
+.desc
+Renders the current scene to the BackBuffer onto the rectangle defined by each cameras CameraViewport( ). Every camera not hidden by HideEntity( ) or with a CameraProjMode( ) of 0 is rendered. Rendering to other buffers is currently not supported by Blitz3D.
+The optional tween parameter should only be specified when RenderWorld is used in conjunction with CaptureWorld. CaptureWorld is used to store the 'old' position, rotation and scale, alpha and colour of each entity in the game world, and a tween value of < 1 will interpolate between these 'old' values and the 'current' ones. A tween value of 0 will render all entities at their state when CaptureWorld was last called, and a tween value of 1 will render all entities at their current state.
+The use of tweening allows you to render more than one frame per game logic update, while still keeping the display smooth. This allows you to cut down on the CPU time that would be required to update your game logic every render. Note, however, that the bottleneck in almost all 3D applications is the graphics card and the CPU time involved in updating game logic is often very little. A good alternative to render tweening is the use of a delta time, that is, moving your entities each frame depending on the time it took for the program to process and render that frame.
+Render tweening is quite an advanced technique, and it is not necessary to  use it, so don't worry if you don't quite understand it. See the castle demo  included in the mak (nickname of Mark Sibly, author of Blitz3D) directory of  the Blitz3D samples section for a demonstration of render tweening.
+
+.also
+CaptureWorld;CameraViewport;CameraProjMode
+
+.code
+None.
+
+:ClearWorld [entities][,brushes][,textures]
+
+.args
+entities (optional) - True to clear all entities, False not to. Defaults  to true.
+brushes (optional) - True to clear all brushes, False not to. Defaults to true.
+textures (optional) - True to clear all textures, False not to. Defaults to  true.
+
+.desc
+Clears all entities, brushes and/or textures from the screen and from memory.
+As soon as you clear something, you will not be able to use it again until you  reload it. Trying to do so will cause a runtime error. 
+This command is useful for when a level has finished and you wish to load  a different level with new entities, brushes and textures. 
+
+.code
+None.
+
+:LoaderMatrix file_extension$,xx#,xy#,xz#,yx#,yy#,yz#,zx#,zy#,zz#
+
+.args
+file extension$ - file extension of 3d file, e.g. ".x",".3ds"
+xx# - 1,1 element of 3x3 matrix
+xy# - 2,1 element of 3x3 matrix
+xz# - 3,1 element of 3x3 matrix
+yx# - 1,2 element of 3x3 matrix
+yy# - 2,2 element of 3x3 matrix
+yz# - 3,2 element of 3x3 matrix
+zx# - 1,3 element of 3x3 matrix
+zy# - 2,3 element of 3x3 matrix
+zz# - 3,3 element of 3x3 matrix
+
+.desc
+Sets a matrix for 3d files loaded with the specified file extension.
+This  can be used to change coordinate systems when loading. 
+By default, the following loader matrices are used: 
+LoaderMatrix "x",1,0,0,0,1,0,0,0,1 ; no change in coord systemLoaderMatrix "3ds",1,0,0,0,0,1,0,1,0 ; swap y/z axis' 
+You can use LoaderMatrix to flip meshes/animations if necessary, eg: 
+LoaderMatrix "x",-1,0,0,0,1,0,0,0,1 ; flip x-cords for ".x" filesLoaderMatrix "3ds",-1,0,0,0,0,-1,0,1,0 ; swap y/z, negate x/z for ".3ds" files 
+
+.code
+None.
+
+:TrisRendered()
+
+.args
+None.
+
+.desc
+Returns the number of triangles rendered during the most recent RenderWorld.
+Useful for debugging purposes -  to see if you're displaying, too many, or too little, polygons. 
+
+.code
+; TrisRendered Example
+; --------------------
+
+Graphics3D 640,480
+SetBuffer BackBuffer()
+
+camera=CreateCamera()
+PositionEntity camera,0,0,-2
+
+light=CreateLight()
+RotateEntity light,90,0,0
+
+segs=Rand( 2,16 )
+sphere=CreateSphere(segs)
+
+While Not KeyDown( 1 )
+
+If KeyHit( 57 )=True
+
+FreeEntity sphere
+segs=Rand( 2,16 )
+sphere=CreateSphere( segs )
+
+EndIf
+
+RenderWorld
+
+Text 0,0,"Press space to create a sphere with a random segments value"
+
+; Display triangles rendered
+Text 0,20,"Triangles Rendered: "+TrisRendered()
+
+Flip
+
+Wend
+
+End
+
